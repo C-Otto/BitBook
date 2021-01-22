@@ -1,0 +1,8 @@
+plugins {
+    id 'bitbook.java-library-conventions'
+    id 'java-test-fixtures'
+}
+
+dependencies {
+    api project(':backend')
+}

@@ -1,0 +1,13 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%relative %-3p %m%rEx{2} [%logger]%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="de.cotto.bitbook" level="DEBUG" />
+
+    <root level="warn">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

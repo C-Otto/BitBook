@@ -1,0 +1,21 @@
+plugins {
+    id 'bitbook.java-conventions'
+}
+
+dependencies {
+    implementation project(':backend-price')
+    implementation project(':backend-transaction')
+    implementation project(':backend-transaction-providers')
+    implementation project(':backend')
+    implementation project(':ownership-cli')
+    implementation project(':cli-base')
+    testImplementation testFixtures(project(':backend-transaction'))
+    testImplementation testFixtures(project(':backend-transaction-models'))
+}
+
+bootJar {
+    archiveClassifier.set('boot')
+}
+bootRun {
+    standardInput = System.in
+}

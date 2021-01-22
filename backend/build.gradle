@@ -1,0 +1,30 @@
+plugins {
+    id 'bitbook.java-library-conventions'
+}
+
+ext {
+    set('springCloudVersion', '2020.0.2')
+}
+
+dependencies {
+    api platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
+    api 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    api 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+    api 'io.github.resilience4j:resilience4j-spring-boot2:1.7.0'
+    api 'com.fasterxml.jackson.core:jackson-databind'
+    api 'org.springframework.boot:spring-boot-starter-data-jpa'
+    api 'com.google.guava:guava:30.1.1-jre'
+    runtimeOnly 'com.h2database:h2'
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rules.forEach {rule ->
+            rule.limits.forEach {limit ->
+                if (limit.counter == 'CLASS') {
+                    limit.minimum = 0.8
+                }
+            }
+        }
+    }
+}

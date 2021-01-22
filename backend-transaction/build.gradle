@@ -1,0 +1,20 @@
+plugins {
+    id 'bitbook.java-library-conventions'
+    id 'java-test-fixtures'
+}
+
+dependencies {
+    api project(':backend')
+    api project(':backend-transaction-models')
+    implementation project(':backend-address-transactions')
+    implementation project(':backend-blockheight')
+    implementation project(':backend-price')
+    implementation project(':backend-request')
+    testImplementation testFixtures(project(':backend-transaction-models'))
+    testImplementation testFixtures(project(':backend-address-transactions'))
+    testFixturesImplementation testFixtures(project(':backend-transaction-models'))
+    testFixturesImplementation testFixtures(project(':backend-address-transactions'))
+    testFixturesImplementation 'javax.persistence:javax.persistence-api'
+    testFixturesImplementation project(':backend')
+    testFixturesImplementation project(':backend-request-models')
+}

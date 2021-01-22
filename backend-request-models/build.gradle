@@ -1,0 +1,7 @@
+plugins {
+    id 'bitbook.java-library-conventions'
+}
+
+dependencies {
+    implementation project(':backend')
+}

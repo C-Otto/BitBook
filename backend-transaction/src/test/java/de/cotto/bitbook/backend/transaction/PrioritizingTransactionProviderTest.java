@@ -1,0 +1,137 @@
+package de.cotto.bitbook.backend.transaction;
+
+import de.cotto.bitbook.backend.transaction.model.Transaction;
+import feign.FeignException;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
+import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
+import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
+import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+class PrioritizingTransactionProviderTest {
+    private static final String OTHER_HASH = "xxx";
+
+    private final ExecutorService executor = Executors.newFixedThreadPool(5);
+
+    private PrioritizingTransactionProvider prioritizingTransactionProvider;
+    private TransactionProvider transactionProvider1;
+    private TransactionProvider transactionProvider2;
+
+    @BeforeEach
+    void setUp() {
+        transactionProvider1 = mock(TransactionProvider.class);
+        transactionProvider2 = mock(TransactionProvider.class);
+        prioritizingTransactionProvider =
+                new PrioritizingTransactionProvider(List.of(transactionProvider1, transactionProvider2));
+    }
+
+    @Test
+    void getTransaction() {
+        when(transactionProvider1.get(any())).thenReturn(Optional.of(TRANSACTION));
+        when(transactionProvider2.get(any())).thenReturn(Optional.of(TRANSACTION));
+        assertThat(get()).isEqualTo(TRANSACTION);
+    }
+
+    @Test
+    void uses_second_provider_if_first_is_rate_limited() {
+        when(transactionProvider1.get(any())).thenThrow(RequestNotPermitted.class);
+        when(transactionProvider2.get(any())).thenReturn(Optional.of(TRANSACTION));
+        assertThat(get()).isEqualTo(TRANSACTION);
+    }
+
+    @Test
+    void uses_second_provider_if_first_has_feign_failure() {
+        when(transactionProvider1.get(any())).thenThrow(FeignException.class);
+        when(transactionProvider2.get(any())).thenReturn(Optional.of(TRANSACTION));
+        assertThat(get()).isEqualTo(TRANSACTION);
+    }
+
+    @Test
+    void uses_second_provider_if_first_is_disabled_via_circuit_breaker() {
+        when(transactionProvider1.get(any())).thenThrow(CallNotPermittedException.class);
+        when(transactionProvider2.get(any())).thenReturn(Optional.of(TRANSACTION));
+        assertThat(get()).isEqualTo(TRANSACTION);
+    }
+
+    @Test
+    void gives_unknown_transaction_if_all_providers_fail() {
+        mockAllFail();
+        assertThat(get()).isEqualTo(Transaction.UNKNOWN);
+    }
+
+    @Test
+    void clears_lowest_priority_requests_if_all_providers_fail() {
+        mockAllFail();
+        executor.execute(() -> prioritizingTransactionProvider.getTransaction(
+                new TransactionRequest(OTHER_HASH, LOWEST)
+        ));
+
+        get(1);
+
+        verify(transactionProvider1, never()).get(OTHER_HASH);
+        verify(transactionProvider2, never()).get(OTHER_HASH);
+    }
+
+    @Test
+    void retains_all_but_lowest_priority_requests_if_all_providers_fail() {
+        mockAllFail();
+        executor.execute(() -> prioritizingTransactionProvider.getTransaction(
+                new TransactionRequest(OTHER_HASH, STANDARD)
+        ));
+        executor.execute(() -> prioritizingTransactionProvider.getTransaction(
+                new TransactionRequest(TRANSACTION_HASH, STANDARD)
+        ));
+        workOnRequestsInBackground(2);
+
+        verify(transactionProvider1, timeout(1_000)).get(TRANSACTION_HASH);
+        verify(transactionProvider1, timeout(1_000)).get(OTHER_HASH);
+        verify(transactionProvider2, timeout(1_000)).get(TRANSACTION_HASH);
+        verify(transactionProvider2, timeout(1_000)).get(OTHER_HASH);
+    }
+
+    @Test
+    void getProvidedResultName() {
+        assertThat(prioritizingTransactionProvider.getProvidedResultName()).isEqualTo("Transaction details");
+    }
+
+    private Transaction get() {
+        return get(0);
+    }
+
+    private Transaction get(int expectedSize) {
+        TransactionRequest request = new TransactionRequest(TRANSACTION_HASH, STANDARD);
+        workOnRequestsInBackground(expectedSize + 1);
+        return prioritizingTransactionProvider.getTransaction(request);
+    }
+
+    private void workOnRequestsInBackground(int expectedSize) {
+        executor.execute(() -> {
+            await().until(
+                    () -> prioritizingTransactionProvider.getRequestQueue().size() == expectedSize
+            );
+            prioritizingTransactionProvider.workOnRequests();
+        });
+    }
+
+    private void mockAllFail() {
+        when(transactionProvider1.get(any())).thenThrow(CallNotPermittedException.class);
+        when(transactionProvider2.get(any())).thenThrow(RequestNotPermitted.class);
+    }
+}

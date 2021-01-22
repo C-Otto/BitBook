@@ -1,0 +1,9 @@
+.gradle
+build/
+out/
+!gradle/wrapper/gradle-wrapper.jar
+
+.idea
+
+bitbook.log
+bitbook.db.*
