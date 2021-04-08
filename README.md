@@ -29,6 +29,9 @@ in some other way.
 If you transfer the coins back to your own wallet, you can continue using BitBook by
 marking the address as owned.
 
+### How do I start BitBook?
+Please have a look at the [Frequently Asked Questions (FAQ)](documentation/faq.md).
+
 ### Further Information
 * [Example](documentation/example.md)
 * [Frequently Asked Questions (FAQ)](documentation/faq.md)
