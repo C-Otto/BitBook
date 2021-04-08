@@ -30,9 +30,10 @@ If you transfer the coins back to your own wallet, you can continue using BitBoo
 marking the address as owned.
 
 ### Further Information
+* [Example](documentation/example.md)
+* [Frequently Asked Questions (FAQ)](documentation/faq.md)
+* [Feature Requests and Bug Reports](documentation/features_and_bugs.md)
 * [Known Limitations](documentation/limitations.md)
+* [Future Ideas](documentation/ideas.md)
 * [Technical Aspects](documentation/technical.md)
 * [Contributing to BitBook](documentation/contributing.md)
-* [Feature Requests and Bug Reports](documentation/features_and_bugs.md)
-* [Frequently Asked Questions (FAQ)](documentation/faq.md)
-* [Future Ideas](documentation/ideas.md)
