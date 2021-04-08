@@ -1,6 +1,6 @@
 # Example Run
 **In the following examples all addresses and transactions are randomly taken from the Bitcoin
-blockchain and all ownership details are purely fictionary!**
+blockchain and all ownership details are purely fictional!**
 
 ![Example Run as gif](bitbook.gif)
 
