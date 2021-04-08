@@ -4,6 +4,7 @@ import org.springframework.boot.ansi.AnsiColor;
 import org.springframework.boot.ansi.AnsiOutput;
 
 import javax.annotation.Nonnull;
+import java.util.Locale;
 
 public class Coins implements Comparable<Coins> {
     public static final int SATOSHIS_IN_COIN = 100_000_000;
@@ -65,7 +66,7 @@ public class Coins implements Comparable<Coins> {
 
     @Nonnull
     private String getWithoutColor() {
-        String result = String.format("%13.8f", satoshis * 1.0 / Coins.SATOSHIS_IN_COIN);
+        String result = String.format(Locale.ENGLISH, "%13.8f", satoshis * 1.0 / Coins.SATOSHIS_IN_COIN);
         StringBuilder suffix = new StringBuilder();
         while (result.endsWith("0")) {
             result = withoutLastCharacter(result);
