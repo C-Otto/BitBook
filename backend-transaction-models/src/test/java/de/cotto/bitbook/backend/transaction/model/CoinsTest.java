@@ -3,6 +3,8 @@ package de.cotto.bitbook.backend.transaction.model;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
+import java.util.Locale;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CoinsTest {
@@ -92,6 +94,17 @@ class CoinsTest {
     @Test
     void justMilliCoins() {
         assertThat(Coins.ofSatoshis(12_300_000)).hasToString("   0.123     ");
+    }
+
+    @Test
+    void formats_decimal_point_with_english_locale() {
+        Locale defaultLocale = Locale.getDefault();
+        Locale.setDefault(Locale.GERMAN);
+        try {
+            assertThat(Coins.ofSatoshis(12_300_000)).hasToString("   0.123     ");
+        } finally {
+            Locale.setDefault(defaultLocale);
+        }
     }
 
     @Test
