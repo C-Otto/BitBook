@@ -17,7 +17,7 @@ jobs:
     - name: Configure cache
       uses: actions/cache@v2
       env:
-        cache-name: gradle-cache
+        cache-name: gradle
       with:
         path: ~/.gradle/caches/build-cache*
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ github.sha }}
