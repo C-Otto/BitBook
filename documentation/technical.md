@@ -19,12 +19,11 @@ I picked this version mostly in order to experiment with tool support, whereas f
 text blocks are nice additions. From a technical point of view, Java 11 support shouldn't be too hard to do.
 Due to limitations in tools like Nullaway, I don't use records. Hopefully this changes soon!
 
-### Gradle 7
-Gradle 6 does not support Java 16, and Gradle 7 is not released, yet. As such, BitBook
-uses the most current release candidate which is Gradle 7 RC2. The project is split into
-several subprojects, making use of test fixtures and different source sets for tests and
-integration tests. The build can be parallelized on suitable hardware, and by using build
-caches incremental builds should be rather fast.
+### Gradle 
+The project is split into several subprojects, making use of test fixtures and
+different source sets for tests and integration tests. The build can be
+parallelized on suitable hardware, and by using build caches incremental builds
+should be rather fast.
 
 ### Requests
 BitBook uses several APIs to download address/transaction information.
