@@ -15,6 +15,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("CPD-START")
 @ExtendWith(MockitoExtension.class)
 class TransactionWithDescriptionDaoImplTest {
     @InjectMocks

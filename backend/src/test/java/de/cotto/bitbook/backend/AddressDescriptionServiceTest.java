@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("CPD-START")
 @ExtendWith(MockitoExtension.class)
 class AddressDescriptionServiceTest {
     private static final String ADDRESS = "foo";
