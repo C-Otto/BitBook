@@ -40,6 +40,11 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class TransactionsCommandsTest {
     private static final String EXPECTED = "expected";
+    private static final String DESCRIPTION = "some description";
+
+    private static final CliAddress CLI_ADDRESS_INVALID = new CliAddress("y");
+    private static final CliTransactionHash CLI_TRANSACTION_HASH = new CliTransactionHash(TRANSACTION_HASH);
+    private static final CliTransactionHash CLI_TRANSACTION_HASH_INVALID = new CliTransactionHash("x");
 
     @InjectMocks
     private TransactionsCommands transactionsCommands;
@@ -66,28 +71,20 @@ class TransactionsCommandsTest {
     void getTransactionDetails() {
         when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(TRANSACTION);
         when(transactionFormatter.format(TRANSACTION)).thenReturn(EXPECTED);
-        String details = transactionsCommands.getTransactionDetails(TRANSACTION_HASH);
+        String details = transactionsCommands.getTransactionDetails(CLI_TRANSACTION_HASH);
         assertThat(details).isEqualTo(EXPECTED);
     }
 
     @Test
-    void getTransactionDetails_removes_non_hex_characters() {
-        when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(TRANSACTION);
-        when(transactionFormatter.format(TRANSACTION)).thenReturn(EXPECTED);
-        String details = transactionsCommands.getTransactionDetails(" x" + TRANSACTION_HASH + ":,! ");
-        assertThat(details).isEqualTo(EXPECTED);
-    }
-
-    @Test
-    void getTransactionDetails_too_short() {
-        assertThat(transactionsCommands.getTransactionDetails("abc"))
+    void getTransactionDetails_invalid() {
+        assertThat(transactionsCommands.getTransactionDetails(CLI_TRANSACTION_HASH_INVALID))
                 .isEqualTo("Expected: 64 hex characters");
         verifyNoInteractions(transactionService);
     }
 
     @Test
     void getAddressTransactions_wrong_address() {
-        assertThat(transactionsCommands.getAddressTransactions(new CliAddress("xxx")))
+        assertThat(transactionsCommands.getAddressTransactions(CLI_ADDRESS_INVALID))
                 .isEqualTo(CliAddress.ERROR_MESSAGE);
     }
 
@@ -132,6 +129,7 @@ class TransactionsCommandsTest {
         when(transactionFormatter.formatSingleLineForAddress(TRANSACTION, address)).thenReturn("f1");
         when(transactionFormatter.formatSingleLineForAddress(TRANSACTION_2, address)).thenReturn("f2");
         when(transactionFormatter.formatSingleLineForAddress(transaction3, address)).thenReturn("f3");
+
         String addressTransactions = transactionsCommands.getAddressTransactions(new CliAddress(address));
 
         assertThat(addressTransactions).isEqualTo("""
@@ -151,9 +149,38 @@ class TransactionsCommandsTest {
         when(addressTransactionsService.getTransactions(ADDRESS)).thenReturn(ADDRESS_TRANSACTIONS);
         when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
                 .thenReturn(Set.of(TRANSACTION, TRANSACTION_2));
+
         String addressTransactions = transactionsCommands.getAddressTransactions(new CliAddress(ADDRESS));
 
         assertThat(addressTransactions).startsWith("Address: 1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD ? (description)");
+    }
+
+    @Test
+    void setTransactionDescription() {
+        String result = transactionsCommands.setTransactionDescription(CLI_TRANSACTION_HASH, DESCRIPTION);
+        assertThat(result).isEqualTo("OK");
+        verify(transactionDescriptionService).set(TRANSACTION_HASH, DESCRIPTION);
+    }
+
+    @Test
+    void setTransactionDescription_invalid() {
+        String result = transactionsCommands.setTransactionDescription(CLI_TRANSACTION_HASH_INVALID, DESCRIPTION);
+        assertThat(result).isEqualTo(CliTransactionHash.ERROR_MESSAGE);
+        verifyNoInteractions(transactionDescriptionService);
+    }
+
+    @Test
+    void removeTransactionDescription() {
+        String result = transactionsCommands.removeTransactionDescription(CLI_TRANSACTION_HASH);
+        assertThat(result).isEqualTo("OK");
+        verify(transactionDescriptionService).remove(TRANSACTION_HASH);
+    }
+
+    @Test
+    void removeTransactionDescription_invalid() {
+        String result = transactionsCommands.removeTransactionDescription(CLI_TRANSACTION_HASH_INVALID);
+        assertThat(result).isEqualTo(CliTransactionHash.ERROR_MESSAGE);
+        verifyNoInteractions(transactionDescriptionService);
     }
 
     private void prepareMocks() {
@@ -162,19 +189,5 @@ class TransactionsCommandsTest {
         when(addressFormatter.getFormattedOwnershipStatus(ADDRESS)).thenReturn("?");
         when(transactionFormatter.formatSingleLineForAddress(any(), any()))
                 .then(invocation -> invocation.getArgument(0) + "/" + invocation.getArgument(1));
-    }
-
-    @Test
-    void setTransactionDescription() {
-        String result = transactionsCommands.setTransactionDescription(TRANSACTION_HASH, "xxx");
-        assertThat(result).isEqualTo("OK");
-        verify(transactionDescriptionService).set(TRANSACTION_HASH, "xxx");
-    }
-
-    @Test
-    void removeTransactionDescription() {
-        String result = transactionsCommands.removeTransactionDescription(TRANSACTION_HASH);
-        assertThat(result).isEqualTo("OK");
-        verify(transactionDescriptionService).remove(TRANSACTION_HASH);
     }
 }

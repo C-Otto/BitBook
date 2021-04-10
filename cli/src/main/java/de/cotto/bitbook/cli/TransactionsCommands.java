@@ -24,7 +24,6 @@ import static java.util.stream.Collectors.toMap;
 @ShellComponent
 public class TransactionsCommands {
 
-    private static final int TRANSACTION_HASH_LENGTH = 64;
     private final TransactionService transactionService;
     private final AddressTransactionsService addressTransactionsService;
     private final AddressDescriptionService addressDescriptionService;
@@ -50,13 +49,12 @@ public class TransactionsCommands {
 
     @ShellMethod("Get data for a given transaction")
     public String getTransactionDetails(
-            @ShellOption(valueProvider = TransactionHashCompletionProvider.class) String transactionHash
+            @ShellOption(valueProvider = TransactionHashCompletionProvider.class) CliTransactionHash transactionHash
     ) {
-        String hashJustHexCharacters = transactionHash.replaceAll("[^a-fA-F0-9]", "");
-        if (hashJustHexCharacters.length() < TRANSACTION_HASH_LENGTH) {
-            return "Expected: 64 hex characters";
+        if (transactionHash.getTransactionHash().isBlank()) {
+            return CliTransactionHash.ERROR_MESSAGE;
         }
-        Transaction transaction = transactionService.getTransactionDetails(hashJustHexCharacters);
+        Transaction transaction = transactionService.getTransactionDetails(transactionHash.getTransactionHash());
         return transactionFormatter.format(transaction);
     }
 
@@ -85,18 +83,25 @@ public class TransactionsCommands {
     @SuppressWarnings("PMD.LinguisticNaming")
     @ShellMethod("Sets a description for the transaction")
     public String setTransactionDescription(
-            @ShellOption(valueProvider = TransactionHashCompletionProvider.class) String transactionHash,
+            @ShellOption(valueProvider = TransactionHashCompletionProvider.class) CliTransactionHash transactionHash,
             @ShellOption(defaultValue = "") String description
     ) {
-        transactionDescriptionService.set(transactionHash, description);
+        if (transactionHash.getTransactionHash().isBlank()) {
+            return CliTransactionHash.ERROR_MESSAGE;
+        }
+        transactionDescriptionService.set(transactionHash.getTransactionHash(), description);
         return "OK";
     }
 
     @ShellMethod("Removes a description for the transaction")
     public String removeTransactionDescription(
-            @ShellOption(valueProvider = TransactionWithDescriptionCompletionProvider.class) String transactionHash
+            @ShellOption(valueProvider = TransactionWithDescriptionCompletionProvider.class)
+                    CliTransactionHash transactionHash
     ) {
-        transactionDescriptionService.remove(transactionHash);
+        if (transactionHash.getTransactionHash().isBlank()) {
+            return CliTransactionHash.ERROR_MESSAGE;
+        }
+        transactionDescriptionService.remove(transactionHash.getTransactionHash());
         return "OK";
     }
 
