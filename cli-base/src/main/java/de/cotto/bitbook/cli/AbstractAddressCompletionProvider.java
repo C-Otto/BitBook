@@ -1,5 +1,6 @@
 package de.cotto.bitbook.cli;
 
+import com.google.common.base.Functions;
 import com.google.common.collect.Streams;
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
@@ -11,10 +12,13 @@ import org.springframework.shell.CompletionContext;
 import org.springframework.shell.CompletionProposal;
 import org.springframework.shell.standard.ValueProviderSupport;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 public abstract class AbstractAddressCompletionProvider extends ValueProviderSupport {
     private static final int MINIMUM_LENGTH_FOR_COMPLETION = 3;
@@ -41,25 +45,32 @@ public abstract class AbstractAddressCompletionProvider extends ValueProviderSup
         if (isTooShort(input)) {
             return List.of();
         }
-        Stream<CompletionProposal> completedFromAddressTransactions =
-                addressCompletionDao.completeFromAddressTransactions(input).stream()
-                .map(addressDescriptionService::get)
-                .filter(this::shouldConsider)
-                .map(this::getCompletionProposal);
-        Stream<CompletionProposal> completedFromInputOutputs =
-                addressCompletionDao.completeFromInputsAndOutputs(input).stream()
-                        .map(addressDescriptionService::get)
-                        .filter(this::shouldConsider)
-                        .map(this::getCompletionProposal);
+        Stream<CompletionProposal> completedFromAddressTransactions = toProposals(
+                addressCompletionDao.completeFromAddressTransactions(input)
+        );
+        Stream<CompletionProposal> completedFromInputOutputs = toProposals(
+                addressCompletionDao.completeFromInputsAndOutputs(input)
+        );
         Stream<CompletionProposal> completedDescriptions =
                 addressDescriptionService.getAddressesWithDescriptionInfix(input).stream()
                         .map(this::getCompletionProposalWithDescriptionInValue);
         return Streams.concat(completedFromAddressTransactions, completedFromInputOutputs, completedDescriptions)
-                .sorted(Comparator.comparing(CompletionProposal::value))
-                .collect(Collectors.toList());
+                .collect(toMap(CompletionProposal::value, Functions.identity(), (a, b) -> a))
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(Map.Entry::getValue)
+                .collect(toList());
     }
 
     protected abstract boolean shouldConsider(AddressWithDescription addressWithDescription);
+
+    private Stream<CompletionProposal> toProposals(Set<String> addresses) {
+        return addresses.stream()
+                .map(addressDescriptionService::get)
+                .filter(this::shouldConsider)
+                .map(this::getCompletionProposal);
+    }
 
     private boolean isTooShort(String input) {
         if (input.startsWith("bc1")) {

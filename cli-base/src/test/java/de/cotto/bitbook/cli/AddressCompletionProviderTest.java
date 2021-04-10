@@ -83,6 +83,20 @@ class AddressCompletionProviderTest {
     }
 
     @Test
+    void complete_no_duplicates() {
+        AddressWithDescription addressWithDescription = new AddressWithDescription(ADDRESS);
+        when(addressDescriptionService.get(ADDRESS)).thenReturn(addressWithDescription);
+        when(addressCompletionDao.completeFromAddressTransactions(input)).thenReturn(Set.of(ADDRESS));
+        when(addressCompletionDao.completeFromInputsAndOutputs(input)).thenReturn(Set.of(ADDRESS));
+
+        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
+
+        assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
+                new CompletionProposal(ADDRESS)
+        );
+    }
+
+    @Test
     void complete_description() {
         when(addressDescriptionService.getAddressesWithDescriptionInfix(input))
                 .thenReturn(Set.of(addressWithDescription));
