@@ -1,6 +1,7 @@
 package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
@@ -32,6 +33,7 @@ import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRA
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -56,6 +58,9 @@ class TransactionsCommandsTest {
 
     @Mock
     private AddressFormatter addressFormatter;
+
+    @Mock
+    private TransactionDescriptionService transactionDescriptionService;
 
     @Test
     void getTransactionDetails() {
@@ -157,5 +162,19 @@ class TransactionsCommandsTest {
         when(addressFormatter.getFormattedOwnershipStatus(ADDRESS)).thenReturn("?");
         when(transactionFormatter.formatSingleLineForAddress(any(), any()))
                 .then(invocation -> invocation.getArgument(0) + "/" + invocation.getArgument(1));
+    }
+
+    @Test
+    void setTransactionDescription() {
+        String result = transactionsCommands.setTransactionDescription(TRANSACTION_HASH, "xxx");
+        assertThat(result).isEqualTo("OK");
+        verify(transactionDescriptionService).set(TRANSACTION_HASH, "xxx");
+    }
+
+    @Test
+    void removeTransactionDescription() {
+        String result = transactionsCommands.removeTransactionDescription(TRANSACTION_HASH);
+        assertThat(result).isEqualTo("OK");
+        verify(transactionDescriptionService).remove(TRANSACTION_HASH);
     }
 }
