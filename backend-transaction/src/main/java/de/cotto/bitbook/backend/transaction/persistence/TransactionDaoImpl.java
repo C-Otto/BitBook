@@ -5,8 +5,6 @@ import de.cotto.bitbook.backend.transaction.model.Transaction;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 @Transactional
@@ -27,12 +25,5 @@ public class TransactionDaoImpl implements TransactionDao {
     @Override
     public void saveTransaction(Transaction transaction) {
         transactionRepository.save(TransactionJpaDto.fromModel(transaction));
-    }
-
-    @Override
-    public Set<String> getTransactionHashesStartingWith(String hashPrefix) {
-        return transactionRepository.findByHashStartingWith(hashPrefix).stream()
-                .map(TransactionHashView::getHash)
-                .collect(Collectors.toSet());
     }
 }

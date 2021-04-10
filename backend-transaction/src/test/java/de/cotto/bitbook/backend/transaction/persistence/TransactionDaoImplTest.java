@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.ZoneOffset;
 import java.util.Optional;
-import java.util.Set;
 
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.DATE_TIME;
@@ -43,13 +42,6 @@ class TransactionDaoImplTest {
         Transaction transaction = transactionDao.getTransaction(TRANSACTION_HASH);
 
         assertThat(transaction).isEqualTo(TRANSACTION);
-    }
-
-    @Test
-    void getTransactionsStartingWith() {
-        String prefix = TRANSACTION_HASH.substring(0, 3);
-        when(transactionRepository.findByHashStartingWith(prefix)).thenReturn(Set.of(() -> TRANSACTION_HASH));
-        assertThat(transactionDao.getTransactionHashesStartingWith(prefix)).containsExactly(TRANSACTION_HASH);
     }
 
     @Test

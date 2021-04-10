@@ -1,6 +1,6 @@
 package de.cotto.bitbook.cli;
 
-import de.cotto.bitbook.backend.transaction.TransactionDao;
+import de.cotto.bitbook.backend.transaction.TransactionCompletionDao;
 import org.springframework.core.MethodParameter;
 import org.springframework.shell.CompletionContext;
 import org.springframework.shell.CompletionProposal;
@@ -14,11 +14,11 @@ import java.util.stream.Collectors;
 public class TransactionHashCompletionProvider extends ValueProviderSupport {
     private static final int MINIMUM_LENGTH_FOR_COMPLETION = 3;
 
-    private final TransactionDao transactionDao;
+    private final TransactionCompletionDao transactionCompletionDao;
 
-    public TransactionHashCompletionProvider(TransactionDao transactionDao) {
+    public TransactionHashCompletionProvider(TransactionCompletionDao transactionCompletionDao) {
         super();
-        this.transactionDao = transactionDao;
+        this.transactionCompletionDao = transactionCompletionDao;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class TransactionHashCompletionProvider extends ValueProviderSupport {
         if (prefix.length() < MINIMUM_LENGTH_FOR_COMPLETION) {
             return List.of();
         }
-        return transactionDao.getTransactionHashesStartingWith(prefix).stream()
+        return transactionCompletionDao.getTransactionHashesStartingWith(prefix).stream()
                 .map(CompletionProposal::new)
                 .collect(Collectors.toList());
     }

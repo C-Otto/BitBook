@@ -1,6 +1,6 @@
 package de.cotto.bitbook.cli;
 
-import de.cotto.bitbook.backend.transaction.TransactionDao;
+import de.cotto.bitbook.backend.transaction.TransactionCompletionDao;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,7 +24,7 @@ class TransactionHashCompletionProviderTest {
     private TransactionHashCompletionProvider completionProvider;
 
     @Mock
-    private TransactionDao transactionDao;
+    private TransactionCompletionDao transactionCompletionDao;
 
     private final String[] hints = new String[0];
     @Mock
@@ -35,7 +35,7 @@ class TransactionHashCompletionProviderTest {
     @Test
     void complete() {
         when(context.currentWordUpToCursor()).thenReturn("abc");
-        when(transactionDao.getTransactionHashesStartingWith("abc")).thenReturn(Set.of(TRANSACTION_HASH));
+        when(transactionCompletionDao.getTransactionHashesStartingWith("abc")).thenReturn(Set.of(TRANSACTION_HASH));
 
         List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
 
@@ -47,6 +47,6 @@ class TransactionHashCompletionProviderTest {
     void does_not_complete_short_hash() {
         when(context.currentWordUpToCursor()).thenReturn("ab");
         assertThat(completionProvider.complete(methodParameter, context, hints)).isEmpty();
-        verifyNoInteractions(transactionDao);
+        verifyNoInteractions(transactionCompletionDao);
     }
 }
