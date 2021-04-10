@@ -88,7 +88,6 @@ class TransactionHashCompletionProviderTest {
     void complete_from_address_transaction_hashes() {
         when(transactionDescriptionService.get(any()))
                 .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
-        when(context.currentWordUpToCursor()).thenReturn(PREFIX);
         when(transactionCompletionDao.completeFromAddressTransactionHashes(PREFIX))
                 .thenReturn(Set.of(TRANSACTION_HASH));
 
