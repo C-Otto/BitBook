@@ -3,6 +3,7 @@ package de.cotto.bitbook.cli;
 import com.google.common.base.Functions;
 import com.google.common.collect.Sets;
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
@@ -27,6 +28,7 @@ public class TransactionsCommands {
     private final TransactionService transactionService;
     private final AddressTransactionsService addressTransactionsService;
     private final AddressDescriptionService addressDescriptionService;
+    private final TransactionDescriptionService transactionDescriptionService;
     private final TransactionFormatter transactionFormatter;
     private final AddressFormatter addressFormatter;
 
@@ -34,12 +36,14 @@ public class TransactionsCommands {
             TransactionService transactionService,
             AddressTransactionsService addressTransactionsService,
             AddressDescriptionService addressDescriptionService,
+            TransactionDescriptionService transactionDescriptionService,
             TransactionFormatter transactionFormatter,
             AddressFormatter addressFormatter
     ) {
         this.transactionService = transactionService;
         this.addressTransactionsService = addressTransactionsService;
         this.addressDescriptionService = addressDescriptionService;
+        this.transactionDescriptionService = transactionDescriptionService;
         this.transactionFormatter = transactionFormatter;
         this.addressFormatter = addressFormatter;
     }
@@ -76,6 +80,24 @@ public class TransactionsCommands {
                 .append("):\n")
                 .append(formattedHashesSortedByDifferenceForAddress(hashes, addressString));
         return StringUtils.stripEnd(result.toString(), "\n");
+    }
+
+    @SuppressWarnings("PMD.LinguisticNaming")
+    @ShellMethod("Sets a description for the transaction")
+    public String setTransactionDescription(
+            @ShellOption(valueProvider = TransactionHashCompletionProvider.class) String transactionHash,
+            @ShellOption(defaultValue = "") String description
+    ) {
+        transactionDescriptionService.set(transactionHash, description);
+        return "OK";
+    }
+
+    @ShellMethod("Removes a description for the transaction")
+    public String removeTransactionDescription(
+            @ShellOption(valueProvider = TransactionWithDescriptionCompletionProvider.class) String transactionHash
+    ) {
+        transactionDescriptionService.remove(transactionHash);
+        return "OK";
     }
 
     private String formattedHashesSortedByDifferenceForAddress(List<String> hashes, String addressString) {
