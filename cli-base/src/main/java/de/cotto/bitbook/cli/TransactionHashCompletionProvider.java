@@ -1,46 +1,19 @@
 package de.cotto.bitbook.cli;
 
-import com.google.common.collect.Streams;
+import de.cotto.bitbook.backend.model.TransactionWithDescription;
 import de.cotto.bitbook.backend.transaction.TransactionCompletionDao;
-import org.springframework.core.MethodParameter;
-import org.springframework.shell.CompletionContext;
-import org.springframework.shell.CompletionProposal;
-import org.springframework.shell.standard.ValueProviderSupport;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 @Component
-public class TransactionHashCompletionProvider extends ValueProviderSupport {
-    private static final int MINIMUM_LENGTH_FOR_COMPLETION = 3;
-
-    private final TransactionCompletionDao transactionCompletionDao;
+public class TransactionHashCompletionProvider extends AbstractTransactionCompletionProvider {
 
     public TransactionHashCompletionProvider(TransactionCompletionDao transactionCompletionDao) {
-        super();
-        this.transactionCompletionDao = transactionCompletionDao;
+        super(transactionCompletionDao);
     }
 
     @Override
-    public List<CompletionProposal> complete(
-            MethodParameter methodParameter,
-            CompletionContext completionContext,
-            String[] hints
-    ) {
-        String prefix = completionContext.currentWordUpToCursor();
-        if (prefix.length() < MINIMUM_LENGTH_FOR_COMPLETION) {
-            return List.of();
-        }
-        Stream<String> fromTransactionDetails =
-                transactionCompletionDao.completeFromTransactionDetails(prefix).stream();
-        Stream<String> fromAddressTransactionHashes =
-                transactionCompletionDao.completeFromAddressTransactionHashes(prefix).stream();
-        return Streams.concat(fromTransactionDetails, fromAddressTransactionHashes)
-                .distinct()
-                .map(CompletionProposal::new)
-                .collect(Collectors.toList());
+    protected boolean shouldConsider(TransactionWithDescription transactionWithDescription) {
+        return true;
     }
 
 }
