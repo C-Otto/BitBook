@@ -1,6 +1,8 @@
 package de.cotto.bitbook.ownership.cli;
 
+import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
+import de.cotto.bitbook.backend.model.TransactionWithDescription;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.price.model.Price;
 import de.cotto.bitbook.backend.transaction.BalanceService;
@@ -14,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +29,7 @@ import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRA
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH_2;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -48,6 +52,9 @@ class OwnershipCommandsTest {
 
     @Mock
     private PriceFormatter priceFormatter;
+
+    @Mock
+    private TransactionDescriptionService transactionDescriptionService;
 
     @Test
     void getBalance() {
@@ -100,6 +107,8 @@ class OwnershipCommandsTest {
         when(priceService.getPrice(TRANSACTION_2.getTime())).thenReturn(price2);
         when(priceFormatter.format(coins1, price1)).thenReturn("p1");
         when(priceFormatter.format(coins2, price2)).thenReturn("p2");
+        when(transactionDescriptionService.get(any()))
+                .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
         when(addressOwnershipService.getNeighbourTransactions()).thenReturn(Map.of(
                 TRANSACTION, coins1,
                 TRANSACTION_2, coins2
@@ -111,7 +120,30 @@ class OwnershipCommandsTest {
     }
 
     @Test
+    void getNeighbourTransactions_with_description() {
+        TransactionWithDescription transactionWithDescription = new TransactionWithDescription(TRANSACTION_HASH, "foo");
+        TransactionWithDescription transactionWithoutDescription = new TransactionWithDescription(TRANSACTION_HASH_2);
+        when(transactionDescriptionService.get(TRANSACTION_HASH)).thenReturn(transactionWithDescription);
+        when(transactionDescriptionService.get(TRANSACTION_HASH_2)).thenReturn(transactionWithoutDescription);
+        String formattedDescription = transactionWithDescription.getFormattedDescription();
+
+        Coins coins = Coins.ofSatoshis(1);
+        when(priceService.getPrice(any(LocalDateTime.class))).thenReturn(Price.of(1));
+        when(priceFormatter.format(any(), any())).thenReturn("p");
+        when(addressOwnershipService.getNeighbourTransactions()).thenReturn(Map.of(
+                TRANSACTION, coins,
+                TRANSACTION_2, coins
+        ));
+        String line1 = TRANSACTION_2.getHash() + ": " + coins + " [p]";
+        String line2 = TRANSACTION.getHash() + ": " + coins + " [p] " + formattedDescription;
+        assertThat(ownershipCommands.getNeighbourTransactions())
+                .isEqualTo(String.join("\n", List.of(line1, line2)));
+    }
+
+    @Test
     void getNeighbourTransactions_sorted_by_hash() {
+        when(transactionDescriptionService.get(any()))
+                .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
         when(addressOwnershipService.getNeighbourTransactions()).thenReturn(Map.of(
                 TRANSACTION, Coins.ofSatoshis(1),
                 TRANSACTION_2, Coins.ofSatoshis(1),
@@ -123,6 +155,8 @@ class OwnershipCommandsTest {
 
     @Test
     void getNeighbourTransactions_does_not_show_zero_values() {
+        when(transactionDescriptionService.get(any()))
+                .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
         when(addressOwnershipService.getNeighbourTransactions()).thenReturn(Map.of(
                 TRANSACTION, Coins.NONE,
                 TRANSACTION_2, Coins.ofSatoshis(1)

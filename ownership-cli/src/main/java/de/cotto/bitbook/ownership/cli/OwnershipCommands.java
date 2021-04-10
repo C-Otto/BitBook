@@ -1,6 +1,7 @@
 package de.cotto.bitbook.ownership.cli;
 
 import com.google.common.base.Functions;
+import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.price.model.Price;
@@ -30,16 +31,19 @@ import static java.util.stream.Collectors.groupingBy;
 public class OwnershipCommands {
 
     private final AddressOwnershipService addressOwnershipService;
+    private final TransactionDescriptionService transactionDescriptionService;
     private final BalanceService balanceService;
     private final PriceService priceService;
     private final PriceFormatter priceFormatter;
 
     public OwnershipCommands(
             AddressOwnershipService addressOwnershipService,
+            TransactionDescriptionService transactionDescriptionService,
             BalanceService balanceService,
             PriceService priceService, PriceFormatter priceFormatter
     ) {
         this.addressOwnershipService = addressOwnershipService;
+        this.transactionDescriptionService = transactionDescriptionService;
         this.balanceService = balanceService;
         this.priceService = priceService;
         this.priceFormatter = priceFormatter;
@@ -135,10 +139,23 @@ public class OwnershipCommands {
                 .sorted(compareByTransactionHash)
                 .forEach(transactionWithCoins -> {
                     Transaction transaction = transactionWithCoins.getKey();
+                    String description =
+                            transactionDescriptionService.get(transaction.getHash()).getFormattedDescription();
+                    String descriptionSuffix;
+                    if (description.isBlank()) {
+                        descriptionSuffix = "";
+                    } else {
+                        descriptionSuffix = " " + description;
+                    }
                     Coins coins = transactionWithCoins.getValue();
                     Price price = priceService.getPrice(transaction.getTime());
                     String formattedPrice = priceFormatter.format(coins, price);
-                    result.append("%s: %s [%s]\n".formatted(transaction.getHash(), coins, formattedPrice));
+                    result.append("%s: %s [%s]%s\n".formatted(
+                            transaction.getHash(),
+                            coins,
+                            formattedPrice,
+                            descriptionSuffix
+                    ));
                 });
     }
 
