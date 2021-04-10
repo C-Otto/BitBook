@@ -52,7 +52,7 @@ public abstract class AbstractAddressCompletionProvider extends ValueProviderSup
                 addressCompletionDao.completeFromInputsAndOutputs(input)
         );
         Stream<CompletionProposal> completedDescriptions =
-                addressDescriptionService.getAddressesWithDescriptionInfix(input).stream()
+                addressDescriptionService.getWithDescriptionInfix(input).stream()
                         .map(this::getCompletionProposalWithDescriptionInValue);
         return Streams.concat(completedFromAddressTransactions, completedFromInputOutputs, completedDescriptions)
                 .collect(toMap(CompletionProposal::value, Functions.identity(), (a, b) -> a))

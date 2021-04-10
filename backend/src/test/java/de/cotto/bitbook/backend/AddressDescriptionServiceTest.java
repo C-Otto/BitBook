@@ -59,17 +59,17 @@ class AddressDescriptionServiceTest {
     }
 
     @Test
-    void getAddressesWithDescriptionInfix() {
+    void getWithDescriptionInfix() {
         String infix = "infix";
         AddressWithDescription expected = new AddressWithDescription("x", "y");
         when(addressWithDescriptionDao.findWithDescriptionInfix(infix)).thenReturn(Set.of(expected));
-        assertThat(service.getAddressesWithDescriptionInfix(infix)).containsExactly(expected);
+        assertThat(service.getWithDescriptionInfix(infix)).containsExactly(expected);
     }
 
     @Test
-    void getAddressesWithDescriptionInfix_too_short() {
+    void getWithDescriptionInfix_too_short() {
         String infix = "ab";
-        assertThat(service.getAddressesWithDescriptionInfix(infix)).isEmpty();
+        assertThat(service.getWithDescriptionInfix(infix)).isEmpty();
         verifyNoInteractions(addressWithDescriptionDao);
     }
 }

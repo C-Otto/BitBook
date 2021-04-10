@@ -10,6 +10,7 @@ import org.springframework.boot.ansi.AnsiOutput;
 import org.springframework.core.MethodParameter;
 import org.springframework.shell.CompletionContext;
 import org.springframework.shell.CompletionProposal;
+import org.springframework.shell.standard.ValueProviderSupport;
 
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,7 @@ public abstract class AbstractTransactionCompletionProvider extends ValueProvide
                 transactionCompletionDao.completeFromAddressTransactionHashes(input)
         );
         Stream<CompletionProposal> completedDescriptions =
-                transactionDescriptionService.getTransactionsWithDescriptionInfix(input).stream()
+                transactionDescriptionService.getWithDescriptionInfix(input).stream()
                         .map(this::getCompletionProposalWithDescriptionInValue);
         return Streams.concat(fromTransactionDetails, fromAddressTransactionHashes, completedDescriptions)
                 .collect(toMap(CompletionProposal::value, Functions.identity(), (a, b) -> a))

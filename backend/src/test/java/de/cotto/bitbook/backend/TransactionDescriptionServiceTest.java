@@ -59,17 +59,17 @@ class TransactionDescriptionServiceTest {
     }
 
     @Test
-    void getTransactionsWithDescriptionInfix() {
+    void getWithDescriptionInfix() {
         String infix = "infix";
         TransactionWithDescription expected = new TransactionWithDescription("x", "y");
         when(dao.findWithDescriptionInfix(infix)).thenReturn(Set.of(expected));
-        assertThat(service.getTransactionsWithDescriptionInfix(infix)).containsExactly(expected);
+        assertThat(service.getWithDescriptionInfix(infix)).containsExactly(expected);
     }
 
     @Test
-    void getAddressesWithDescriptionInfix_too_short() {
+    void getWithDescriptionInfix_too_short() {
         String infix = "ab";
-        assertThat(service.getTransactionsWithDescriptionInfix(infix)).isEmpty();
+        assertThat(service.getWithDescriptionInfix(infix)).isEmpty();
         verifyNoInteractions(dao);
     }
 }
