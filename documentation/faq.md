@@ -56,8 +56,9 @@ Quit Command
 Transactions Commands
         get-address-transactions: Get transactions for address
         get-transaction-details: Get data for a given transaction
+        remove-transaction-description: Removes a description for the transaction
+        set-transaction-description: Sets a description for the transaction
 ```
-
 ## How should I interpret the shown prices/values?
 While the coin information is accurate to the Satoshi, for fiat (Euro) values only a single price per
 day is used. As such, the shown values are intended to be helpful, but not accurate enough for proper
