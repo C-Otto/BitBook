@@ -1,7 +1,9 @@
 package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
+import de.cotto.bitbook.backend.model.TransactionWithDescription;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.price.model.Price;
 import de.cotto.bitbook.backend.transaction.model.Coins;
@@ -47,6 +49,9 @@ class TransactionFormatterTest {
     private AddressDescriptionService addressDescriptionService;
 
     @Mock
+    private TransactionDescriptionService transactionDescriptionService;
+
+    @Mock
     private AddressFormatter addressFormatter;
 
     @Mock
@@ -69,11 +74,14 @@ class TransactionFormatterTest {
     }
 
     private void testFormatForPrice(Price price) {
+        String transactionDescription = "xxx";
         mockPrice(Price.UNKNOWN);
         when(priceService.getPrice(TRANSACTION.getTime())).thenReturn(price);
         when(addressFormatter.getFormattedOwnershipStatus(any())).thenReturn("?");
         when(addressDescriptionService.get(any()))
                 .then(invocation -> new AddressWithDescription(invocation.getArgument(0)));
+        when(transactionDescriptionService.get(any()))
+                .then(invocation -> new TransactionWithDescription(invocation.getArgument(0), transactionDescription));
 
         String formattedInputs = formattedInputOutput(INPUT_2, price) + "\n" + formattedInputOutput(INPUT_1, price);
         String formattedOutputs =
@@ -85,7 +93,7 @@ class TransactionFormatterTest {
                 Inputs:%n%s
                 Outputs:%n%s
                 """.formatted(
-                TRANSACTION.getHash(),
+                new TransactionWithDescription(TRANSACTION.getHash(), transactionDescription),
                 TRANSACTION.getBlockHeight(),
                 DATE_TIME.format(DateTimeFormatter.ISO_DATE_TIME),
                 formattedCoinsWithPrice(TRANSACTION.getFees(), price),

@@ -1,6 +1,8 @@
 package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.TransactionWithDescription;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.price.model.Price;
 import de.cotto.bitbook.backend.transaction.model.Coins;
@@ -17,17 +19,20 @@ import java.util.stream.Collectors;
 @Component
 public class TransactionFormatter {
     private final AddressDescriptionService addressDescriptionService;
+    private final TransactionDescriptionService transactionDescriptionService;
     private final AddressFormatter addressFormatter;
     private final PriceService priceService;
     private final PriceFormatter priceFormatter;
 
     public TransactionFormatter(
             AddressDescriptionService addressDescriptionService,
+            TransactionDescriptionService transactionDescriptionService,
             AddressFormatter addressFormatter,
             PriceService priceService,
             PriceFormatter priceFormatter
     ) {
         this.addressDescriptionService = addressDescriptionService;
+        this.transactionDescriptionService = transactionDescriptionService;
         this.addressFormatter = addressFormatter;
         this.priceService = priceService;
         this.priceFormatter = priceFormatter;
@@ -37,13 +42,15 @@ public class TransactionFormatter {
         String formattedTime = transaction.getTime().format(DateTimeFormatter.ISO_DATE_TIME);
         Price price = priceService.getPrice(transaction.getTime());
         String fees = formatWithPrice(transaction.getFees(), price);
+        TransactionWithDescription transactionWithDescription =
+                transactionDescriptionService.get(transaction.getHash());
         return """
                Transaction:\t%s
                Height:\t\t%d (%s)
                Fees:\t\t%s
                Inputs:%n%s
                Outputs:%n%s
-               """.formatted(transaction.getHash(),
+               """.formatted(transactionWithDescription,
                 transaction.getBlockHeight(),
                 formattedTime,
                 fees,
