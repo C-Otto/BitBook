@@ -1,5 +1,7 @@
 package de.cotto.bitbook.cli;
 
+import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.TransactionWithDescription;
 import de.cotto.bitbook.backend.transaction.TransactionCompletionDao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH_2;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -26,13 +29,16 @@ import static org.mockito.Mockito.when;
 class TransactionHashCompletionProviderTest {
     private static final String PREFIX = "abc";
 
+    private final String[] hints = new String[0];
+
     @InjectMocks
     private TransactionHashCompletionProvider completionProvider;
 
     @Mock
     private TransactionCompletionDao transactionCompletionDao;
 
-    private final String[] hints = new String[0];
+    @Mock
+    private TransactionDescriptionService transactionDescriptionService;
 
     @Mock
     private CompletionContext context;
@@ -47,16 +53,20 @@ class TransactionHashCompletionProviderTest {
 
     @Test
     void complete() {
+        when(transactionDescriptionService.get(any()))
+                .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
         when(transactionCompletionDao.completeFromTransactionDetails(PREFIX))
                 .thenReturn(Set.of(TRANSACTION_HASH));
         when(transactionCompletionDao.completeFromAddressTransactionHashes(PREFIX))
                 .thenReturn(Set.of(TRANSACTION_HASH_2));
 
-        assertProposalsForHashes(TRANSACTION_HASH, TRANSACTION_HASH_2);
+        assertProposalsForHashes(TRANSACTION_HASH_2, TRANSACTION_HASH);
     }
 
     @Test
     void complete_no_duplicates() {
+        when(transactionDescriptionService.get(any()))
+                .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
         when(transactionCompletionDao.completeFromTransactionDetails(PREFIX))
                 .thenReturn(Set.of(TRANSACTION_HASH));
         when(transactionCompletionDao.completeFromAddressTransactionHashes(PREFIX))
@@ -67,6 +77,8 @@ class TransactionHashCompletionProviderTest {
 
     @Test
     void complete_from_transaction_details() {
+        when(transactionDescriptionService.get(any()))
+                .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
         when(transactionCompletionDao.completeFromTransactionDetails(PREFIX)).thenReturn(Set.of(TRANSACTION_HASH));
 
         assertProposalsForHashes(TRANSACTION_HASH);
@@ -74,6 +86,8 @@ class TransactionHashCompletionProviderTest {
 
     @Test
     void complete_from_address_transaction_hashes() {
+        when(transactionDescriptionService.get(any()))
+                .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
         when(context.currentWordUpToCursor()).thenReturn(PREFIX);
         when(transactionCompletionDao.completeFromAddressTransactionHashes(PREFIX))
                 .thenReturn(Set.of(TRANSACTION_HASH));
