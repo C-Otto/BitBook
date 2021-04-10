@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AddressWithDescriptionCompletionProviderTest {
     private final String[] hints = new String[0];
+
     @InjectMocks
     private AddressWithDescriptionCompletionProvider completionProvider;
 
