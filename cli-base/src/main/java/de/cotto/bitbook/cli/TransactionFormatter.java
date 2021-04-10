@@ -77,7 +77,7 @@ public class TransactionFormatter {
 
     public String formatSingleLineForAddress(Transaction transaction, String address) {
         Price price = priceService.getPrice(transaction.getTime());
-        String description = transactionDescriptionService.get(transaction.getHash()).getDescription();
+        String description = transactionDescriptionService.get(transaction.getHash()).getFormattedDescription();
         String descriptionSuffix;
         if (description.isBlank()) {
             descriptionSuffix = "";
