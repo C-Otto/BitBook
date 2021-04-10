@@ -21,10 +21,20 @@ class TransactionCompletionDaoImplTest {
     @Mock
     private TransactionRepository transactionRepository;
 
+    @Mock
+    private AddressTransactionsRepository addressTransactionsRepository;
+
+    private final String prefix = TRANSACTION_HASH.substring(0, 3);
+
     @Test
-    void getTransactionsStartingWith() {
-        String prefix = TRANSACTION_HASH.substring(0, 3);
+    void completeFromTransactionDetails() {
         when(transactionRepository.findByHashStartingWith(prefix)).thenReturn(Set.of(() -> TRANSACTION_HASH));
-        assertThat(transactionDao.getTransactionHashesStartingWith(prefix)).containsExactly(TRANSACTION_HASH);
+        assertThat(transactionDao.completeFromTransactionDetails(prefix)).containsExactly(TRANSACTION_HASH);
+    }
+
+    @Test
+    void completeFromAddressTransactionHashes() {
+        when(addressTransactionsRepository.findTransactionHashesByPrefix(prefix)).thenReturn(Set.of(TRANSACTION_HASH));
+        assertThat(transactionDao.completeFromAddressTransactionHashes(prefix)).containsExactly(TRANSACTION_HASH);
     }
 }
