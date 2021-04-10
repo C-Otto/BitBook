@@ -99,7 +99,7 @@ class TransactionHashCompletionProviderTest {
     @Test
     void complete_from_description() {
         String description = "xxxyyy";
-        when(transactionDescriptionService.getTransactionsWithDescriptionInfix(INPUT))
+        when(transactionDescriptionService.getWithDescriptionInfix(INPUT))
                 .thenReturn(Set.of(new TransactionWithDescription(TRANSACTION_HASH, description)));
 
         List<CompletionProposal> proposals = completionProvider.complete(methodParameter, context, hints);

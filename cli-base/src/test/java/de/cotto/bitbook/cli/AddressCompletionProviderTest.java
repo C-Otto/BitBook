@@ -98,7 +98,7 @@ class AddressCompletionProviderTest {
 
     @Test
     void complete_description() {
-        when(addressDescriptionService.getAddressesWithDescriptionInfix(input))
+        when(addressDescriptionService.getWithDescriptionInfix(input))
                 .thenReturn(Set.of(addressWithDescription));
 
         List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
@@ -111,7 +111,7 @@ class AddressCompletionProviderTest {
     @Test
     void complete_sorted_by_address() {
         AddressWithDescription addressWithDescription = new AddressWithDescription(ADDRESS, description);
-        when(addressDescriptionService.getAddressesWithDescriptionInfix(input))
+        when(addressDescriptionService.getWithDescriptionInfix(input))
                 .thenReturn(Set.of(addressWithDescription));
 
         when(addressCompletionDao.completeFromAddressTransactions(input)).thenReturn(Set.of(ADDRESS_2));
