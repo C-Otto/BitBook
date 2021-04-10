@@ -11,15 +11,25 @@ import java.util.stream.Collectors;
 @Transactional
 public class TransactionCompletionDaoImpl implements TransactionCompletionDao {
     private final TransactionRepository transactionRepository;
+    private final AddressTransactionsRepository addressTransactionsRepository;
 
-    public TransactionCompletionDaoImpl(TransactionRepository transactionRepository) {
+    public TransactionCompletionDaoImpl(
+            TransactionRepository transactionRepository,
+            AddressTransactionsRepository addressTransactionsRepository
+    ) {
         this.transactionRepository = transactionRepository;
+        this.addressTransactionsRepository = addressTransactionsRepository;
     }
 
     @Override
-    public Set<String> getTransactionHashesStartingWith(String hashPrefix) {
+    public Set<String> completeFromTransactionDetails(String hashPrefix) {
         return transactionRepository.findByHashStartingWith(hashPrefix).stream()
                 .map(TransactionHashView::getHash)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<String> completeFromAddressTransactionHashes(String hashPrefix) {
+        return addressTransactionsRepository.findTransactionHashesByPrefix(hashPrefix);
     }
 }

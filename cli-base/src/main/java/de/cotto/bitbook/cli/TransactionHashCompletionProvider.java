@@ -1,5 +1,6 @@
 package de.cotto.bitbook.cli;
 
+import com.google.common.collect.Streams;
 import de.cotto.bitbook.backend.transaction.TransactionCompletionDao;
 import org.springframework.core.MethodParameter;
 import org.springframework.shell.CompletionContext;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class TransactionHashCompletionProvider extends ValueProviderSupport {
@@ -31,7 +33,12 @@ public class TransactionHashCompletionProvider extends ValueProviderSupport {
         if (prefix.length() < MINIMUM_LENGTH_FOR_COMPLETION) {
             return List.of();
         }
-        return transactionCompletionDao.getTransactionHashesStartingWith(prefix).stream()
+        Stream<String> fromTransactionDetails =
+                transactionCompletionDao.completeFromTransactionDetails(prefix).stream();
+        Stream<String> fromAddressTransactionHashes =
+                transactionCompletionDao.completeFromAddressTransactionHashes(prefix).stream();
+        return Streams.concat(fromTransactionDetails, fromAddressTransactionHashes)
+                .distinct()
                 .map(CompletionProposal::new)
                 .collect(Collectors.toList());
     }
