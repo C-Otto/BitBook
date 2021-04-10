@@ -1,6 +1,5 @@
-package de.cotto.bitbook.backend;
+package de.cotto.bitbook.backend.model;
 
-import de.cotto.bitbook.backend.model.AddressWithDescription;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
