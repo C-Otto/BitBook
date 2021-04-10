@@ -171,14 +171,17 @@ class TransactionFormatterTest {
         Coins coins = Coins.ofSatoshis(-2_147_483_646);
         String formattedTime = TRANSACTION.getTime().format(DateTimeFormatter.ISO_DATE_TIME);
         String description = "xxx";
+        TransactionWithDescription transactionWithDescription =
+                new TransactionWithDescription(TRANSACTION_HASH, description);
         when(transactionDescriptionService.get(TRANSACTION_HASH))
-                .thenReturn(new TransactionWithDescription(TRANSACTION_HASH, description));
+                .thenReturn(transactionWithDescription);
+        String formattedDescription = transactionWithDescription.getFormattedDescription();
         String expected = "%s: %s (block height %d, %s) %s".formatted(
                 TRANSACTION_HASH,
                 formattedCoinsWithPrice(coins, price),
                 TRANSACTION.getBlockHeight(),
                 formattedTime,
-                description
+                formattedDescription
         );
         assertThat(transactionFormatter.formatSingleLineForAddress(TRANSACTION, INPUT_ADDRESS_2)).isEqualTo(expected);
     }
