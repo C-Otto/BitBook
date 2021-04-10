@@ -1,6 +1,7 @@
 package de.cotto.bitbook.cli;
 
 import com.google.common.collect.Streams;
+import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.model.TransactionWithDescription;
 import de.cotto.bitbook.backend.transaction.TransactionCompletionDao;
 import org.springframework.core.MethodParameter;
@@ -16,10 +17,15 @@ public abstract class AbstractTransactionCompletionProvider extends ValueProvide
     private static final int MINIMUM_LENGTH_FOR_COMPLETION = 3;
 
     private final TransactionCompletionDao transactionCompletionDao;
+    private final TransactionDescriptionService transactionDescriptionService;
 
-    public AbstractTransactionCompletionProvider(TransactionCompletionDao transactionCompletionDao) {
+    public AbstractTransactionCompletionProvider(
+            TransactionCompletionDao transactionCompletionDao,
+            TransactionDescriptionService transactionDescriptionService
+    ) {
         super();
         this.transactionCompletionDao = transactionCompletionDao;
+        this.transactionDescriptionService = transactionDescriptionService;
     }
 
     @Override
@@ -38,8 +44,20 @@ public abstract class AbstractTransactionCompletionProvider extends ValueProvide
                 transactionCompletionDao.completeFromAddressTransactionHashes(prefix).stream();
         return Streams.concat(fromTransactionDetails, fromAddressTransactionHashes)
                 .distinct()
-                .map(CompletionProposal::new)
+                .sorted()
+                .map(transactionDescriptionService::get)
+                .filter(this::shouldConsider)
+                .map(this::getCompletionProposal)
                 .collect(Collectors.toList());
+    }
+
+    private CompletionProposal getCompletionProposal(TransactionWithDescription transactionWithDescription) {
+        String description = transactionWithDescription.getDescription();
+        CompletionProposal completionProposal = new CompletionProposal(transactionWithDescription.getTransactionHash());
+        if (description.isEmpty()) {
+            return completionProposal;
+        }
+        return completionProposal.description(description);
     }
 
     protected abstract boolean shouldConsider(TransactionWithDescription transactionWithDescription);
