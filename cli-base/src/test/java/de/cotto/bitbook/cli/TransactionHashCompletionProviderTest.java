@@ -9,6 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.ansi.AnsiColor;
+import org.springframework.boot.ansi.AnsiOutput;
 import org.springframework.core.MethodParameter;
 import org.springframework.shell.CompletionContext;
 import org.springframework.shell.CompletionProposal;
@@ -27,7 +29,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionHashCompletionProviderTest {
-    private static final String PREFIX = "abc";
+    private static final String INPUT = "abc";
 
     private final String[] hints = new String[0];
 
@@ -48,16 +50,16 @@ class TransactionHashCompletionProviderTest {
 
     @BeforeEach
     void setUp() {
-        when(context.currentWordUpToCursor()).thenReturn(PREFIX);
+        when(context.currentWordUpToCursor()).thenReturn(INPUT);
     }
 
     @Test
     void complete() {
         when(transactionDescriptionService.get(any()))
                 .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
-        when(transactionCompletionDao.completeFromTransactionDetails(PREFIX))
+        when(transactionCompletionDao.completeFromTransactionDetails(INPUT))
                 .thenReturn(Set.of(TRANSACTION_HASH));
-        when(transactionCompletionDao.completeFromAddressTransactionHashes(PREFIX))
+        when(transactionCompletionDao.completeFromAddressTransactionHashes(INPUT))
                 .thenReturn(Set.of(TRANSACTION_HASH_2));
 
         assertProposalsForHashes(TRANSACTION_HASH_2, TRANSACTION_HASH);
@@ -67,9 +69,9 @@ class TransactionHashCompletionProviderTest {
     void complete_no_duplicates() {
         when(transactionDescriptionService.get(any()))
                 .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
-        when(transactionCompletionDao.completeFromTransactionDetails(PREFIX))
+        when(transactionCompletionDao.completeFromTransactionDetails(INPUT))
                 .thenReturn(Set.of(TRANSACTION_HASH));
-        when(transactionCompletionDao.completeFromAddressTransactionHashes(PREFIX))
+        when(transactionCompletionDao.completeFromAddressTransactionHashes(INPUT))
                 .thenReturn(Set.of(TRANSACTION_HASH));
 
         assertProposalsForHashes(TRANSACTION_HASH);
@@ -79,7 +81,7 @@ class TransactionHashCompletionProviderTest {
     void complete_from_transaction_details() {
         when(transactionDescriptionService.get(any()))
                 .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
-        when(transactionCompletionDao.completeFromTransactionDetails(PREFIX)).thenReturn(Set.of(TRANSACTION_HASH));
+        when(transactionCompletionDao.completeFromTransactionDetails(INPUT)).thenReturn(Set.of(TRANSACTION_HASH));
 
         assertProposalsForHashes(TRANSACTION_HASH);
     }
@@ -88,10 +90,22 @@ class TransactionHashCompletionProviderTest {
     void complete_from_address_transaction_hashes() {
         when(transactionDescriptionService.get(any()))
                 .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
-        when(transactionCompletionDao.completeFromAddressTransactionHashes(PREFIX))
+        when(transactionCompletionDao.completeFromAddressTransactionHashes(INPUT))
                 .thenReturn(Set.of(TRANSACTION_HASH));
 
         assertProposalsForHashes(TRANSACTION_HASH);
+    }
+
+    @Test
+    void complete_from_description() {
+        String description = "xxxyyy";
+        when(transactionDescriptionService.getTransactionsWithDescriptionInfix(INPUT))
+                .thenReturn(Set.of(new TransactionWithDescription(TRANSACTION_HASH, description)));
+
+        List<CompletionProposal> proposals = completionProvider.complete(methodParameter, context, hints);
+
+        assertThat(proposals).usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(new CompletionProposal(hashWithAnsiDescription(description)));
     }
 
     @Test
@@ -107,5 +121,12 @@ class TransactionHashCompletionProviderTest {
                 Arrays.stream(transactionHashes).map(CompletionProposal::new).collect(Collectors.toList());
         assertThat(proposals).usingRecursiveFieldByFieldElementComparator()
                 .isEqualTo(completionProposals);
+    }
+
+    private String hashWithAnsiDescription(String description) {
+        return TRANSACTION_HASH
+               + "\u00a0("
+               + AnsiOutput.toString(AnsiColor.BRIGHT_BLACK, description, AnsiColor.DEFAULT)
+               + ")";
     }
 }
