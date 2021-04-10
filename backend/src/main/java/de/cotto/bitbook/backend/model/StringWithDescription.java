@@ -15,7 +15,7 @@ public abstract class StringWithDescription<T extends StringWithDescription<T>> 
         this.description = description;
     }
 
-    protected String getString() {
+    public String getString() {
         return string;
     }
 
