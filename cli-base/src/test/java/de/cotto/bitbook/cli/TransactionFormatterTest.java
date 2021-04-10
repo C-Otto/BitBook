@@ -11,7 +11,6 @@ import de.cotto.bitbook.backend.transaction.model.Input;
 import de.cotto.bitbook.backend.transaction.model.InputOutput;
 import de.cotto.bitbook.backend.transaction.model.Output;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
-import de.cotto.bitbook.backend.transaction.model.TransactionFixtures;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -34,8 +33,10 @@ import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_2
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_1;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_2;
+import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.DATE_TIME;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
+import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -119,8 +120,8 @@ class TransactionFormatterTest {
         void format_aggregates_inputs_per_address() {
             Coins sumOfInputs = INPUT_VALUE_1.add(INPUT_VALUE_2);
             Transaction transaction = new Transaction(
-                    TransactionFixtures.TRANSACTION_HASH,
-                    TransactionFixtures.BLOCK_HEIGHT,
+                    TRANSACTION_HASH,
+                    BLOCK_HEIGHT,
                     DATE_TIME,
                     sumOfInputs,
                     List.of(new Input(INPUT_VALUE_1, INPUT_ADDRESS_1), new Input(INPUT_VALUE_2, INPUT_ADDRESS_1)),
@@ -135,8 +136,8 @@ class TransactionFormatterTest {
         void format_aggregates_outputs_per_address() {
             Coins sumOfOutputs = OUTPUT_VALUE_1.add(OUTPUT_VALUE_2);
             Transaction transaction = new Transaction(
-                    TransactionFixtures.TRANSACTION_HASH,
-                    TransactionFixtures.BLOCK_HEIGHT,
+                    TRANSACTION_HASH,
+                    BLOCK_HEIGHT,
                     DATE_TIME,
                     Coins.NONE,
                     List.of(new Input(sumOfOutputs, INPUT_ADDRESS_1)),
@@ -149,12 +150,14 @@ class TransactionFormatterTest {
     }
 
     @Test
-    void formatSingleLineForAddress() {
+    void formatSingleLineForAddress_no_description() {
         Price price = mockPrice(Price.of(123));
         Coins coins = Coins.ofSatoshis(-2_147_483_646);
         String formattedTime = TRANSACTION.getTime().format(DateTimeFormatter.ISO_DATE_TIME);
+        when(transactionDescriptionService.get(TRANSACTION_HASH))
+                .thenReturn(new TransactionWithDescription(TRANSACTION_HASH));
         String expected = "%s: %s (block height %d, %s)".formatted(
-                TRANSACTION.getHash(),
+                TRANSACTION_HASH,
                 formattedCoinsWithPrice(coins, price),
                 TRANSACTION.getBlockHeight(),
                 formattedTime
@@ -163,7 +166,27 @@ class TransactionFormatterTest {
     }
 
     @Test
+    void formatSingleLineForAddress_with_description() {
+        Price price = mockPrice(Price.of(123));
+        Coins coins = Coins.ofSatoshis(-2_147_483_646);
+        String formattedTime = TRANSACTION.getTime().format(DateTimeFormatter.ISO_DATE_TIME);
+        String description = "xxx";
+        when(transactionDescriptionService.get(TRANSACTION_HASH))
+                .thenReturn(new TransactionWithDescription(TRANSACTION_HASH, description));
+        String expected = "%s: %s (block height %d, %s) %s".formatted(
+                TRANSACTION_HASH,
+                formattedCoinsWithPrice(coins, price),
+                TRANSACTION.getBlockHeight(),
+                formattedTime,
+                description
+        );
+        assertThat(transactionFormatter.formatSingleLineForAddress(TRANSACTION, INPUT_ADDRESS_2)).isEqualTo(expected);
+    }
+
+    @Test
     void formatSingleLineForAddress_without_price() {
+        when(transactionDescriptionService.get(any()))
+                .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
         mockPrice(Price.UNKNOWN);
         Coins coins = Coins.ofSatoshis(-2_147_483_646);
         String formattedTime = TRANSACTION.getTime().format(DateTimeFormatter.ISO_DATE_TIME);
