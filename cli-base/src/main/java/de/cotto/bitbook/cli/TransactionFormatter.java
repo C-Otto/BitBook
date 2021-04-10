@@ -77,11 +77,19 @@ public class TransactionFormatter {
 
     public String formatSingleLineForAddress(Transaction transaction, String address) {
         Price price = priceService.getPrice(transaction.getTime());
-        return "%s: %s (block height %d, %s)".formatted(
+        String description = transactionDescriptionService.get(transaction.getHash()).getDescription();
+        String descriptionSuffix;
+        if (description.isBlank()) {
+            descriptionSuffix = "";
+        } else {
+            descriptionSuffix = " " + description;
+        }
+        return "%s: %s (block height %d, %s)%s".formatted(
                 transaction.getHash(),
                 formatWithPrice(transaction.getDifferenceForAddress(address), price),
                 transaction.getBlockHeight(),
-                transaction.getTime().format(DateTimeFormatter.ISO_DATE_TIME)
+                transaction.getTime().format(DateTimeFormatter.ISO_DATE_TIME),
+                descriptionSuffix
         );
     }
 
