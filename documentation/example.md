@@ -145,8 +145,9 @@ BitBook$ reset-ownership 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS
 OK
 ```
 
-## Descriptions
-It is possible to add descriptions to addresses. This can help to identify different wallets
+## Address Descriptions
+It is possible to add descriptions to addresses.
+This can help to identify different wallets
 (phone, coldstorage, laptop, ...), or add information about foreign addresses
 (exchange name, personal contact, ...).
 To set a description for an address, you may use the command `set-address-description`:
@@ -181,4 +182,20 @@ To remove a description, use `remove-address-description`:
 ```
 BitBook$ remove-address-description 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS
 OK
+```
+
+### Transaction Descriptions
+Similary, you can also set a description for a transaction:
+
+```
+set-transaction-description f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5 "Stuff from Pete"
+```
+
+This information is then included whenever the transaction hash is shown:
+
+```
+BitBook$ get-address-transactions 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a
+Address: 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a ✓
+Transaction hashes (1):
+f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5:    0.0238648  [     1,195.29€] (block height 677175, 2021-03-31T17:06:30)      Stuff from Pete
 ```
