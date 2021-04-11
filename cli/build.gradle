@@ -9,6 +9,7 @@ dependencies {
     implementation project(':backend')
     implementation project(':ownership-cli')
     implementation project(':cli-base')
+    implementation 'org.flywaydb:flyway-core'
     testImplementation testFixtures(project(':backend-transaction'))
     testImplementation testFixtures(project(':backend-transaction-models'))
 }
