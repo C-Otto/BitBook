@@ -62,6 +62,8 @@ This update is performed if 48 blocks have been added to the blockchain since th
 It may happen that information for one transaction or even several transactions cannot be retrieved.
 In this case an error message is shown at the end of the list.
 
+In the background BitBook automatically fetches transaction and price details for the hashes listed in the output.
+
 ## Ownership Commands
 You can mark addresses as *owned* or *foreign*.
 The information is included in the output (`✓` for owned addresses, `✗` for foreign addresses).
