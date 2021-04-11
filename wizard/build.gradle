@@ -1,0 +1,8 @@
+plugins {
+    id 'bitbook.java-library-conventions'
+}
+
+dependencies {
+    implementation project(':ownership')
+    testImplementation testFixtures(project(':backend:transaction:models'))
+}
