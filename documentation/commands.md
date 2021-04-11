@@ -28,6 +28,9 @@ Outputs:
            35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS ✓    0.124      [     6,210.66€]  Address Description
 ```
 
+Note that BitBook only shows confirmed transactions with a confirmation depth of at least 6 confirmations.
+This is done to avoid having outdated information in the case of chain reorgs.
+
 ### Get Address Transactions
 Using the `get-address-transactions` command you get information about all transactions connected to the address:
 
