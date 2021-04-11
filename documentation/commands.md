@@ -57,7 +57,7 @@ Note that the underlying network requests may be slow for addresses with many tr
 The list of associated transactions is persisted, so it will not be downloaded more than once.
 However, as new transactions may be added to the blockchain, BitBook needs to update the list.
 This update is performed if 48 blocks have been added to the blockchain since the last update.
-**This means that an update request ist performed roughly once every 8 hours.**
+**This means that an update request is performed roughly once every 8 hours.**
 
 It may happen that information for one transaction or even several transactions cannot be retrieved.
 In this case an error message is shown at the end of the list.
