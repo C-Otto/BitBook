@@ -70,7 +70,10 @@ public class OwnershipCommands {
                 .collect(Collectors.joining("\n"));
     }
 
-    @ShellMethod("Get transactions connected to own addresses where source/target has unknown ownership")
+    @ShellMethod(
+            value = "Get transactions connected to own addresses where source/target has unknown ownership",
+            key = {"get-neighbour-transactions", "get-neighbor-transactions"}
+    )
     public String getNeighbourTransactions() {
         Map<Transaction, Coins> map = addressOwnershipService.getNeighbourTransactions();
         StringBuilder result = new StringBuilder();
