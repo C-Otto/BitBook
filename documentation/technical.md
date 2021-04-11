@@ -73,3 +73,15 @@ As there may be several requests for the same piece of information (which may be
 responsible for the queue organization and result forwarding is rather complex.
 To avoid concurrent database modifications, the classes are tweaked so that results are returned sequentially, i.e.
 NOT in parallel.
+
+### JLine and Spring Shell
+The CLI is created using Spring Shell, which under the hood makes use of JLine.
+I'm not very happy with this choice, mostly because both libraries seem to be in a bad shape.
+As an example, I'm unable to use case-insensitive tab completion (see [issue #20](https://github.com/C-Otto/BitBook/issues/20)).
+
+Furthermore, tab completion only works if the completion suggestion contains the phrase in front of `<tab>`, i.e.
+`foo<tab>` will only show suggestions that include `foo`. In order to make tab completion work for descriptions,
+I had to resort to a weird hack involving a null byte seperator (see `AbstractCompletionProvider`).
+Note that this is also the case if the phrase (`foo`) is included in the description of the completion suggestion.
+
+I'd also like to end the program using CTRL+D, which doesn't seem to be possible.

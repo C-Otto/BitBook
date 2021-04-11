@@ -34,6 +34,7 @@ Please have a look at the [Frequently Asked Questions (FAQ)](documentation/faq.m
 
 ### Further Information
 * [Example](documentation/example.md)
+* [Commands](documentation/commands.md)
 * [Frequently Asked Questions (FAQ)](documentation/faq.md)
 * [Feature Requests and Bug Reports](documentation/features_and_bugs.md)
 * [Known Limitations](documentation/limitations.md)

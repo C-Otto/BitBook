@@ -20,8 +20,8 @@ As such, you may see error messages if a provider (API) failed.
 If you need to download huge amounts of data (addresses with many transactions), BitBook might fail.
 In this case it might help to try again later, possibly with a different IP address.
 
-Also see [#5](https://github.com/C-Otto/BitBook/issues/5).
+Also see [issue #5](https://github.com/C-Otto/BitBook/issues/5).
 
 ## Pagination
 For addresses for which many transaction hashes are known, BitBook currently is unable to use most API's responses.
-This implementation details is addressed in [#6](https://github.com/C-Otto/BitBook/issues/6).
+This implementation details is addressed in [issue #6](https://github.com/C-Otto/BitBook/issues/6).
