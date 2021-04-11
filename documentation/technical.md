@@ -11,7 +11,7 @@ Please create issues, provide pull requests, send mails, reach out via Twitter, 
 BitBook creates and uses a single-file H2 database. So far I haven't seen the need to
 use a "proper" database.
 Furthermore, this simplifies the setup and makes backups easier to do.
-Similarly, there is no support for database migrations (Flyway, Liquibase), yet. 
+Database schema updates may be applied via Flyway (scripts in `cli/src/main/resources/db/migration`).
 
 ### Java 16
 At the time of writing this, Java 16 is the current Java version.
