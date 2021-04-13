@@ -171,7 +171,7 @@ This is due to the fact that BitBook is designed to help you track your coins.
 
 ```
 BitBook$ get-neighbour-transactions
-f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5:   -0.1238648  [    -6,203.89€]          Description
+f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5:   -0.1238648  [    -6,203.89€] (block 677175, 2021-03-31T17:06:31)          Description
 ```
 
 The command output is a list of transactions, similar to what you see in [Get Address Transactions](#get-address-transactions).
