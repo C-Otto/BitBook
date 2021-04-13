@@ -75,7 +75,7 @@ your owned address to an address with unknown ownership:
 
 ```
 BitBook$ get-neighbour-transactions
-f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5:   -0.1238648  [    -6,203.89€]
+f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5:   -0.1238648  [    -6,203.89€] (block 677175, 2021-03-31T17:06:31)
 ```
 
 In this list you can see that the transaction `f74b...` takes 0.1238648 coins out of your owned
