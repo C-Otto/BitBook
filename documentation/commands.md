@@ -38,6 +38,7 @@ Using the `get-address-transactions` command you get information about all trans
 ```
 BitBook$ get-address-transactions 3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd
 Address: 3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd ?
+Description: 
 Transaction hashes (2):
 3dfc4275b1b16be3009f087442f176f1acd89c71e996b3a6aec469e373dc65ca:    0.12319446 [     6,170.32€] (block height 677169, 2021-03-31T16:12:03)
 da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f:   -0.12319446 [    -6,170.32€] (block height 677171, 2021-03-31T16:23:15) Some Description
