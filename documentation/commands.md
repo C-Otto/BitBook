@@ -19,7 +19,7 @@ The output also shows descriptions for the addresses and transaction itself, if 
 
 ```
 Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f       TX Description
-Height:         677171 (2021-03-31T16:23:14)
+Block:          677171 (2021-03-31T16:23:14)
 Fees:              0.00023186 [        11.61€]
 Inputs:
            3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd ?    0.12319446 [     6,170.32€]                     
@@ -135,7 +135,7 @@ A simple case is shown in the [example](example.md):
 ```
 BitBook$ get-transaction-details da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
-Height:         677171 (2021-03-31T16:23:14)
+Block:          677171 (2021-03-31T16:23:14)
 Fees:              0.00023186 [        11.61€]
 Inputs:
            3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd ?    0.12319446 [     6,170.32€]                     

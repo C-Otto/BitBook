@@ -46,7 +46,7 @@ public class TransactionFormatter {
                 transactionDescriptionService.get(transaction.getHash());
         return """
                Transaction:\t%s
-               Height:\t\t%d (%s)
+               Block:\t\t%d (%s)
                Fees:\t\t%s
                Inputs:%n%s
                Outputs:%n%s
@@ -84,7 +84,7 @@ public class TransactionFormatter {
         } else {
             descriptionSuffix = " " + description;
         }
-        return "%s: %s (block height %d, %s)%s".formatted(
+        return "%s: %s (block %d, %s)%s".formatted(
                 transaction.getHash(),
                 formatWithPrice(transaction.getDifferenceForAddress(address), price),
                 transaction.getBlockHeight(),
