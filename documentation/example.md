@@ -9,7 +9,7 @@ You can query details for this transaction using the command `get-transaction-de
 ```
 BitBook$ get-transaction-details da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
-Height:         677171 (2021-03-31T16:23:14)
+Block:          677171 (2021-03-31T16:23:14)
 Fees:              0.00023186 [        11.61€]
 Inputs:
            3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd ?    0.12319446 [     6,170.32€]                     
@@ -39,7 +39,7 @@ address as indicated by the checkmark `✓` in the output:
 ```
 BitBook$ get-transaction-details da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
-Height:         677171 (2021-03-31T16:23:14)
+Block:          677171 (2021-03-31T16:23:14)
 Fees:              0.00023186 [        11.61€]
 Inputs:
            3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd ?    0.12319446 [     6,170.32€]                     
@@ -57,7 +57,7 @@ BitBook$ foreign 39Kyuxzgs4jm61MYgJYeJNHfUq5RanKBHf
 OK
 BitBook$ get-transaction-details da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
-Height:         677171 (2021-03-31T16:23:14)
+Block:          677171 (2021-03-31T16:23:14)
 Fees:              0.00023186 [        11.61€]
 Inputs:
            3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd ✗    0.12319446 [     6,170.32€]                     
@@ -84,7 +84,7 @@ address, and sends these coins to addresses with unknown ownership.
 ```
 BitBook$ get-transaction-details f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5
 Transaction:    f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5
-Height:         677175 (2021-03-31T17:06:30)
+Block:          677175 (2021-03-31T17:06:30)
 Fees:              0.0001352  [         6.77€]
 Inputs:
            35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS ✓    0.124      [     6,210.66€]                     
@@ -169,7 +169,7 @@ Furthermore, the description is shown anytime the address is presented to the us
 ```
 BitBook$ get-transaction-details f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5
 Transaction:    f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5
-Height:         677175 (2021-03-31T17:06:30)
+Block:          677175 (2021-03-31T17:06:30)
 Fees:              0.0001352  [         6.77€]
 Inputs:
            35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS ✓    0.124      [     6,210.66€]                     

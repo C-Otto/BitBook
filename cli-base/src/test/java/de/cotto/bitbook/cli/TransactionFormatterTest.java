@@ -89,7 +89,7 @@ class TransactionFormatterTest {
                 formattedInputOutput(OUTPUT_1, price) + "\n" + formattedInputOutput(OUTPUT_2, price);
         String expected = """
                 Transaction:\t%s
-                Height:\t\t%d (%s)
+                Block:\t\t%d (%s)
                 Fees:\t\t%s
                 Inputs:%n%s
                 Outputs:%n%s
@@ -156,7 +156,7 @@ class TransactionFormatterTest {
         String formattedTime = TRANSACTION.getTime().format(DateTimeFormatter.ISO_DATE_TIME);
         when(transactionDescriptionService.get(TRANSACTION_HASH))
                 .thenReturn(new TransactionWithDescription(TRANSACTION_HASH));
-        String expected = "%s: %s (block height %d, %s)".formatted(
+        String expected = "%s: %s (block %d, %s)".formatted(
                 TRANSACTION_HASH,
                 formattedCoinsWithPrice(coins, price),
                 TRANSACTION.getBlockHeight(),
@@ -176,7 +176,7 @@ class TransactionFormatterTest {
         when(transactionDescriptionService.get(TRANSACTION_HASH))
                 .thenReturn(transactionWithDescription);
         String formattedDescription = transactionWithDescription.getFormattedDescription();
-        String expected = "%s: %s (block height %d, %s) %s".formatted(
+        String expected = "%s: %s (block %d, %s) %s".formatted(
                 TRANSACTION_HASH,
                 formattedCoinsWithPrice(coins, price),
                 TRANSACTION.getBlockHeight(),
@@ -193,7 +193,7 @@ class TransactionFormatterTest {
         mockPrice(Price.UNKNOWN);
         Coins coins = Coins.ofSatoshis(-2_147_483_646);
         String formattedTime = TRANSACTION.getTime().format(DateTimeFormatter.ISO_DATE_TIME);
-        String expected = "%s: %s (block height %d, %s)".formatted(
+        String expected = "%s: %s (block %d, %s)".formatted(
                 TRANSACTION.getHash(),
                 formattedCoinsWithPrice(coins, Price.UNKNOWN),
                 TRANSACTION.getBlockHeight(),
