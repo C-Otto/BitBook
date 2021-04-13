@@ -18,14 +18,15 @@ The symbol to the right of the address shows the ownership status (`?` if not se
 The output also shows descriptions for the addresses and transaction itself, if set.
 
 ```
-Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f       TX Description
+Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
+Description:    This is the transaction description 
 Block:          677171 (2021-03-31T16:23:14)
 Fees:              0.00023186 [        11.61€]
 Inputs:
            3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd ?    0.12319446 [     6,170.32€]                     
            39Kyuxzgs4jm61MYgJYeJNHfUq5RanKBHf ✗    0.0010374  [        51.96€]                     
 Outputs:
-           35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS ✓    0.124      [     6,210.66€]  Address Description
+           35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS ✓    0.124      [     6,210.66€] Address Description
 ```
 
 Note that BitBook only shows confirmed transactions with a confirmation depth of at least 6 confirmations.
@@ -39,7 +40,7 @@ BitBook$ get-address-transactions 3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd
 Address: 3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd ?
 Transaction hashes (2):
 3dfc4275b1b16be3009f087442f176f1acd89c71e996b3a6aec469e373dc65ca:    0.12319446 [     6,170.32€] (block height 677169, 2021-03-31T16:12:03)
-da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f:   -0.12319446 [    -6,170.32€] (block height 677171, 2021-03-31T16:23:15)     Some Description
+da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f:   -0.12319446 [    -6,170.32€] (block height 677171, 2021-03-31T16:23:15) Some Description
 ```
 
 The value shown next to each transaction tells you the effect of the transaction to the address.
@@ -101,7 +102,7 @@ list.
 ```
 BitBook$ list-owned-addresses
 35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS    0          [         0.00€]                     
-36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a    0.0238648  [     1,127.22€]     Some Description
+36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a    0.0238648  [     1,127.22€] Some Description
 ```
 
 Note that the list of hashes associated with each owned address is updated as part of this computation, which might
@@ -135,6 +136,7 @@ A simple case is shown in the [example](example.md):
 ```
 BitBook$ get-transaction-details da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
+Description:    
 Block:          677171 (2021-03-31T16:23:14)
 Fees:              0.00023186 [        11.61€]
 Inputs:
