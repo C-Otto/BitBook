@@ -26,7 +26,7 @@ public abstract class StringWithDescription<T extends StringWithDescription<T>> 
     protected abstract String getFormattedString();
 
     public String getFormattedDescription() {
-        return padOrShorten(description, 40);
+        return shortenIfNecessary(description, 40);
     }
 
     @Override
@@ -45,12 +45,15 @@ public abstract class StringWithDescription<T extends StringWithDescription<T>> 
                 .compare(this, other);
     }
 
-    protected String padOrShorten(String string, int limit) {
+    protected String padOrShorten(String string, @SuppressWarnings("SameParameterValue") int limit) {
+        return StringUtils.leftPad(shortenIfNecessary(string, limit), limit);
+    }
+
+    protected String shortenIfNecessary(String string, int limit) {
         if (string.length() > limit) {
             return string.substring(0, limit - 1) + "…";
-        } else {
-            return StringUtils.leftPad(string, limit);
         }
+        return string;
     }
 
     @Override

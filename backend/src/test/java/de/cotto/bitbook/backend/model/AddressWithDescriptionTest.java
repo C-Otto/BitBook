@@ -57,7 +57,7 @@ class AddressWithDescriptionTest {
     @Test
     void testToString() {
         String formattedAddress = StringUtils.leftPad(ADDRESS_WITH_DESCRIPTION.getAddress(), 45);
-        String formattedDescription = StringUtils.leftPad(ADDRESS_WITH_DESCRIPTION.getDescription(), 40);
+        String formattedDescription = ADDRESS_WITH_DESCRIPTION.getDescription();
         assertThat(ADDRESS_WITH_DESCRIPTION).hasToString(formattedAddress + " " + formattedDescription);
     }
 
@@ -70,7 +70,7 @@ class AddressWithDescriptionTest {
         assertThat(addressWithDescription).hasToString(
                 SHORTENED_45 +
                 " " +
-                StringUtils.leftPad(addressWithDescription.getDescription(), 40)
+                addressWithDescription.getDescription()
         );
     }
 
@@ -90,7 +90,7 @@ class AddressWithDescriptionTest {
     @Test
     void testToString_without_description() {
         assertThat(new AddressWithDescription("x")).hasToString(
-                StringUtils.leftPad("x", 45) + " " + StringUtils.leftPad("", 40)
+                StringUtils.leftPad("x", 45) + " "
         );
     }
 
@@ -116,7 +116,7 @@ class AddressWithDescriptionTest {
     @Test
     void getFormattedDescription() {
         assertThat(ADDRESS_WITH_DESCRIPTION.getFormattedDescription())
-                .isEqualTo(StringUtils.leftPad(ADDRESS_WITH_DESCRIPTION.getDescription(), 40));
+                .isEqualTo(ADDRESS_WITH_DESCRIPTION.getDescription());
     }
 
     @Test
