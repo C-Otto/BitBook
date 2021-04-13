@@ -3,6 +3,7 @@ package de.cotto.bitbook.cli;
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
+import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
@@ -11,6 +12,7 @@ import de.cotto.bitbook.backend.transaction.model.Input;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,6 +35,7 @@ import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRA
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -66,6 +69,9 @@ class TransactionsCommandsTest {
 
     @Mock
     private TransactionDescriptionService transactionDescriptionService;
+
+    @Mock
+    private PriceService priceService;
 
     @Test
     void getTransactionDetails() {
@@ -153,6 +159,20 @@ class TransactionsCommandsTest {
         String addressTransactions = transactionsCommands.getAddressTransactions(new CliAddress(ADDRESS));
 
         assertThat(addressTransactions).startsWith("Address: 1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD ? (description)");
+    }
+
+    @Test
+    void getAddressTransactions_requests_all_prices_before_formatting_details() {
+        when(addressDescriptionService.get(ADDRESS)).thenReturn(new AddressWithDescription(ADDRESS));
+        when(addressTransactionsService.getTransactions(ADDRESS))
+                .thenReturn(new AddressTransactions(ADDRESS, Set.of(TRANSACTION_HASH), LAST_CHECKED_AT_BLOCK_HEIGHT));
+        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH))).thenReturn(Set.of(TRANSACTION));
+
+        transactionsCommands.getAddressTransactions(new CliAddress(ADDRESS));
+
+        InOrder inOrder = inOrder(priceService, transactionFormatter);
+        inOrder.verify(priceService).getPrice(TRANSACTION.getTime());
+        inOrder.verify(transactionFormatter).formatSingleLineForAddress(any(), any());
     }
 
     @Test

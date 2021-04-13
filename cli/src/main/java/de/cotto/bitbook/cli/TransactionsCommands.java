@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
+import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
@@ -30,6 +31,7 @@ public class TransactionsCommands {
     private final TransactionDescriptionService transactionDescriptionService;
     private final TransactionFormatter transactionFormatter;
     private final AddressFormatter addressFormatter;
+    private final PriceService priceService;
 
     public TransactionsCommands(
             TransactionService transactionService,
@@ -37,7 +39,8 @@ public class TransactionsCommands {
             AddressDescriptionService addressDescriptionService,
             TransactionDescriptionService transactionDescriptionService,
             TransactionFormatter transactionFormatter,
-            AddressFormatter addressFormatter
+            AddressFormatter addressFormatter,
+            PriceService priceService
     ) {
         this.transactionService = transactionService;
         this.addressTransactionsService = addressTransactionsService;
@@ -45,6 +48,7 @@ public class TransactionsCommands {
         this.transactionDescriptionService = transactionDescriptionService;
         this.transactionFormatter = transactionFormatter;
         this.addressFormatter = addressFormatter;
+        this.priceService = priceService;
     }
 
     @ShellMethod("Get data for a given transaction")
@@ -107,7 +111,8 @@ public class TransactionsCommands {
 
     private String formattedHashesSortedByDifferenceForAddress(List<String> hashes, String addressString) {
         Map<String, Transaction> transactionDetails =
-                transactionService.getTransactionDetails(Sets.newHashSet(hashes)).stream()
+                transactionService.getTransactionDetails(Sets.newHashSet(hashes)).parallelStream()
+                        .peek(transaction -> priceService.getPrice(transaction.getTime()))
                         .collect(toMap(Transaction::getHash, Functions.identity()));
         String details = hashes.stream()
                 .map(hash -> transactionDetails.getOrDefault(hash, Transaction.UNKNOWN))
