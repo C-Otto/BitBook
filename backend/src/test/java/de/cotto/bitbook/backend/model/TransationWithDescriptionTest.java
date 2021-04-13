@@ -1,7 +1,6 @@
 package de.cotto.bitbook.backend.model;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,7 +56,7 @@ class TransationWithDescriptionTest {
     @Test
     void testToString() {
         String transactionHash = TRANSACTION_WITH_DESCRIPTION.getTransactionHash();
-        String formattedDescription = StringUtils.leftPad(TRANSACTION_WITH_DESCRIPTION.getDescription(), 40);
+        String formattedDescription = TRANSACTION_WITH_DESCRIPTION.getDescription();
         assertThat(TRANSACTION_WITH_DESCRIPTION).hasToString(transactionHash + " " + formattedDescription);
     }
 
@@ -77,7 +76,7 @@ class TransationWithDescriptionTest {
     @Test
     void testToString_without_description() {
         assertThat(new TransactionWithDescription("x"))
-                .hasToString("x" + " " + StringUtils.leftPad("", 40));
+                .hasToString("x ");
     }
 
     @Test
@@ -88,7 +87,7 @@ class TransationWithDescriptionTest {
     @Test
     void getFormattedDescription() {
         assertThat(TRANSACTION_WITH_DESCRIPTION.getFormattedDescription())
-                .isEqualTo(StringUtils.leftPad(TRANSACTION_WITH_DESCRIPTION.getDescription(), 40));
+                .isEqualTo(TRANSACTION_WITH_DESCRIPTION.getDescription());
     }
 
     @Test
