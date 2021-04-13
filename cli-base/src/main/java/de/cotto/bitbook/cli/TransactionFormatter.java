@@ -76,6 +76,11 @@ public class TransactionFormatter {
     }
 
     public String formatSingleLineForAddress(Transaction transaction, String address) {
+        Coins differenceForAddress = transaction.getDifferenceForAddress(address);
+        return formatSingleLineForValue(transaction, differenceForAddress);
+    }
+
+    public String formatSingleLineForValue(Transaction transaction, Coins value) {
         Price price = priceService.getPrice(transaction.getTime());
         String description = transactionDescriptionService.get(transaction.getHash()).getFormattedDescription();
         String descriptionSuffix;
@@ -86,7 +91,7 @@ public class TransactionFormatter {
         }
         return "%s: %s (block %d, %s)%s".formatted(
                 transaction.getHash(),
-                formatWithPrice(transaction.getDifferenceForAddress(address), price),
+                formatWithPrice(value, price),
                 transaction.getBlockHeight(),
                 transaction.getTime().format(DateTimeFormatter.ISO_DATE_TIME),
                 descriptionSuffix

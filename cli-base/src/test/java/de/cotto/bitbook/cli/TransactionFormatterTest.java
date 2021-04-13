@@ -150,25 +150,35 @@ class TransactionFormatterTest {
     }
 
     @Test
-    void formatSingleLineForAddress_no_description() {
-        Price price = mockPrice(Price.of(123));
+    void formatSingleLineForAddress() {
+        when(transactionDescriptionService.get(TRANSACTION_HASH))
+                .thenReturn(new TransactionWithDescription(TRANSACTION_HASH, "hello"));
         Coins coins = Coins.ofSatoshis(-2_147_483_646);
+        assertThat(transactionFormatter.formatSingleLineForAddress(TRANSACTION, INPUT_ADDRESS_2))
+                .isEqualTo(transactionFormatter.formatSingleLineForValue(TRANSACTION, coins));
+    }
+
+    @Test
+    void formatSingleLineForValue_without_description() {
+        Price price = mockPrice(Price.of(123));
+        Coins value = Coins.ofSatoshis(100);
         String formattedTime = TRANSACTION.getTime().format(DateTimeFormatter.ISO_DATE_TIME);
         when(transactionDescriptionService.get(TRANSACTION_HASH))
                 .thenReturn(new TransactionWithDescription(TRANSACTION_HASH));
         String expected = "%s: %s (block %d, %s)".formatted(
                 TRANSACTION_HASH,
-                formattedCoinsWithPrice(coins, price),
+                formattedCoinsWithPrice(value, price),
                 TRANSACTION.getBlockHeight(),
                 formattedTime
         );
-        assertThat(transactionFormatter.formatSingleLineForAddress(TRANSACTION, INPUT_ADDRESS_2)).isEqualTo(expected);
+        assertThat(transactionFormatter.formatSingleLineForValue(TRANSACTION, value))
+                .isEqualTo(expected);
     }
 
     @Test
-    void formatSingleLineForAddress_with_description() {
+    void formatSingleLineForValue_with_description() {
         Price price = mockPrice(Price.of(123));
-        Coins coins = Coins.ofSatoshis(-2_147_483_646);
+        Coins value = Coins.ofSatoshis(500);
         String formattedTime = TRANSACTION.getTime().format(DateTimeFormatter.ISO_DATE_TIME);
         String description = "xxx";
         TransactionWithDescription transactionWithDescription =
@@ -178,28 +188,28 @@ class TransactionFormatterTest {
         String formattedDescription = transactionWithDescription.getFormattedDescription();
         String expected = "%s: %s (block %d, %s) %s".formatted(
                 TRANSACTION_HASH,
-                formattedCoinsWithPrice(coins, price),
+                formattedCoinsWithPrice(value, price),
                 TRANSACTION.getBlockHeight(),
                 formattedTime,
                 formattedDescription
         );
-        assertThat(transactionFormatter.formatSingleLineForAddress(TRANSACTION, INPUT_ADDRESS_2)).isEqualTo(expected);
+        assertThat(transactionFormatter.formatSingleLineForValue(TRANSACTION, value)).isEqualTo(expected);
     }
 
     @Test
-    void formatSingleLineForAddress_without_price() {
+    void formatSingleLineForValue_without_price() {
         when(transactionDescriptionService.get(any()))
                 .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
         mockPrice(Price.UNKNOWN);
-        Coins coins = Coins.ofSatoshis(-2_147_483_646);
+        Coins value = Coins.ofSatoshis(123);
         String formattedTime = TRANSACTION.getTime().format(DateTimeFormatter.ISO_DATE_TIME);
         String expected = "%s: %s (block %d, %s)".formatted(
                 TRANSACTION.getHash(),
-                formattedCoinsWithPrice(coins, Price.UNKNOWN),
+                formattedCoinsWithPrice(value, Price.UNKNOWN),
                 TRANSACTION.getBlockHeight(),
                 formattedTime
         );
-        assertThat(transactionFormatter.formatSingleLineForAddress(TRANSACTION, INPUT_ADDRESS_2)).isEqualTo(expected);
+        assertThat(transactionFormatter.formatSingleLineForValue(TRANSACTION, value)).isEqualTo(expected);
     }
 
     private Price mockPrice(Price price) {

@@ -1,7 +1,6 @@
 package de.cotto.bitbook.ownership.cli;
 
 import com.google.common.base.Functions;
-import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.price.model.Price;
@@ -12,8 +11,8 @@ import de.cotto.bitbook.cli.AddressCompletionProvider;
 import de.cotto.bitbook.cli.AddressWithOwnershipCompletionProvider;
 import de.cotto.bitbook.cli.CliAddress;
 import de.cotto.bitbook.cli.PriceFormatter;
+import de.cotto.bitbook.cli.TransactionFormatter;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
@@ -31,22 +30,23 @@ import static java.util.stream.Collectors.groupingBy;
 public class OwnershipCommands {
 
     private final AddressOwnershipService addressOwnershipService;
-    private final TransactionDescriptionService transactionDescriptionService;
     private final BalanceService balanceService;
     private final PriceService priceService;
     private final PriceFormatter priceFormatter;
+    private final TransactionFormatter transactionFormatter;
 
     public OwnershipCommands(
             AddressOwnershipService addressOwnershipService,
-            TransactionDescriptionService transactionDescriptionService,
             BalanceService balanceService,
-            PriceService priceService, PriceFormatter priceFormatter
+            PriceService priceService,
+            PriceFormatter priceFormatter,
+            TransactionFormatter transactionFormatter
     ) {
         this.addressOwnershipService = addressOwnershipService;
-        this.transactionDescriptionService = transactionDescriptionService;
         this.balanceService = balanceService;
         this.priceService = priceService;
         this.priceFormatter = priceFormatter;
+        this.transactionFormatter = transactionFormatter;
     }
 
     @ShellMethod("Get the total balance over all owned addresses")
@@ -73,15 +73,14 @@ public class OwnershipCommands {
     @ShellMethod("Get transactions connected to own addresses where source/target has unknown ownership")
     public String getNeighbourTransactions() {
         Map<Transaction, Coins> map = addressOwnershipService.getNeighbourTransactions();
-        StringBuilder result = new StringBuilder();
         Map<Coins, List<Map.Entry<Transaction, Coins>>> byCoins = map.entrySet().stream()
                 .collect(groupingBy(Map.Entry::getValue));
-        byCoins.entrySet().stream()
+        return byCoins.entrySet().stream()
                 .map(entry -> new SimpleEntry<>(entry.getKey().absolute(), entry.getValue()))
                 .sorted(comparingByKey())
                 .filter(coins -> coins.getKey().absolute().isPositive())
-                .forEach(coinsEntry -> appendTransactions(result, coinsEntry.getValue()));
-        return withoutTrailingNewline(result);
+                .map(coinsEntry -> appendTransactions(coinsEntry.getValue()))
+                .collect(Collectors.joining("\n"));
     }
 
     @ShellMethod(value = "Mark an address as owened", key = {"mark-address-as-owned", "owned"})
@@ -132,34 +131,15 @@ public class OwnershipCommands {
         return addressWithDescription.getFormattedWithInfix(coinsWithPrice);
     }
 
-    private void appendTransactions(StringBuilder result, List<Map.Entry<Transaction, Coins>> entries) {
+    private String appendTransactions(List<Map.Entry<Transaction, Coins>> entries) {
         Comparator<Map.Entry<Transaction, Coins>> compareByTransactionHash =
                 Comparator.comparing(entry -> entry.getKey().getHash());
-        entries.stream()
+        return entries.stream()
                 .sorted(compareByTransactionHash)
-                .forEach(transactionWithCoins -> {
-                    Transaction transaction = transactionWithCoins.getKey();
-                    String description =
-                            transactionDescriptionService.get(transaction.getHash()).getFormattedDescription();
-                    String descriptionSuffix;
-                    if (description.isBlank()) {
-                        descriptionSuffix = "";
-                    } else {
-                        descriptionSuffix = " " + description;
-                    }
-                    Coins coins = transactionWithCoins.getValue();
-                    Price price = priceService.getPrice(transaction.getTime());
-                    String formattedPrice = priceFormatter.format(coins, price);
-                    result.append("%s: %s [%s]%s\n".formatted(
-                            transaction.getHash(),
-                            coins,
-                            formattedPrice,
-                            descriptionSuffix
-                    ));
-                });
-    }
-
-    private String withoutTrailingNewline(StringBuilder result) {
-        return StringUtils.stripEnd(result.toString(), "\n");
+                .map(transactionWithCoins -> transactionFormatter.formatSingleLineForValue(
+                        transactionWithCoins.getKey(),
+                        transactionWithCoins.getValue()
+                ))
+                .collect(Collectors.joining("\n"));
     }
 }
