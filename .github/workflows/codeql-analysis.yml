@@ -41,7 +41,7 @@ jobs:
       with:
         java-version: '16'
         distribution: 'adopt'
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
+    - name: Compile with Gradle
+      run: ./gradlew testClasses
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
