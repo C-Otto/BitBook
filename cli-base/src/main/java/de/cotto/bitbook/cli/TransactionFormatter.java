@@ -46,11 +46,13 @@ public class TransactionFormatter {
                 transactionDescriptionService.get(transaction.getHash());
         return """
                Transaction:\t%s
+               Description:\t%s
                Block:\t\t%d (%s)
                Fees:\t\t%s
                Inputs:%n%s
                Outputs:%n%s
-               """.formatted(transactionWithDescription,
+               """.formatted(transaction.getHash(),
+                transactionWithDescription.getDescription(),
                 transaction.getBlockHeight(),
                 formattedTime,
                 fees,
