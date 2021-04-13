@@ -25,6 +25,17 @@ jobs:
       uses: github/codeql-action/init@v1
       with:
         languages: ${{ matrix.language }}
+    - name: Configure cache
+      uses: actions/cache@v2
+      env:
+        cache-name: gradle
+      with:
+        path: ~/.gradle/caches/build-cache*
+        key: ${{ runner.os }}-codeql-${{ env.cache-name }}-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-codeql-${{ env.cache-name }}-
+          ${{ runner.os }}-codeql-
+          ${{ runner.os }}-
     - name: Set up JDK 16
       uses: actions/setup-java@v2
       with:
