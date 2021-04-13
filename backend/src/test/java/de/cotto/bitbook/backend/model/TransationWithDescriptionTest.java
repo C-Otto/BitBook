@@ -9,8 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("CPD-START")
 class TransationWithDescriptionTest {
     private static final String TOO_LONG =
-            "abcaaaaaaaaaaaaaaaXaaaaaaaaaaaaaaaaaaaaaaaaXIIIIIIIIIIIIIIIIIZ";
-    private static final String SHORTENED_20 = "abcaaaaaaaaaaaaaaaX…";
+            "abcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaXIIIIIIIIIIIIIIIIIZ";
+    private static final String SHORTENED_40 = "abcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaX…";
     private static final TransactionWithDescription TRANSACTION_WITH_DESCRIPTION =
             create("x", "y");
 
@@ -57,7 +57,7 @@ class TransationWithDescriptionTest {
     @Test
     void testToString() {
         String transactionHash = TRANSACTION_WITH_DESCRIPTION.getTransactionHash();
-        String formattedDescription = StringUtils.leftPad(TRANSACTION_WITH_DESCRIPTION.getDescription(), 20);
+        String formattedDescription = StringUtils.leftPad(TRANSACTION_WITH_DESCRIPTION.getDescription(), 40);
         assertThat(TRANSACTION_WITH_DESCRIPTION).hasToString(transactionHash + " " + formattedDescription);
     }
 
@@ -70,14 +70,14 @@ class TransationWithDescriptionTest {
         assertThat(transactionWithDescription).hasToString(
                 transactionWithDescription.getTransactionHash() +
                 " " +
-                SHORTENED_20
+                SHORTENED_40
         );
     }
 
     @Test
     void testToString_without_description() {
         assertThat(new TransactionWithDescription("x"))
-                .hasToString("x" + " " + StringUtils.leftPad("", 20));
+                .hasToString("x" + " " + StringUtils.leftPad("", 40));
     }
 
     @Test
@@ -88,7 +88,7 @@ class TransationWithDescriptionTest {
     @Test
     void getFormattedDescription() {
         assertThat(TRANSACTION_WITH_DESCRIPTION.getFormattedDescription())
-                .isEqualTo(StringUtils.leftPad(TRANSACTION_WITH_DESCRIPTION.getDescription(), 20));
+                .isEqualTo(StringUtils.leftPad(TRANSACTION_WITH_DESCRIPTION.getDescription(), 40));
     }
 
     @Test
@@ -96,7 +96,7 @@ class TransationWithDescriptionTest {
         assertThat(new TransactionWithDescription(
                 TRANSACTION_WITH_DESCRIPTION.getTransactionHash(),
                 TOO_LONG
-        ).getFormattedDescription()).isEqualTo(SHORTENED_20);
+        ).getFormattedDescription()).isEqualTo(SHORTENED_40);
     }
 
     private static TransactionWithDescription create(String transactionHash, String description) {

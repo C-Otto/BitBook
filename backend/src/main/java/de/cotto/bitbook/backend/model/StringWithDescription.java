@@ -26,7 +26,7 @@ public abstract class StringWithDescription<T extends StringWithDescription<T>> 
     protected abstract String getFormattedString();
 
     public String getFormattedDescription() {
-        return padOrShorten(description, 20);
+        return padOrShorten(description, 40);
     }
 
     @Override
