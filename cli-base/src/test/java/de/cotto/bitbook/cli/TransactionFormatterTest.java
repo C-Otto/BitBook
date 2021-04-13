@@ -89,12 +89,14 @@ class TransactionFormatterTest {
                 formattedInputOutput(OUTPUT_1, price) + "\n" + formattedInputOutput(OUTPUT_2, price);
         String expected = """
                 Transaction:\t%s
+                Description:\t%s
                 Block:\t\t%d (%s)
                 Fees:\t\t%s
                 Inputs:%n%s
                 Outputs:%n%s
                 """.formatted(
-                new TransactionWithDescription(TRANSACTION.getHash(), transactionDescription),
+                TRANSACTION.getHash(),
+                transactionDescription,
                 TRANSACTION.getBlockHeight(),
                 DATE_TIME.format(DateTimeFormatter.ISO_DATE_TIME),
                 formattedCoinsWithPrice(TRANSACTION.getFees(), price),
@@ -112,6 +114,8 @@ class TransactionFormatterTest {
         void setUp() {
             price = mockPrice(Price.of(123));
             when(addressFormatter.getFormattedOwnershipStatus(any())).thenReturn("?");
+            when(transactionDescriptionService.get(any()))
+                    .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
             when(addressDescriptionService.get(any()))
                     .then(invocation -> new AddressWithDescription(invocation.getArgument(0)));
         }
