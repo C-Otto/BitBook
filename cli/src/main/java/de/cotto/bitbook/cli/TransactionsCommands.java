@@ -4,7 +4,6 @@ import com.google.common.base.Functions;
 import com.google.common.collect.Sets;
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
-import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
@@ -71,11 +70,13 @@ public class TransactionsCommands {
             return "Expected base58 or bech32 address";
         }
         AddressTransactions transactions = addressTransactionsService.getTransactions(addressString);
-        StringBuilder result = new StringBuilder(36);
+        String description = addressDescriptionService.get(addressString).getDescription();
+        StringBuilder result = new StringBuilder(51);
         result.append("Address: ").append(addressString)
                 .append(' ')
-                .append(addressFormatter.getFormattedOwnershipStatus(addressString));
-        appendDescription(addressString, result);
+                .append(addressFormatter.getFormattedOwnershipStatus(addressString))
+                .append("\nDescription: ")
+                .append(description);
         List<String> hashes = transactions.getTransactionHashes().stream().sorted().collect(toList());
         result.append("\nTransaction hashes (")
                 .append(hashes.size())
@@ -130,13 +131,4 @@ public class TransactionsCommands {
         return details;
     }
 
-    private void appendDescription(String address, StringBuilder result) {
-        AddressWithDescription addressWithDescription = addressDescriptionService.get(address);
-        String description = addressWithDescription.getDescription();
-        if (!description.isEmpty()) {
-            result.append(" (");
-            result.append(description);
-            result.append(')');
-        }
-    }
 }

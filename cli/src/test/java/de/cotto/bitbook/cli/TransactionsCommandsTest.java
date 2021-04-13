@@ -104,7 +104,7 @@ class TransactionsCommandsTest {
         String details = transactionsCommands.getAddressTransactions(new CliAddress(ADDRESS));
 
         assertThat(details)
-                .startsWith("Address: " + ADDRESS + " ?\nTransaction hashes (4):")
+                .startsWith("Address: " + ADDRESS + " ?\nDescription: \nTransaction hashes (4):")
                 .endsWith("\n[Details for at least one transaction could not be downloaded]")
                 .contains(TRANSACTION_HASH)
                 .contains(TRANSACTION_HASH_2);
@@ -140,6 +140,7 @@ class TransactionsCommandsTest {
 
         assertThat(addressTransactions).isEqualTo("""
                 Address: bc1xxxn59nfqcw2la4ms7zsphqllm5789syhrgcupw ?
+                Description:\040
                 Transaction hashes (3):
                 f2
                 f1
@@ -158,7 +159,8 @@ class TransactionsCommandsTest {
 
         String addressTransactions = transactionsCommands.getAddressTransactions(new CliAddress(ADDRESS));
 
-        assertThat(addressTransactions).startsWith("Address: 1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD ? (description)");
+        assertThat(addressTransactions)
+                .startsWith("Address: 1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD ?\nDescription: description\n");
     }
 
     @Test
