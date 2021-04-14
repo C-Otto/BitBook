@@ -71,6 +71,11 @@ public class AddressOwnershipService {
         }
     }
 
+    public void setAddressAsOwned(String address) {
+        addressOwnershipDao.setAddressAsOwned(address);
+        addressTransactionsService.requestTransactionsInBackground(address);
+    }
+
     public void setAddressAsOwned(String address, String description) {
         addressOwnershipDao.setAddressAsOwned(address);
         addressDescriptionService.set(address, description);

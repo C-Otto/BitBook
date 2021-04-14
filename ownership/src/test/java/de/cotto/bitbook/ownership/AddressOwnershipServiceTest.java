@@ -244,18 +244,30 @@ class AddressOwnershipServiceTest {
 
     @Test
     void setAddressAsOwned() {
+        addressOwnershipService.setAddressAsOwned(ADDRESS);
+        verify(ownedAddressesDao).setAddressAsOwned(ADDRESS);
+    }
+
+    @Test
+    void setAddressAsOwned_with_description() {
         addressOwnershipService.setAddressAsOwned(ADDRESS, DESCRIPTION);
         verify(ownedAddressesDao).setAddressAsOwned(ADDRESS);
     }
 
     @Test
-    void setAddressAsOwned_persists_description() {
+    void setAddressAsOwned_with_description_persists_description() {
         addressOwnershipService.setAddressAsOwned(ADDRESS, DESCRIPTION);
         verify(addressDescriptionService).set(ADDRESS, DESCRIPTION);
     }
 
     @Test
     void setAddressAsOwned_requests_address_details_in_background() {
+        addressOwnershipService.setAddressAsOwned(ADDRESS);
+        verify(addressTransactionsService).requestTransactionsInBackground(ADDRESS);
+    }
+
+    @Test
+    void setAddressAsOwned_with_description_requests_address_details_in_background() {
         addressOwnershipService.setAddressAsOwned(ADDRESS, DESCRIPTION);
         verify(addressTransactionsService).requestTransactionsInBackground(ADDRESS);
     }
