@@ -274,20 +274,26 @@ class AddressOwnershipServiceTest {
 
     @Test
     void setAddressAsForeign() {
-        addressOwnershipService.setAddressAsForeign(ADDRESS, "");
+        addressOwnershipService.setAddressAsForeign(ADDRESS);
         verify(ownedAddressesDao).setAddressAsForeign(ADDRESS);
+    }
+
+    @Test
+    void setAddressAsForeign_with_description() {
+        addressOwnershipService.setAddressAsForeign(ADDRESS, "hi");
+        verify(ownedAddressesDao).setAddressAsForeign(ADDRESS);
+    }
+
+    @Test
+    void setAddressAsForeign_with_description_persists_description() {
+        addressOwnershipService.setAddressAsForeign(ADDRESS, DESCRIPTION);
+        verify(addressDescriptionService).set(ADDRESS, DESCRIPTION);
     }
 
     @Test
     void resetOwnership() {
         addressOwnershipService.resetOwnership(ADDRESS);
         verify(ownedAddressesDao).remove(ADDRESS);
-    }
-
-    @Test
-    void setAddressAsForeign_persists_description() {
-        addressOwnershipService.setAddressAsForeign(ADDRESS, DESCRIPTION);
-        verify(addressDescriptionService).set(ADDRESS, DESCRIPTION);
     }
 
     @Test
