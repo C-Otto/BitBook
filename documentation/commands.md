@@ -235,3 +235,6 @@ BitBook$ get-address-transactions 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS Pete Peters
 The list of completion candidates is adapted to the needs of the specific commands.
 As an example, when using `remove-transaction-description`, you are only shown transaction hashes for which a
 description is known.
+
+### LND Support
+Please have a look at [lnd.md](lnd.md).
