@@ -13,13 +13,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 @Component
 public class LndService {
+    private static final String DEFAULT_ADDRESS_DESCRIPTION = "LND";
+    private static final String SWEEP_TRANSACTION_DESCRIPTION = "LND sweep transaction";
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ObjectMapper objectMapper;
     private final TransactionService transactionService;
@@ -42,7 +46,7 @@ public class LndService {
     }
 
     public long lndAddFromSweeps(String json) {
-        Set<String> hashes = parseHashes(json);
+        Set<String> hashes = parse(json, this::parseHashes).orElse(Set.of());
         return hashes.stream()
                 .map(this::getGetTransactionDetails)
                 .filter(this::isSweepTransaction)
@@ -52,19 +56,26 @@ public class LndService {
                 .count();
     }
 
-    private Set<String> parseHashes(String json) {
+    public long lndAddUnspentOutputs(String json) {
+        Set<String> addresses = parse(json, this::parseAddressesFromUnspentOutputs).orElse(Set.of());
+        addresses.forEach(addressOwnershipService::setAddressAsOwned);
+        addresses.forEach(address -> addressDescriptionService.set(address, DEFAULT_ADDRESS_DESCRIPTION));
+        return addresses.size();
+    }
+
+    private <T> Optional<T> parse(String json, Function<JsonNode, T> parseFunction) {
         try (JsonParser parser = objectMapper.createParser(json)) {
             JsonNode rootNode = parser.getCodec().readTree(parser);
-            return parseHashes(rootNode);
+            if (rootNode == null) {
+                return Optional.empty();
+            }
+            return Optional.of(parseFunction.apply(rootNode));
         } catch (IOException e) {
-            return Set.of();
+            return Optional.empty();
         }
     }
 
-    private Set<String> parseHashes(@Nullable JsonNode rootNode) {
-        if (rootNode == null) {
-            return Set.of();
-        }
+    private Set<String> parseHashes(JsonNode rootNode) {
         JsonNode sweeps = rootNode.get("Sweeps");
         if (sweeps == null) {
             return Set.of();
@@ -84,6 +95,21 @@ public class LndService {
         return hashes;
     }
 
+    private Set<String> parseAddressesFromUnspentOutputs(JsonNode rootNode) {
+        JsonNode utxos = rootNode.get("utxos");
+        if (utxos == null) {
+            return Set.of();
+        }
+        Set<String> addresses = new LinkedHashSet<>();
+        for (JsonNode utxo : utxos) {
+            if (utxo.get("confirmations").intValue() == 0) {
+                continue;
+            }
+            addresses.add(utxo.get("address").textValue());
+        }
+        return addresses;
+    }
+
     private Transaction getGetTransactionDetails(String transactionHash) {
         Transaction transactionDetails = transactionService.getTransactionDetails(transactionHash);
         if (transactionDetails.isInvalid()) {
@@ -101,7 +127,7 @@ public class LndService {
     }
 
     private Transaction addTransactionDescription(Transaction transaction) {
-        transactionDescriptionService.set(transaction.getHash(), "LND sweep transaction");
+        transactionDescriptionService.set(transaction.getHash(), SWEEP_TRANSACTION_DESCRIPTION);
         return transaction;
     }
 
@@ -109,9 +135,9 @@ public class LndService {
         String inputAddress = getInputAddress(transaction);
         AddressWithDescription addressWithDescription = addressDescriptionService.get(inputAddress);
         if (addressWithDescription.getDescription().isBlank()) {
-            addressDescriptionService.set(inputAddress, "LND");
+            addressDescriptionService.set(inputAddress, DEFAULT_ADDRESS_DESCRIPTION);
         }
-        addressDescriptionService.set(getOutputAddress(transaction), "LND");
+        addressDescriptionService.set(getOutputAddress(transaction), DEFAULT_ADDRESS_DESCRIPTION);
         return transaction;
     }
 
