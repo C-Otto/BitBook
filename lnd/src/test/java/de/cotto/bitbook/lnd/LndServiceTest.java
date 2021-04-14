@@ -2,8 +2,12 @@ package de.cotto.bitbook.lnd;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.cotto.bitbook.backend.transaction.TransactionService;
+import de.cotto.bitbook.backend.transaction.model.Coins;
+import de.cotto.bitbook.lnd.features.ClosedChannelsService;
 import de.cotto.bitbook.lnd.features.SweepTransactionsService;
 import de.cotto.bitbook.lnd.features.UnspentOutputsService;
+import de.cotto.bitbook.lnd.model.ClosedChannel;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -14,7 +18,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH_2;
+import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.CLOSED_CHANNEL;
+import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.CLOSING_TRANSACTION;
+import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.OPENING_TRANSACTION;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -23,7 +33,13 @@ class LndServiceTest {
     private LndService lndService;
 
     @Mock
+    private TransactionService transactionService;
+
+    @Mock
     private AddressOwnershipService addressOwnershipService;
+
+    @Mock
+    private ClosedChannelsService closedChannelsService;
 
     @Mock
     private UnspentOutputsService unspentOutputsService;
@@ -37,8 +53,10 @@ class LndServiceTest {
                 new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         lndService = new LndService(
                 objectMapper,
+                closedChannelsService,
                 unspentOutputsService,
-                sweepTransactionsService
+                sweepTransactionsService,
+                transactionService
         );
     }
 
@@ -140,6 +158,121 @@ class LndServiceTest {
 
         private void assertFailure(String json) {
             assertThat(lndService.addFromUnspentOutputs(json)).isEqualTo(0);
+            verifyNoInteractions(addressOwnershipService);
+        }
+    }
+
+    @Nested
+    class AddFromClosedChannels {
+        @Test
+        void empty_json() {
+            assertFailure("");
+        }
+
+        @Test
+        void not_json() {
+            assertFailure("---");
+        }
+
+        @Test
+        void empty_json_object() {
+            assertFailure("{}");
+        }
+
+        @Test
+        void no_channels() {
+            assertFailure("{\"foo\": 1}");
+        }
+
+        @Test
+        void not_array() {
+            String json = "{\"channels\":1}";
+            assertFailure(json);
+        }
+
+        @Test
+        void skips_channels_with_unconfirmed_close_transactions() {
+            int closeHeight = 0;
+            String json = "{\"channels\": [" +
+                          "{" +
+                          "\"channel_point\": \"" + TRANSACTION_HASH + ":123\"" +
+                          ",\"closing_tx_hash\": \"" + TRANSACTION_HASH_2 + "\"" +
+                          ",\"remote_pubkey\": \"pubkey\"" +
+                          ",\"chain_hash\": \"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\"" +
+                          ",\"settled_balance\": \"123\"" +
+                          ",\"close_height\": " + closeHeight +
+                          ",\"close_type\": \"COOPERATIVE_CLOSE\"" +
+                          ",\"open_initiator\": \"INITIATOR_REMOTE\"" +
+                          ",\"close_initiator\": \"INITIATOR_REMOTE\"" +
+                          ",\"resolutions\": []" +
+                          "}" +
+                          "]}";
+
+            lndService.addFromClosedChannels(json);
+
+            verify(closedChannelsService).addFromClosedChannels(Set.of());
+            verifyNoInteractions(transactionService);
+        }
+
+        @Test
+        void skips_channels_with_unknown_close_transactions() {
+            String closingTransactionHash = "0000000000000000000000000000000000000000000000000000000000000000";
+            String json = "{\"channels\": [" +
+                          "{" +
+                          "\"channel_point\": \"" + TRANSACTION_HASH + ":123\"" +
+                          ",\"closing_tx_hash\": \"" + closingTransactionHash + "\"" +
+                          ",\"remote_pubkey\": \"pubkey\"" +
+                          ",\"chain_hash\": \"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\"" +
+                          ",\"settled_balance\": \"123\"" +
+                          ",\"close_height\": 123" +
+                          ",\"close_type\": \"COOPERATIVE_CLOSE\"" +
+                          ",\"open_initiator\": \"INITIATOR_REMOTE\"" +
+                          ",\"close_initiator\": \"INITIATOR_REMOTE\"" +
+                          ",\"resolutions\": []" +
+                          "}" +
+                          "]}";
+
+            lndService.addFromClosedChannels(json);
+
+            verify(closedChannelsService).addFromClosedChannels(Set.of());
+            verifyNoInteractions(transactionService);
+        }
+
+        @Test
+        void success() {
+            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(OPENING_TRANSACTION);
+            when(transactionService.getTransactionDetails(TRANSACTION_HASH_2)).thenReturn(CLOSING_TRANSACTION);
+            ClosedChannel closedChannel2 = CLOSED_CHANNEL.toBuilder().withSettledBalance(Coins.ofSatoshis(500)).build();
+            when(closedChannelsService.addFromClosedChannels(Set.of(CLOSED_CHANNEL, closedChannel2))).thenReturn(2L);
+
+            long result = lndService.addFromClosedChannels(
+                    "{\"channels\": [" +
+                    getJsonSingleClosedChannel(CLOSED_CHANNEL.getSettledBalance()) +
+                    "," +
+                    getJsonSingleClosedChannel(closedChannel2.getSettledBalance()) +
+                    "]}"
+            );
+
+            assertThat(result).isEqualTo(2);
+        }
+
+        private String getJsonSingleClosedChannel(Coins settledBalance) {
+            return "{" +
+                   "\"channel_point\": \"" + TRANSACTION_HASH + ":123\"," +
+                   "\"closing_tx_hash\": \"" + TRANSACTION_HASH_2 + "\"," +
+                   "\"remote_pubkey\": \"pubkey\"," +
+                   "\"chain_hash\": \"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\"," +
+                   "\"settled_balance\": \"" + settledBalance.getSatoshis() + "\"," +
+                   "\"close_height\": 123," +
+                   "\"close_type\": \"COOPERATIVE_CLOSE\"," +
+                   "\"open_initiator\": \"INITIATOR_REMOTE\"," +
+                   "\"close_initiator\": \"INITIATOR_REMOTE\"," +
+                   "\"resolutions\": []" +
+                   "}";
+        }
+
+        private void assertFailure(String json) {
+            assertThat(lndService.addFromClosedChannels(json)).isEqualTo(0);
             verifyNoInteractions(addressOwnershipService);
         }
     }

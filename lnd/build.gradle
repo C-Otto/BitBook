@@ -7,16 +7,5 @@ dependencies {
     implementation project(':backend-transaction')
     implementation project(':ownership')
     testImplementation testFixtures(project(':backend-transaction-models'))
-}
-
-jacocoTestCoverageVerification {
-    violationRules {
-        rules.forEach {rule ->
-            rule.limits.forEach {limit ->
-                if (limit.counter == 'BRANCH') {
-                    limit.minimum = 0.96
-                }
-            }
-        }
-    }
+    testFixturesImplementation testFixtures(project(':backend-transaction-models'))
 }

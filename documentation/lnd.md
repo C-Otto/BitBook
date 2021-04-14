@@ -44,3 +44,37 @@ Then you can use the command as follows:
 BitBook$ lnd-add-from-sweeps /tmp/lnd-sweeps.json
 Added information for 86 sweep transactions
 ```
+
+### Closed Channels
+lnd stores information about closed channels, including references to the opening and closing transactions.
+This record also includes information about the value returned to your own wallet.
+
+BitBook offers the command `lnd-add-from-closed-channels` which parses this information and
+
+- marks the channel address (input of closing transaction) as owned if you opened the channel,
+  or as foreign if the remote opened the channel
+- for the closing transaction:
+  - sets the description to "Closing Channel with <pubkey> (<type>)"
+    - type is one out of "cooperative", "cooperative local", "cooperative remote", "force local", "force remote"
+  - sets the input address description to "Lightning-Channel with <pubkey>"
+  - for addresses which are used to return channel funds, marks these as owned
+- for the opening transaction:
+  - sets the description to "Opening Channel with <pubkey> (<type>)"
+    - type is one out of "local", "remote", "unknown"
+  
+Notes:
+
+- If your lnd node has/had channels to another node you own, setting ownership of the address belonging to the remote
+  node as *foreign* may be wrong. To avoid this, for addresses already marked as *owned* the ownership is not changed.
+- If a transaction opens more than one channel, only one of these is mentioned in the description.
+
+To run the command:
+1. first create the JSON file using lnd: `$ lncli closedchannels > lnd-closedchannels.json`
+2. transfer the JSON file to the host where you are running BitBook: `$ scp server:/home/lnd/lnd-closedchannels.json /tmp/`
+3. start BitBook
+
+Then you can use the command as follows:
+```
+BitBook$ lnd-add-from-closed-channels /tmp/lnd-closedchannels.json
+TODO
+```
