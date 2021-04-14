@@ -1,10 +1,10 @@
 # Commands
 
-### Help
+## Help
 The `help` command shows a list of available commands.
 You can also use `help xxx` to get more information about command `xxx`.
 
-### Get Transaction Details
+## Get Transaction Details
 With `get-transaction-details <hash>` you can request information about a specific transaction.
 The output includes the block height of the block that includes the transaction, and a time
 when this transaction was first seen (which may be identical to the time the block was mined).
@@ -32,7 +32,7 @@ Outputs:
 Note that BitBook only shows confirmed transactions with a confirmation depth of at least 6 confirmations.
 This is done to avoid having outdated information in the case of chain reorgs.
 
-### Get Address Transactions
+## Get Address Transactions
 Using the `get-address-transactions` command you get information about all transactions connected to the address:
 
 ```
@@ -197,7 +197,7 @@ Descriptions set for transactions are included in the output.
 Note that the list of hashes associated with each owned address is updated as part of this computation, which might
 cause a delay (see [Get Address Transactions](#get-address-transactions)).
 
-### Descriptions
+## Descriptions
 You can set textual descriptions to addresses and transactions so that this additional information is shown in the
 commands' outputs in addition to the address/transaction hash.
 
@@ -209,7 +209,7 @@ set-transaction-description f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c
 
 You can also remove descriptions using `remove-address-description` and `remove-transaction-description`.
 
-### Tab Completion
+## Tab Completion
 All commands taking address or transaction hashes as arguments support tab completion.
 For addresses, completion works for addresses that are either "known" (by, possibly indirectly,
 using `get-address-transactions`), or if the address is listed as an input or output of a known transaction.
@@ -236,5 +236,5 @@ The list of completion candidates is adapted to the needs of the specific comman
 As an example, when using `remove-transaction-description`, you are only shown transaction hashes for which a
 description is known.
 
-### LND Support
+## LND Support
 Please have a look at [lnd.md](lnd.md).
