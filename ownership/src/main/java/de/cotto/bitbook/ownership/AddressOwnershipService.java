@@ -77,13 +77,16 @@ public class AddressOwnershipService {
     }
 
     public void setAddressAsOwned(String address, String description) {
-        addressOwnershipDao.setAddressAsOwned(address);
+        setAddressAsOwned(address);
         addressDescriptionService.set(address, description);
-        addressTransactionsService.requestTransactionsInBackground(address);
+    }
+
+    public void setAddressAsForeign(String address) {
+        addressOwnershipDao.setAddressAsForeign(address);
     }
 
     public void setAddressAsForeign(String address, String description) {
-        addressOwnershipDao.setAddressAsForeign(address);
+        setAddressAsForeign(address);
         addressDescriptionService.set(address, description);
     }
 
