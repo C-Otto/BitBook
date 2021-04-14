@@ -191,4 +191,57 @@ class LndServiceTest {
             verifyNoInteractions(addressOwnershipService);
         }
     }
+
+    @Nested
+    class AddFromUnspentOutputs {
+        @Test
+        void empty_json() {
+            assertFailure("");
+        }
+
+        @Test
+        void not_json() {
+            assertFailure("---");
+        }
+
+        @Test
+        void empty_json_object() {
+            assertFailure("{}");
+        }
+
+        @Test
+        void no_utxos() {
+            assertFailure("{\"foo\": 1}");
+        }
+
+        @Test
+        void empty_array() {
+            String json = "{\"utxos\":[]}";
+            assertFailure(json);
+        }
+
+        @Test
+        void unconfirmed_transaction() {
+            String json = "{\"utxos\":[{\"address\":\"bc1qngw83\",\"confirmations\": 0}]}";
+            assertFailure(json);
+        }
+
+        @Test
+        void success() {
+            String json = "{\"utxos\":[" +
+                          "{\"address\":\"bc1qngw83\",\"confirmations\": 123}, " +
+                          "{\"address\":\"bc1aaaaaa\",\"confirmations\":597}" +
+                          "]}";
+            assertThat(lndService.lndAddUnspentOutputs(json)).isEqualTo(2);
+            verify(addressOwnershipService).setAddressAsOwned("bc1qngw83");
+            verify(addressOwnershipService).setAddressAsOwned("bc1aaaaaa");
+            verify(addressDescriptionService).set("bc1qngw83", DEFAULT_DESCRIPTION);
+            verify(addressDescriptionService).set("bc1aaaaaa", DEFAULT_DESCRIPTION);
+        }
+
+        private void assertFailure(String json) {
+            assertThat(lndService.lndAddUnspentOutputs(json)).isEqualTo(0);
+            verifyNoInteractions(addressOwnershipService);
+        }
+    }
 }

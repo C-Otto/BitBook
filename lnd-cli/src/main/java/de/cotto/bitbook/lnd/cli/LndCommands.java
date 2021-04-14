@@ -26,4 +26,14 @@ public class LndCommands {
         }
         return "Added information for " + numberOfSweepTransactions + " sweep transactions";
     }
+
+    @ShellMethod("Add information from lnd unspent outputs obtained by `lncli listunspent`")
+    public String lndAddUnspentOutputs(File jsonFile) throws IOException {
+        String content = Files.readString(jsonFile.toPath(), StandardCharsets.US_ASCII);
+        long numberOfSweepTransactions = lndService.lndAddUnspentOutputs(content);
+        if (numberOfSweepTransactions == 0) {
+            return "Unable to find unspent output address in file";
+        }
+        return "Marked " + numberOfSweepTransactions + " addresses as owned by LND";
+    }
 }
