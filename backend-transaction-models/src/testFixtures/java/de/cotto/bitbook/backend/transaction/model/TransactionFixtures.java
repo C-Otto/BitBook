@@ -15,7 +15,7 @@ import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_2
 
 public class TransactionFixtures {
     public static final String TRANSACTION_HASH = "c56c2a4ec7099879c2c4da74f4e5105a5a5d0ed94aa7d64518fa7e4256d42d9e";
-    public static final String TRANSACTION_HASH_2 = "123123123123";
+    public static final String TRANSACTION_HASH_2 = "aad0e9e8f453da1a207600f856325f10b2e1a03c39c308481855925f15ed4cfe";
     public static final int BLOCK_HEIGHT = 601_164;
     public static final LocalDateTime DATE_TIME = LocalDateTime.of(2019, 10, 26, 20, 6, 35);
     public static final long DATE_TIME_EPOCH_SECONDS = DATE_TIME.toEpochSecond(ZoneOffset.UTC);
