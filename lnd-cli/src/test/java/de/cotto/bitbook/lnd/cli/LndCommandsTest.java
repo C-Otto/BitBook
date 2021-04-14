@@ -63,6 +63,25 @@ class LndCommandsTest {
                 .isEqualTo("Unable to find unspent output address in file");
     }
 
+    @Test
+    void lndAddFromClosedChannels() throws IOException {
+        when(lndService.addFromClosedChannels(any())).thenReturn(123L);
+        String json = "{\"foo\": \"bar\"}";
+        File file = createTempFile(json);
+
+        assertThat(lndCommands.lndAddFromClosedChannels(file)).isEqualTo("Added information for 123 closed channels");
+
+        verify(lndService).addFromClosedChannels(json);
+    }
+
+    @Test
+    void lndAddFromClosedChannels_failure() throws IOException {
+        when(lndService.addFromClosedChannels(any())).thenReturn(0L);
+        File file = createTempFile();
+
+        assertThat(lndCommands.lndAddFromClosedChannels(file)).isEqualTo("Unable to find closed channel in file");
+    }
+
     private File createTempFile(String json) throws IOException {
         File file = createTempFile();
         Files.writeString(file.toPath(), json);
