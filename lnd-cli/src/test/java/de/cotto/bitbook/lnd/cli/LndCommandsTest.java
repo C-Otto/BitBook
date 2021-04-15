@@ -38,13 +38,13 @@ class LndCommandsTest {
     @Test
     void lndAddFromSweeps_failure() throws IOException {
         when(lndService.addFromSweeps(any())).thenReturn(0L);
-        File file = File.createTempFile("temp", "bitbook");
+        File file = createTempFile();
 
         assertThat(lndCommands.lndAddFromSweeps(file)).isEqualTo("Unable to find sweep transactions in file");
     }
 
     @Test
-    void lndAddUnspentOutputs() throws IOException {
+    void addFromUnspentOutputs() throws IOException {
         when(lndService.addFromUnspentOutputs(any())).thenReturn(123L);
         String json = "{\"foo\": \"bar\"}";
         File file = createTempFile(json);
@@ -55,17 +55,21 @@ class LndCommandsTest {
     }
 
     @Test
-    void lndAddUnspentOutputs_failure() throws IOException {
+    void lndAddFromUnspentOutputs_failure() throws IOException {
         when(lndService.addFromUnspentOutputs(any())).thenReturn(0L);
-        File file = File.createTempFile("temp", "bitbook");
+        File file = createTempFile();
 
         assertThat(lndCommands.lndAddFromUnspentOutputs(file))
                 .isEqualTo("Unable to find unspent output address in file");
     }
 
     private File createTempFile(String json) throws IOException {
-        File file = File.createTempFile("temp", "bitbook");
+        File file = createTempFile();
         Files.writeString(file.toPath(), json);
         return file;
+    }
+
+    private File createTempFile() throws IOException {
+        return File.createTempFile("temp", "bitbook");
     }
 }
