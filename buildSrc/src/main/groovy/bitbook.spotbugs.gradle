@@ -11,7 +11,7 @@ spotbugsTest.reports.configure {
     html.enabled = true
 }
 spotbugs {
-    excludeFilter = file('../config/spotbugs-exclude.xml')
+    excludeFilter = file("${rootDir}/config/spotbugs-exclude.xml")
 }
 
 tasks.withType(Test).forEach { testTask ->
