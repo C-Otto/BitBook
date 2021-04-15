@@ -138,7 +138,7 @@ class LndServiceTest {
             when(addressDescriptionService.get(any()))
                     .then(invocation -> new AddressWithDescription(invocation.getArgument(0)));
             when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(TRANSACTION_4);
-            assertThat(lndService.lndAddFromSweeps(jsonForTransactionHash())).isEqualTo(1);
+            assertThat(lndService.addFromSweeps(jsonForTransactionHash())).isEqualTo(1);
         }
 
         @Test
@@ -156,7 +156,7 @@ class LndServiceTest {
             String json = "{\"Sweeps\":{\"TransactionIds\": {\"transaction_ids\": [\"%s\", \"%s\"]}}}"
                     .formatted(TRANSACTION_HASH, TRANSACTION_HASH_2);
 
-            assertThat(lndService.lndAddFromSweeps(json)).isEqualTo(2);
+            assertThat(lndService.addFromSweeps(json)).isEqualTo(2);
 
             verify(transactionDescriptionService).set(TRANSACTION_HASH, "lnd sweep transaction");
             verify(transactionDescriptionService).set(TRANSACTION_HASH_2, "lnd sweep transaction");
@@ -176,7 +176,7 @@ class LndServiceTest {
                     .thenReturn(new AddressWithDescription(INPUT_SWEEP_1.getAddress(), "do-not-overwrite-me"));
             when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(SWEEP_TRANSACTION);
 
-            lndService.lndAddFromSweeps(jsonForTransactionHash());
+            lndService.addFromSweeps(jsonForTransactionHash());
 
             verify(transactionDescriptionService, never()).set(eq(INPUT_SWEEP_1.getAddress()), any());
         }
@@ -187,7 +187,7 @@ class LndServiceTest {
         }
 
         private void assertFailure(String json) {
-            assertThat(lndService.lndAddFromSweeps(json)).isEqualTo(0);
+            assertThat(lndService.addFromSweeps(json)).isEqualTo(0);
             verifyNoInteractions(addressOwnershipService);
         }
     }
@@ -232,7 +232,7 @@ class LndServiceTest {
                           "{\"address\":\"bc1qngw83\",\"confirmations\": 123}, " +
                           "{\"address\":\"bc1aaaaaa\",\"confirmations\":597}" +
                           "]}";
-            assertThat(lndService.lndAddUnspentOutputs(json)).isEqualTo(2);
+            assertThat(lndService.addUnspentOutputs(json)).isEqualTo(2);
             verify(addressOwnershipService).setAddressAsOwned("bc1qngw83");
             verify(addressOwnershipService).setAddressAsOwned("bc1aaaaaa");
             verify(addressDescriptionService).set("bc1qngw83", DEFAULT_DESCRIPTION);
@@ -240,7 +240,7 @@ class LndServiceTest {
         }
 
         private void assertFailure(String json) {
-            assertThat(lndService.lndAddUnspentOutputs(json)).isEqualTo(0);
+            assertThat(lndService.addUnspentOutputs(json)).isEqualTo(0);
             verifyNoInteractions(addressOwnershipService);
         }
     }

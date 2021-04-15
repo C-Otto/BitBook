@@ -20,7 +20,7 @@ public class LndCommands {
     @ShellMethod("Add information from lnd sweep information obtained by `lncli wallet listsweeps`")
     public String lndAddFromSweeps(File jsonFile) throws IOException {
         String content = Files.readString(jsonFile.toPath(), StandardCharsets.US_ASCII);
-        long numberOfSweepTransactions = lndService.lndAddFromSweeps(content);
+        long numberOfSweepTransactions = lndService.addFromSweeps(content);
         if (numberOfSweepTransactions == 0) {
             return "Unable to find sweep transactions in file";
         }
@@ -30,7 +30,7 @@ public class LndCommands {
     @ShellMethod("Add information from lnd unspent outputs obtained by `lncli listunspent`")
     public String lndAddUnspentOutputs(File jsonFile) throws IOException {
         String content = Files.readString(jsonFile.toPath(), StandardCharsets.US_ASCII);
-        long numberOfSweepTransactions = lndService.lndAddUnspentOutputs(content);
+        long numberOfSweepTransactions = lndService.addUnspentOutputs(content);
         if (numberOfSweepTransactions == 0) {
             return "Unable to find unspent output address in file";
         }
