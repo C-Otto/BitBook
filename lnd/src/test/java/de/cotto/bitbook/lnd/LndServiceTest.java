@@ -2,13 +2,8 @@ package de.cotto.bitbook.lnd;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.cotto.bitbook.backend.AddressDescriptionService;
-import de.cotto.bitbook.backend.TransactionDescriptionService;
-import de.cotto.bitbook.backend.transaction.TransactionService;
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Input;
-import de.cotto.bitbook.backend.transaction.model.Output;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
+import de.cotto.bitbook.lnd.features.SweepTransactionsService;
+import de.cotto.bitbook.lnd.features.UnspentOutputsService;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -17,73 +12,38 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
+import java.util.Set;
 
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.DATE_TIME;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_2;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_4;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH_2;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class LndServiceTest {
-    private static final String DEFAULT_DESCRIPTION = "lnd";
-
     private LndService lndService;
 
     @Mock
-    private TransactionService transactionService;
-
-    @Mock
-    private TransactionDescriptionService transactionDescriptionService;
-
-    @Mock
-    private AddressDescriptionService addressDescriptionService;
-
-    @Mock
     private AddressOwnershipService addressOwnershipService;
+
+    @Mock
+    private UnspentOutputsService unspentOutputsService;
+
+    @Mock
+    private SweepTransactionsService sweepTransactionsService;
 
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper =
                 new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         lndService = new LndService(
-                transactionService,
-                addressDescriptionService,
-                transactionDescriptionService,
-                addressOwnershipService,
-                objectMapper
+                objectMapper,
+                unspentOutputsService,
+                sweepTransactionsService
         );
     }
 
     @Nested
     class AddFromSweeps {
-        private static final Input INPUT_SWEEP_1 = new Input(Coins.ofSatoshis(200), "input-address1");
-        private static final Input INPUT_SWEEP_2 = new Input(Coins.ofSatoshis(2), "input-address2");
-        private static final Output OUTPUT_SWEEP_1 = new Output(Coins.ofSatoshis(199), "output-address1");
-        private static final Output OUTPUT_SWEEP_2 = new Output(Coins.ofSatoshis(2), "output-address2");
-        private static final Transaction SWEEP_TRANSACTION = new Transaction(
-                TRANSACTION_HASH,
-                BLOCK_HEIGHT,
-                DATE_TIME,
-                Coins.ofSatoshis(1),
-                List.of(INPUT_SWEEP_1),
-                List.of(OUTPUT_SWEEP_1)
-        );
-        private static final Transaction SWEEP_TRANSACTION_2 = new Transaction(
-                TRANSACTION_HASH_2,
-                BLOCK_HEIGHT,
-                DATE_TIME,
-                Coins.ofSatoshis(0),
-                List.of(INPUT_SWEEP_2),
-                List.of(OUTPUT_SWEEP_2)
-        );
-
         @Test
         void empty_json() {
             assertFailure("");
@@ -123,53 +83,14 @@ class LndServiceTest {
         }
 
         @Test
-        void unknown_transaction() {
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(Transaction.UNKNOWN);
-            assertFailure(jsonForTransactionHash());
-        }
-
-        @Test
-        void accepts_two_inputs() {
-            // this may happen for closed channels with unsettled UTXOs
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(TRANSACTION_4);
-            assertThat(lndService.addFromSweeps(jsonForTransactionHash())).isEqualTo(1);
-        }
-
-        @Test
-        void not_sweep_because_of_two_outputs() {
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(TRANSACTION_2);
-            assertFailure(jsonForTransactionHash());
-        }
-
-        @Test
-        void sweep_transactions() {
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(SWEEP_TRANSACTION);
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH_2)).thenReturn(SWEEP_TRANSACTION_2);
-            String json = "{\"Sweeps\":{\"TransactionIds\": {\"transaction_ids\": [\"%s\", \"%s\"]}}}"
-                    .formatted(TRANSACTION_HASH, TRANSACTION_HASH_2);
-
+        void success() {
+            when(sweepTransactionsService.addFromSweeps(Set.of("a", "b"))).thenReturn(2L);
+            String json = "{\"Sweeps\":{\"TransactionIds\": {\"transaction_ids\": [\"a\", \"b\"]}}}";
             assertThat(lndService.addFromSweeps(json)).isEqualTo(2);
-
-            verify(transactionDescriptionService).set(TRANSACTION_HASH, "lnd sweep transaction");
-            verify(transactionDescriptionService).set(TRANSACTION_HASH_2, "lnd sweep transaction");
-            verify(addressDescriptionService).set(INPUT_SWEEP_1.getAddress(), DEFAULT_DESCRIPTION);
-            verify(addressDescriptionService).set(INPUT_SWEEP_2.getAddress(), DEFAULT_DESCRIPTION);
-            verify(addressDescriptionService).set(OUTPUT_SWEEP_1.getAddress(), DEFAULT_DESCRIPTION);
-            verify(addressDescriptionService).set(OUTPUT_SWEEP_2.getAddress(), DEFAULT_DESCRIPTION);
-            verify(addressOwnershipService).setAddressAsOwned(INPUT_SWEEP_1.getAddress());
-            verify(addressOwnershipService).setAddressAsOwned(INPUT_SWEEP_2.getAddress());
-            verify(addressOwnershipService).setAddressAsOwned(OUTPUT_SWEEP_1.getAddress());
-            verify(addressOwnershipService).setAddressAsOwned(OUTPUT_SWEEP_2.getAddress());
-        }
-
-        private String jsonForTransactionHash() {
-            return "{\"Sweeps\":{\"TransactionIds\": {\"transaction_ids\": [\"%s\"]}}}"
-                    .formatted(TRANSACTION_HASH);
         }
 
         private void assertFailure(String json) {
             assertThat(lndService.addFromSweeps(json)).isEqualTo(0);
-            verifyNoInteractions(addressOwnershipService);
         }
     }
 
@@ -209,15 +130,12 @@ class LndServiceTest {
 
         @Test
         void success() {
+            when(unspentOutputsService.addFromUnspentOutputs(Set.of("bc1qngw83", "bc1aaaaaa"))).thenReturn(2L);
             String json = "{\"utxos\":[" +
-                          "{\"address\":\"bc1qngw83\",\"confirmations\": 123}, " +
+                          "{\"address\":\"bc1qngw83\",\"confirmations\":123}, " +
                           "{\"address\":\"bc1aaaaaa\",\"confirmations\":597}" +
                           "]}";
             assertThat(lndService.addFromUnspentOutputs(json)).isEqualTo(2);
-            verify(addressOwnershipService).setAddressAsOwned("bc1qngw83");
-            verify(addressOwnershipService).setAddressAsOwned("bc1aaaaaa");
-            verify(addressDescriptionService).set("bc1qngw83", DEFAULT_DESCRIPTION);
-            verify(addressDescriptionService).set("bc1aaaaaa", DEFAULT_DESCRIPTION);
         }
 
         private void assertFailure(String json) {
