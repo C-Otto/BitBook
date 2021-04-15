@@ -77,5 +77,5 @@ To run the command:
 Then you can use the command as follows:
 ```
 BitBook$ lnd-add-from-closed-channels /tmp/lnd-closedchannels.json
-TODO
+Added information for 99 channels
 ```
