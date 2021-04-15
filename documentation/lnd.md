@@ -10,7 +10,7 @@ different computers. Furthermore, by not giving BitBook access to lnd, there's n
 ### Unspent Outputs
 Using `lncli listunspent` you can get a list of all unspent outputs managed by lnd.
 As such, BitBook should mark these addresses as owned (with the description "lnd").
-You can do this using the command `lnd-add-unspent-outputs`:
+You can do this using the command `lnd-add-from-unspent-outputs`:
 
 1. first create the JSON file using lnd: `$ lncli listunspent > lnd-unspent.json`
 2. transfer the JSON file to the host where you are running BitBook: `$ scp server:/home/lnd/lnd-unspent.json /tmp/`
@@ -18,7 +18,7 @@ You can do this using the command `lnd-add-unspent-outputs`:
 
 Then you can use the command as follows:
 ```
-BitBook$ lnd-add-unspent-outputs /tmp/lnd-unspent.json
+BitBook$ lnd-add-from-unspent-outputs /tmp/lnd-unspent.json
 Marked 6 addresses as owned by lnd
 ```
 

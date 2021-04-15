@@ -232,7 +232,7 @@ class LndServiceTest {
                           "{\"address\":\"bc1qngw83\",\"confirmations\": 123}, " +
                           "{\"address\":\"bc1aaaaaa\",\"confirmations\":597}" +
                           "]}";
-            assertThat(lndService.addUnspentOutputs(json)).isEqualTo(2);
+            assertThat(lndService.addFromUnspentOutputs(json)).isEqualTo(2);
             verify(addressOwnershipService).setAddressAsOwned("bc1qngw83");
             verify(addressOwnershipService).setAddressAsOwned("bc1aaaaaa");
             verify(addressDescriptionService).set("bc1qngw83", DEFAULT_DESCRIPTION);
@@ -240,7 +240,7 @@ class LndServiceTest {
         }
 
         private void assertFailure(String json) {
-            assertThat(lndService.addUnspentOutputs(json)).isEqualTo(0);
+            assertThat(lndService.addFromUnspentOutputs(json)).isEqualTo(0);
             verifyNoInteractions(addressOwnershipService);
         }
     }
