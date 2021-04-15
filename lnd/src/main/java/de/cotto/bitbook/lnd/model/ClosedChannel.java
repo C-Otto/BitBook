@@ -5,9 +5,11 @@ import de.cotto.bitbook.backend.transaction.model.Output;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 
 import javax.annotation.Nullable;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ClosedChannel {
@@ -21,6 +23,7 @@ public class ClosedChannel {
     private final Coins settledBalance;
     private final Initiator openInitiator;
     private final CloseType closeType;
+    private final Set<Resolution> resolutions;
 
     private ClosedChannel(
             String chainHash,
@@ -29,7 +32,8 @@ public class ClosedChannel {
             String remotePubkey,
             Coins settledBalance,
             Initiator openInitiator,
-            CloseType closeType
+            CloseType closeType,
+            Set<Resolution> resolutions
     ) {
         this.chainHash = chainHash;
         this.openingTransaction = openingTransaction;
@@ -38,6 +42,7 @@ public class ClosedChannel {
         this.settledBalance = settledBalance;
         this.openInitiator = openInitiator;
         this.closeType = closeType;
+        this.resolutions = resolutions;
     }
 
     public Transaction getOpeningTransaction() {
@@ -68,6 +73,10 @@ public class ClosedChannel {
         return closeType;
     }
 
+    public Set<Resolution> getResolutions() {
+        return resolutions;
+    }
+
     public boolean isValid() {
         return BITCOIN_GENESIS_BLOCK_HASH.equals(chainHash)
                && !openingTransaction.isInvalid()
@@ -83,7 +92,8 @@ public class ClosedChannel {
                 .withRemotePubkey(remotePubkey)
                 .withSettledBalance(settledBalance)
                 .withOpenInitiator(openInitiator)
-                .withCloseType(closeType);
+                .withCloseType(closeType)
+                .withResolutions(resolutions);
     }
 
     public static ClosedChannelBuilder builder() {
@@ -111,6 +121,7 @@ public class ClosedChannel {
                ", settledBalance=" + settledBalance +
                ", openInitiator=" + openInitiator +
                ", closeType=" + closeType +
+               ", resolutions=" + resolutions +
                '}';
     }
 
@@ -129,7 +140,8 @@ public class ClosedChannel {
                && Objects.equals(remotePubkey, that.remotePubkey)
                && Objects.equals(settledBalance, that.settledBalance)
                && openInitiator == that.openInitiator
-               && closeType == that.closeType;
+               && closeType == that.closeType
+               && Objects.equals(resolutions, that.resolutions);
     }
 
     @Override
@@ -141,7 +153,8 @@ public class ClosedChannel {
                 remotePubkey,
                 settledBalance,
                 openInitiator,
-                closeType
+                closeType,
+                resolutions
         );
     }
 
@@ -152,6 +165,7 @@ public class ClosedChannel {
         private String remotePubkey = "";
         private Coins settledBalance = Coins.NONE;
         private Initiator openInitiator = Initiator.UNKNOWN;
+        private Set<Resolution> resolutions = new LinkedHashSet<>();
 
         @Nullable
         private CloseType closeType;
@@ -194,6 +208,16 @@ public class ClosedChannel {
             return this;
         }
 
+        public ClosedChannelBuilder withResolution(Resolution resolution) {
+            this.resolutions.add(resolution);
+            return this;
+        }
+
+        public ClosedChannelBuilder withResolutions(Set<Resolution> resolutions) {
+            this.resolutions = resolutions;
+            return this;
+        }
+
         public ClosedChannel build() {
             return new ClosedChannel(
                     chainHash,
@@ -202,7 +226,8 @@ public class ClosedChannel {
                     remotePubkey,
                     settledBalance,
                     openInitiator,
-                    Objects.requireNonNull(closeType)
+                    Objects.requireNonNull(closeType),
+                    resolutions
             );
         }
     }

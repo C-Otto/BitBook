@@ -16,6 +16,8 @@ import java.util.Set;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.AMBIGUOUS_SETTLEMENT_ADDRESS;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.CLOSED_CHANNEL;
+import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.SWEEP_TRANSACTION_HASH;
+import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.WITH_RESOLUTION;
 import static de.cotto.bitbook.lnd.model.Initiator.LOCAL;
 import static de.cotto.bitbook.lnd.model.Initiator.REMOTE;
 import static de.cotto.bitbook.lnd.model.Initiator.UNKNOWN;
@@ -42,6 +44,9 @@ public class ClosedChannelsServiceTest {
 
     @Mock
     private AddressOwnershipService addressOwnershipService;
+
+    @Mock
+    private SweepTransactionsService sweepTransactionsService;
 
     @Test
     void no_channel() {
@@ -152,6 +157,12 @@ public class ClosedChannelsServiceTest {
     void does_not_set_description_for_settled_balance_receive_address_if_not_unique() {
         load(CLOSED_CHANNEL.toBuilder().withClosingTransaction(TRANSACTION).build());
         verify(addressDescriptionService, never()).set(any(), any());
+    }
+
+    @Test
+    void adds_from_sweep_transactions_in_htlc_resolutions() {
+        load(WITH_RESOLUTION);
+        verify(sweepTransactionsService).addFromSweeps(Set.of(SWEEP_TRANSACTION_HASH));
     }
 
     private void load(ClosedChannel closedChannel) {
