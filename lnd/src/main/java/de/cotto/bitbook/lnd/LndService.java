@@ -45,7 +45,7 @@ public class LndService {
         this.objectMapper = objectMapper;
     }
 
-    public long lndAddFromSweeps(String json) {
+    public long addFromSweeps(String json) {
         Set<String> hashes = parse(json, this::parseHashes).orElse(Set.of());
         return hashes.stream()
                 .map(this::getGetTransactionDetails)
@@ -56,7 +56,7 @@ public class LndService {
                 .count();
     }
 
-    public long lndAddUnspentOutputs(String json) {
+    public long addUnspentOutputs(String json) {
         Set<String> addresses = parse(json, this::parseAddressesFromUnspentOutputs).orElse(Set.of());
         addresses.forEach(addressOwnershipService::setAddressAsOwned);
         addresses.forEach(address -> addressDescriptionService.set(address, DEFAULT_ADDRESS_DESCRIPTION));

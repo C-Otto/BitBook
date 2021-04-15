@@ -26,18 +26,18 @@ class LndCommandsTest {
 
     @Test
     void lndAddFromSweeps() throws IOException {
-        when(lndService.lndAddFromSweeps(any())).thenReturn(123L);
+        when(lndService.addFromSweeps(any())).thenReturn(123L);
         String json = "{\"foo\": \"bar\"}";
         File file = createTempFile(json);
 
         assertThat(lndCommands.lndAddFromSweeps(file)).isEqualTo("Added information for 123 sweep transactions");
 
-        verify(lndService).lndAddFromSweeps(json);
+        verify(lndService).addFromSweeps(json);
     }
 
     @Test
     void lndAddFromSweeps_failure() throws IOException {
-        when(lndService.lndAddFromSweeps(any())).thenReturn(0L);
+        when(lndService.addFromSweeps(any())).thenReturn(0L);
         File file = File.createTempFile("temp", "bitbook");
 
         assertThat(lndCommands.lndAddFromSweeps(file)).isEqualTo("Unable to find sweep transactions in file");
@@ -45,18 +45,18 @@ class LndCommandsTest {
 
     @Test
     void lndAddUnspentOutputs() throws IOException {
-        when(lndService.lndAddUnspentOutputs(any())).thenReturn(123L);
+        when(lndService.addUnspentOutputs(any())).thenReturn(123L);
         String json = "{\"foo\": \"bar\"}";
         File file = createTempFile(json);
 
         assertThat(lndCommands.lndAddUnspentOutputs(file)).isEqualTo("Marked 123 addresses as owned by lnd");
 
-        verify(lndService).lndAddUnspentOutputs(json);
+        verify(lndService).addUnspentOutputs(json);
     }
 
     @Test
     void lndAddUnspentOutputs_failure() throws IOException {
-        when(lndService.lndAddUnspentOutputs(any())).thenReturn(0L);
+        when(lndService.addUnspentOutputs(any())).thenReturn(0L);
         File file = File.createTempFile("temp", "bitbook");
 
         assertThat(lndCommands.lndAddUnspentOutputs(file)).isEqualTo("Unable to find unspent output address in file");
