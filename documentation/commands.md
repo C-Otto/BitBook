@@ -236,5 +236,5 @@ The list of completion candidates is adapted to the needs of the specific comman
 As an example, when using `remove-transaction-description`, you are only shown transaction hashes for which a
 description is known.
 
-## LND Support
+## lnd Support
 Please have a look at [lnd.md](lnd.md).

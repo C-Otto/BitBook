@@ -21,8 +21,8 @@ import java.util.function.Function;
 
 @Component
 public class LndService {
-    private static final String DEFAULT_ADDRESS_DESCRIPTION = "LND";
-    private static final String SWEEP_TRANSACTION_DESCRIPTION = "LND sweep transaction";
+    private static final String DEFAULT_ADDRESS_DESCRIPTION = "lnd";
+    private static final String SWEEP_TRANSACTION_DESCRIPTION = "lnd sweep transaction";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ObjectMapper objectMapper;

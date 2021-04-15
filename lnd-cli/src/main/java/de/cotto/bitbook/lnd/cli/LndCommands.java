@@ -34,6 +34,6 @@ public class LndCommands {
         if (numberOfSweepTransactions == 0) {
             return "Unable to find unspent output address in file";
         }
-        return "Marked " + numberOfSweepTransactions + " addresses as owned by LND";
+        return "Marked " + numberOfSweepTransactions + " addresses as owned by lnd";
     }
 }

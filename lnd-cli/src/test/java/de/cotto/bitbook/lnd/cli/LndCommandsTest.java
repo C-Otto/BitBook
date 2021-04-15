@@ -49,7 +49,7 @@ class LndCommandsTest {
         String json = "{\"foo\": \"bar\"}";
         File file = createTempFile(json);
 
-        assertThat(lndCommands.lndAddUnspentOutputs(file)).isEqualTo("Marked 123 addresses as owned by LND");
+        assertThat(lndCommands.lndAddUnspentOutputs(file)).isEqualTo("Marked 123 addresses as owned by lnd");
 
         verify(lndService).lndAddUnspentOutputs(json);
     }
