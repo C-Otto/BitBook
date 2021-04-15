@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class LndServiceTest {
-    private static final String DEFAULT_DESCRIPTION = "LND";
+    private static final String DEFAULT_DESCRIPTION = "lnd";
 
     private LndService lndService;
 
@@ -158,8 +158,8 @@ class LndServiceTest {
 
             assertThat(lndService.lndAddFromSweeps(json)).isEqualTo(2);
 
-            verify(transactionDescriptionService).set(TRANSACTION_HASH, "LND sweep transaction");
-            verify(transactionDescriptionService).set(TRANSACTION_HASH_2, "LND sweep transaction");
+            verify(transactionDescriptionService).set(TRANSACTION_HASH, "lnd sweep transaction");
+            verify(transactionDescriptionService).set(TRANSACTION_HASH_2, "lnd sweep transaction");
             verify(addressDescriptionService).set(INPUT_SWEEP_1.getAddress(), DEFAULT_DESCRIPTION);
             verify(addressDescriptionService).set(INPUT_SWEEP_2.getAddress(), DEFAULT_DESCRIPTION);
             verify(addressDescriptionService).set(OUTPUT_SWEEP_1.getAddress(), DEFAULT_DESCRIPTION);
