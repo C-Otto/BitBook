@@ -31,9 +31,7 @@ BitBook offers the command `lnd-add-from-sweeps` which parses lnd sweep informat
 transaction:
 
  - sets the transaction description to "lnd sweep transaction"
- - sets the target address description to "lnd"
- - sets the source address description to "lnd" if it is not set
-   (a better description can be obtained when parsing channel close data)
+ - sets the source and target addresses descriptions to "lnd"
  - marks both addresses as owned
 
 To run the command:

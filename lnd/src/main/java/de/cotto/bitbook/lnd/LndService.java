@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
-import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
@@ -132,11 +131,7 @@ public class LndService {
     }
 
     private Transaction addAddressDescriptions(Transaction transaction) {
-        String inputAddress = getInputAddress(transaction);
-        AddressWithDescription addressWithDescription = addressDescriptionService.get(inputAddress);
-        if (addressWithDescription.getDescription().isBlank()) {
-            addressDescriptionService.set(inputAddress, DEFAULT_ADDRESS_DESCRIPTION);
-        }
+        addressDescriptionService.set(getInputAddress(transaction), DEFAULT_ADDRESS_DESCRIPTION);
         addressDescriptionService.set(getOutputAddress(transaction), DEFAULT_ADDRESS_DESCRIPTION);
         return transaction;
     }

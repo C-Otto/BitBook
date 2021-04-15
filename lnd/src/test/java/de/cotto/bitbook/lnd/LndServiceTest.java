@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
-import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.backend.transaction.model.Input;
@@ -27,9 +26,6 @@ import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRA
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH_2;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -135,8 +131,6 @@ class LndServiceTest {
         @Test
         void accepts_two_inputs() {
             // this may happen for closed channels with unsettled UTXOs
-            when(addressDescriptionService.get(any()))
-                    .then(invocation -> new AddressWithDescription(invocation.getArgument(0)));
             when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(TRANSACTION_4);
             assertThat(lndService.addFromSweeps(jsonForTransactionHash())).isEqualTo(1);
         }
@@ -149,8 +143,6 @@ class LndServiceTest {
 
         @Test
         void sweep_transactions() {
-            when(addressDescriptionService.get(any()))
-                    .then(invocation -> new AddressWithDescription(invocation.getArgument(0)));
             when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(SWEEP_TRANSACTION);
             when(transactionService.getTransactionDetails(TRANSACTION_HASH_2)).thenReturn(SWEEP_TRANSACTION_2);
             String json = "{\"Sweeps\":{\"TransactionIds\": {\"transaction_ids\": [\"%s\", \"%s\"]}}}"
@@ -168,17 +160,6 @@ class LndServiceTest {
             verify(addressOwnershipService).setAddressAsOwned(INPUT_SWEEP_2.getAddress());
             verify(addressOwnershipService).setAddressAsOwned(OUTPUT_SWEEP_1.getAddress());
             verify(addressOwnershipService).setAddressAsOwned(OUTPUT_SWEEP_2.getAddress());
-        }
-
-        @Test
-        void does_not_overwrite_source_description() {
-            when(addressDescriptionService.get(INPUT_SWEEP_1.getAddress()))
-                    .thenReturn(new AddressWithDescription(INPUT_SWEEP_1.getAddress(), "do-not-overwrite-me"));
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(SWEEP_TRANSACTION);
-
-            lndService.addFromSweeps(jsonForTransactionHash());
-
-            verify(transactionDescriptionService, never()).set(eq(INPUT_SWEEP_1.getAddress()), any());
         }
 
         private String jsonForTransactionHash() {
