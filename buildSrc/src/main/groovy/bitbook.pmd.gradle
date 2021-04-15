@@ -3,7 +3,7 @@ plugins {
 }
 
 pmd {
-    ruleSetFiles = files('../config/pmd-ruleset.xml')
+    ruleSetFiles = files("${rootDir}/config/pmd-ruleset.xml")
     ruleSets = []
     consoleOutput = true
     toolVersion = '6.33.0'
