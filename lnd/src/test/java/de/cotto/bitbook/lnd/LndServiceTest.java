@@ -2,12 +2,9 @@ package de.cotto.bitbook.lnd;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.cotto.bitbook.backend.transaction.TransactionService;
-import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.lnd.features.ClosedChannelsService;
 import de.cotto.bitbook.lnd.features.SweepTransactionsService;
 import de.cotto.bitbook.lnd.features.UnspentOutputsService;
-import de.cotto.bitbook.lnd.model.ClosedChannel;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -18,16 +15,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH_2;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.CLOSED_CHANNEL;
-import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.CLOSING_TRANSACTION;
-import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.OPENING_TRANSACTION;
-import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.RESOLUTION_AMOUNT;
-import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.SWEEP_TRANSACTION_HASH;
-import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.WITH_RESOLUTION;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -35,9 +26,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class LndServiceTest {
     private LndService lndService;
-
-    @Mock
-    private TransactionService transactionService;
 
     @Mock
     private AddressOwnershipService addressOwnershipService;
@@ -51,6 +39,9 @@ class LndServiceTest {
     @Mock
     private SweepTransactionsService sweepTransactionsService;
 
+    @Mock
+    private ClosedChannelsParser closedChannelsParser;
+
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper =
@@ -60,7 +51,7 @@ class LndServiceTest {
                 closedChannelsService,
                 unspentOutputsService,
                 sweepTransactionsService,
-                transactionService
+                closedChannelsParser
         );
     }
 
@@ -170,113 +161,27 @@ class LndServiceTest {
     class AddFromClosedChannels {
         @Test
         void empty_json() {
-            assertFailure("");
+            assertThat(lndService.addFromClosedChannels("")).isEqualTo(0);
+            verifyNoInteractions(closedChannelsParser);
         }
 
         @Test
         void not_json() {
-            assertFailure("---");
+            assertThat(lndService.addFromClosedChannels("---")).isEqualTo(0);
+            verifyNoInteractions(closedChannelsParser);
         }
 
         @Test
-        void empty_json_object() {
-            assertFailure("{}");
+        void parses_json() {
+            lndService.addFromClosedChannels("{\"foo\": 1}");
+            verify(closedChannelsParser).parse(argThat(node -> "{\"foo\":1}".equals(node.toString())));
         }
 
         @Test
-        void no_channels() {
-            assertFailure("{\"foo\": 1}");
-        }
-
-        @Test
-        void not_array() {
-            String json = "{\"channels\":1}";
-            assertFailure(json);
-        }
-
-        @Test
-        void skips_channels_with_unconfirmed_close_transactions() {
-            int closeHeight = 0;
-            String json = getJsonArrayWithSingleChannel("").replace(
-                    String.valueOf(BLOCK_HEIGHT),
-                    String.valueOf(closeHeight)
-            );
-
-            lndService.addFromClosedChannels(json);
-
-            verify(closedChannelsService).addFromClosedChannels(Set.of());
-            verifyNoInteractions(transactionService);
-        }
-
-        @Test
-        void skips_channels_with_unknown_close_transactions() {
-            String closingTransactionHash = "0000000000000000000000000000000000000000000000000000000000000000";
-            String json = getJsonArrayWithSingleChannel("").replace(TRANSACTION_HASH_2, closingTransactionHash);
-
-            lndService.addFromClosedChannels(json);
-
-            verify(closedChannelsService).addFromClosedChannels(Set.of());
-            verifyNoInteractions(transactionService);
-        }
-
-        @Test
-        void success() {
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(OPENING_TRANSACTION);
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH_2)).thenReturn(CLOSING_TRANSACTION);
-            ClosedChannel closedChannel2 = CLOSED_CHANNEL.toBuilder().withSettledBalance(Coins.ofSatoshis(500)).build();
-            when(closedChannelsService.addFromClosedChannels(Set.of(CLOSED_CHANNEL, closedChannel2))).thenReturn(2L);
-
-            long result = lndService.addFromClosedChannels(
-                    "{\"channels\": [" +
-                    getJsonSingleClosedChannel(CLOSED_CHANNEL.getSettledBalance(), "") +
-                    "," +
-                    getJsonSingleClosedChannel(closedChannel2.getSettledBalance(), "") +
-                    "]}"
-            );
-
-            assertThat(result).isEqualTo(2);
-        }
-
-        @Test
-        void with_resolution() {
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(OPENING_TRANSACTION);
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH_2)).thenReturn(CLOSING_TRANSACTION);
-            when(closedChannelsService.addFromClosedChannels(Set.of(WITH_RESOLUTION))).thenReturn(1L);
-
-            long result = lndService.addFromClosedChannels(
-                    getJsonArrayWithSingleChannel("{" +
-                                                  "\"sweep_txid\": \"" + SWEEP_TRANSACTION_HASH + "\"," +
-                                                  "\"amount_sat\": \"" + RESOLUTION_AMOUNT.getSatoshis() + "\"" +
-                                                  "}")
-            );
-
-            assertThat(result).isEqualTo(1L);
-        }
-
-        private String getJsonArrayWithSingleChannel(String resolutions) {
-            return "{\"channels\": [" +
-                   getJsonSingleClosedChannel(CLOSED_CHANNEL.getSettledBalance(), resolutions)
-                   + "]}";
-        }
-
-        private String getJsonSingleClosedChannel(Coins settledBalance, String resolutions) {
-            return "{" +
-                   "\"channel_point\": \"" + TRANSACTION_HASH + ":123\"," +
-                   "\"closing_tx_hash\": \"" + TRANSACTION_HASH_2 + "\"," +
-                   "\"remote_pubkey\": \"pubkey\"," +
-                   "\"chain_hash\": \"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\"," +
-                   "\"settled_balance\": \"" + settledBalance.getSatoshis() + "\"," +
-                   "\"close_height\": 601164," +
-                   "\"close_type\": \"COOPERATIVE_CLOSE\"," +
-                   "\"open_initiator\": \"INITIATOR_REMOTE\"," +
-                   "\"close_initiator\": \"INITIATOR_REMOTE\"," +
-                   "\"resolutions\": [" + resolutions + "]" +
-                   "}";
-        }
-
-        private void assertFailure(String json) {
-            assertThat(lndService.addFromClosedChannels(json)).isEqualTo(0);
-            verifyNoInteractions(addressOwnershipService);
+        void calls_service() {
+            when(closedChannelsParser.parse(any())).thenReturn(Set.of(CLOSED_CHANNEL));
+            lndService.addFromClosedChannels("{}");
+            verify(closedChannelsService).addFromClosedChannels(Set.of(CLOSED_CHANNEL));
         }
     }
 }
