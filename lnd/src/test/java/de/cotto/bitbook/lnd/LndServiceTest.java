@@ -2,6 +2,7 @@ package de.cotto.bitbook.lnd;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.cotto.bitbook.lnd.features.ChannelsService;
 import de.cotto.bitbook.lnd.features.ClosedChannelsService;
 import de.cotto.bitbook.lnd.features.SweepTransactionsService;
 import de.cotto.bitbook.lnd.features.UnspentOutputsService;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
+import static de.cotto.bitbook.lnd.model.ChannelFixtures.CHANNEL;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.CLOSED_CHANNEL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,6 +44,12 @@ class LndServiceTest {
     @Mock
     private ClosedChannelsParser closedChannelsParser;
 
+    @Mock
+    private ChannelsService channelsService;
+
+    @Mock
+    private ChannelsParser channelsParser;
+
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper =
@@ -51,7 +59,9 @@ class LndServiceTest {
                 closedChannelsService,
                 unspentOutputsService,
                 sweepTransactionsService,
-                closedChannelsParser
+                closedChannelsParser,
+                channelsService,
+                channelsParser
         );
     }
 
@@ -64,7 +74,7 @@ class LndServiceTest {
 
         @Test
         void not_json() {
-            assertFailure("---");
+            assertFailure("-x--");
         }
 
         @Test
@@ -74,7 +84,7 @@ class LndServiceTest {
 
         @Test
         void no_sweeps() {
-            assertFailure("{\"foo\": 1}");
+            assertFailure("{\"hello\": 2}");
         }
 
         @Test
@@ -154,6 +164,34 @@ class LndServiceTest {
         private void assertFailure(String json) {
             assertThat(lndService.addFromUnspentOutputs(json)).isEqualTo(0);
             verifyNoInteractions(addressOwnershipService);
+        }
+    }
+
+    @Nested
+    class AddFromChannels {
+        @Test
+        void empty_json() {
+            assertThat(lndService.addFromChannels("")).isEqualTo(0);
+            verifyNoInteractions(channelsParser);
+        }
+
+        @Test
+        void not_json() {
+            assertThat(lndService.addFromChannels("---")).isEqualTo(0);
+            verifyNoInteractions(channelsParser);
+        }
+
+        @Test
+        void parses_json() {
+            lndService.addFromChannels("{\"foo\": 1}");
+            verify(channelsParser).parse(argThat(node -> "{\"foo\":1}".equals(node.toString())));
+        }
+
+        @Test
+        void calls_service() {
+            when(channelsParser.parse(any())).thenReturn(Set.of(CHANNEL));
+            lndService.addFromChannels("{}");
+            verify(channelsService).addFromChannels(Set.of(CHANNEL));
         }
     }
 

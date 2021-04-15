@@ -35,6 +35,15 @@ public class LndCommands {
         return "Marked " + numberOfUnspentOutputs + " addresses as owned by lnd";
     }
 
+    @ShellMethod("Add information from channels obtained by `lncli listchannels`")
+    public String lndAddFromChannels(File jsonFile) throws IOException {
+        long channels = lndService.addFromChannels(readFile(jsonFile));
+        if (channels == 0) {
+            return "Unable to find channel in file";
+        }
+        return "Added information for %d channels".formatted(channels);
+    }
+
     @ShellMethod("Add information from closed channels obtained by `lncli closedchannels`")
     public String lndAddFromClosedChannels(File jsonFile) throws IOException {
         long closedChannels = lndService.addFromClosedChannels(readFile(jsonFile));

@@ -18,6 +18,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class LndCommandsTest {
+    private static final String JSON = "{\"hello\": \"kitty\"}";
+
     @InjectMocks
     private LndCommands lndCommands;
 
@@ -27,12 +29,11 @@ class LndCommandsTest {
     @Test
     void lndAddFromSweeps() throws IOException {
         when(lndService.addFromSweeps(any())).thenReturn(123L);
-        String json = "{\"foo\": \"bar\"}";
-        File file = createTempFile(json);
+        File file = createTempFileWithContent();
 
         assertThat(lndCommands.lndAddFromSweeps(file)).isEqualTo("Added information for 123 sweep transactions");
 
-        verify(lndService).addFromSweeps(json);
+        verify(lndService).addFromSweeps(JSON);
     }
 
     @Test
@@ -46,12 +47,11 @@ class LndCommandsTest {
     @Test
     void addFromUnspentOutputs() throws IOException {
         when(lndService.addFromUnspentOutputs(any())).thenReturn(123L);
-        String json = "{\"foo\": \"bar\"}";
-        File file = createTempFile(json);
+        File file = createTempFileWithContent();
 
         assertThat(lndCommands.lndAddFromUnspentOutputs(file)).isEqualTo("Marked 123 addresses as owned by lnd");
 
-        verify(lndService).addFromUnspentOutputs(json);
+        verify(lndService).addFromUnspentOutputs(JSON);
     }
 
     @Test
@@ -64,14 +64,31 @@ class LndCommandsTest {
     }
 
     @Test
+    void lndAddFromChannels() throws IOException {
+        when(lndService.addFromChannels(any())).thenReturn(123L);
+        File file = createTempFileWithContent();
+
+        assertThat(lndCommands.lndAddFromChannels(file)).isEqualTo("Added information for 123 channels");
+
+        verify(lndService).addFromChannels(JSON);
+    }
+
+    @Test
+    void lndAddFromChannels_failure() throws IOException {
+        when(lndService.addFromChannels(any())).thenReturn(0L);
+        File file = createTempFile();
+
+        assertThat(lndCommands.lndAddFromChannels(file)).isEqualTo("Unable to find channel in file");
+    }
+
+    @Test
     void lndAddFromClosedChannels() throws IOException {
         when(lndService.addFromClosedChannels(any())).thenReturn(123L);
-        String json = "{\"foo\": \"bar\"}";
-        File file = createTempFile(json);
+        File file = createTempFileWithContent();
 
         assertThat(lndCommands.lndAddFromClosedChannels(file)).isEqualTo("Added information for 123 closed channels");
 
-        verify(lndService).addFromClosedChannels(json);
+        verify(lndService).addFromClosedChannels(JSON);
     }
 
     @Test
@@ -82,9 +99,9 @@ class LndCommandsTest {
         assertThat(lndCommands.lndAddFromClosedChannels(file)).isEqualTo("Unable to find closed channel in file");
     }
 
-    private File createTempFile(String json) throws IOException {
+    private File createTempFileWithContent() throws IOException {
         File file = createTempFile();
-        Files.writeString(file.toPath(), json);
+        Files.writeString(file.toPath(), JSON);
         return file;
     }
 

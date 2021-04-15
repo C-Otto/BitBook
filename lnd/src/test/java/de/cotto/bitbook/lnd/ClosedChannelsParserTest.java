@@ -36,18 +36,18 @@ class ClosedChannelsParserTest {
 
     @Test
     void empty_json_object() throws IOException {
-        assertFailure("{}");
+        assertThat(closedChannelsParser.parse(toJsonNode("{}"))).isEmpty();
     }
 
     @Test
     void no_channels() throws IOException {
-        assertFailure("{\"foo\": 1}");
+        assertThat(closedChannelsParser.parse(toJsonNode("{\"foo\": 1}"))).isEmpty();
     }
 
     @Test
     void not_array() throws IOException {
         String json = "{\"channels\":1}";
-        assertFailure(json);
+        assertThat(closedChannelsParser.parse(toJsonNode(json))).isEmpty();
     }
 
     @Test
@@ -118,10 +118,6 @@ class ClosedChannelsParserTest {
                "\"close_initiator\": \"INITIATOR_REMOTE\"," +
                "\"resolutions\": [" + resolutions + "]" +
                "}";
-    }
-
-    private void assertFailure(String json) throws IOException {
-        assertThat(closedChannelsParser.parse(toJsonNode(json))).isEmpty();
     }
 
     private JsonNode toJsonNode(String json) throws IOException {
