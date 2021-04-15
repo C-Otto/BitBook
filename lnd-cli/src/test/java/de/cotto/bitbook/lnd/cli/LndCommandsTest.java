@@ -99,6 +99,26 @@ class LndCommandsTest {
         assertThat(lndCommands.lndAddFromClosedChannels(file)).isEqualTo("Unable to find closed channel in file");
     }
 
+    @Test
+    void lndAddFromOnchainTransactions() throws IOException {
+        when(lndService.addFromOnchainTransactions(any())).thenReturn(123L);
+        File file = createTempFileWithContent();
+
+        assertThat(lndCommands.lndAddFromOnchainTransactions(file))
+                .isEqualTo("Added information from 123 transactions");
+
+        verify(lndService).addFromOnchainTransactions(JSON);
+    }
+
+    @Test
+    void lndAddFromOnchainTransactions_failure() throws IOException {
+        when(lndService.addFromOnchainTransactions(any())).thenReturn(0L);
+        File file = createTempFile();
+
+        assertThat(lndCommands.lndAddFromOnchainTransactions(file))
+                .isEqualTo("Unable to find usable transactions in file");
+    }
+
     private File createTempFileWithContent() throws IOException {
         File file = createTempFile();
         Files.writeString(file.toPath(), JSON);

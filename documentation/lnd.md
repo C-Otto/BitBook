@@ -107,3 +107,24 @@ Then you can use the command as follows:
 BitBook$ lnd-add-from-closed-channels /tmp/lnd-closedchannels.json
 Added information for 99 channels
 ```
+
+### On-Chain Transactions
+lnd keeps a record of all on-chain transactions, which includes regular transactions from/to lnd's wallet, and channel
+opening transactions. You can make use of this information by using the command `lnd-add-from-onchain-transactions`.
+
+Currently, the following transaction types are supported:
+
+#### Funding Transactions
+For transactions that send funds to lnd's wallet, the target address is marked as owned.
+Furthermore, the description "lnd" is added.
+
+To run the command:
+1. first create the JSON file using lnd: `$ lncli listchaintxns > lnd-onchain-transactions.json`
+2. transfer the JSON file to the host where you are running BitBook: `$ scp server:/home/lnd/lnd-onchain-transactions.json /tmp/`
+3. start BitBook
+
+Then you can use the command as follows:
+```
+BitBook$ lnd-add-from-onchain-transactions /tmp/lnd-onchain-transactions.json
+Added information from 671 transactions
+```

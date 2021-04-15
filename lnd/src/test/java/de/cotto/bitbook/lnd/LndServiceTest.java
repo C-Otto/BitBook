@@ -6,6 +6,7 @@ import de.cotto.bitbook.lnd.features.ChannelsService;
 import de.cotto.bitbook.lnd.features.ClosedChannelsService;
 import de.cotto.bitbook.lnd.features.SweepTransactionsService;
 import de.cotto.bitbook.lnd.features.UnspentOutputsService;
+import de.cotto.bitbook.lnd.model.OnchainTransaction;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 import static de.cotto.bitbook.lnd.model.ChannelFixtures.CHANNEL;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.CLOSED_CHANNEL;
+import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.ONCHAIN_TRANSACTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -50,6 +52,12 @@ class LndServiceTest {
     @Mock
     private ChannelsParser channelsParser;
 
+    @Mock
+    private OnchainTransactionsParser onchainTransactionsParser;
+
+    @Mock
+    private OnchainTransactionsService onchainTransactionsService;
+
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper =
@@ -61,7 +69,9 @@ class LndServiceTest {
                 sweepTransactionsService,
                 closedChannelsParser,
                 channelsService,
-                channelsParser
+                channelsParser,
+                onchainTransactionsParser,
+                onchainTransactionsService
         );
     }
 
@@ -177,14 +187,14 @@ class LndServiceTest {
 
         @Test
         void not_json() {
-            assertThat(lndService.addFromChannels("---")).isEqualTo(0);
+            assertThat(lndService.addFromChannels("NOT JSON")).isEqualTo(0);
             verifyNoInteractions(channelsParser);
         }
 
         @Test
         void parses_json() {
-            lndService.addFromChannels("{\"foo\": 1}");
-            verify(channelsParser).parse(argThat(node -> "{\"foo\":1}".equals(node.toString())));
+            lndService.addFromChannels("{\"valid\": \"json\"}");
+            verify(channelsParser).parse(argThat(node -> "{\"valid\":\"json\"}".equals(node.toString())));
         }
 
         @Test
@@ -220,6 +230,33 @@ class LndServiceTest {
             when(closedChannelsParser.parse(any())).thenReturn(Set.of(CLOSED_CHANNEL));
             lndService.addFromClosedChannels("{}");
             verify(closedChannelsService).addFromClosedChannels(Set.of(CLOSED_CHANNEL));
+        }
+    }
+
+    @Nested
+    class AddFromOnchainTransactions {
+        @Test
+        void empty_json() {
+            assertThat(lndService.addFromOnchainTransactions("")).isEqualTo(0);
+        }
+
+        @Test
+        void not_json() {
+            assertThat(lndService.addFromOnchainTransactions("---")).isEqualTo(0);
+        }
+
+        @Test
+        void parses_json() {
+            lndService.addFromOnchainTransactions("{\"hello\": \"world\"}");
+            verify(onchainTransactionsParser).parse(argThat(node -> "{\"hello\":\"world\"}".equals(node.toString())));
+        }
+
+        @Test
+        void calls_service() {
+            Set<OnchainTransaction> onchainTransactions = Set.of(ONCHAIN_TRANSACTION);
+            when(onchainTransactionsParser.parse(any())).thenReturn(onchainTransactions);
+            lndService.addFromOnchainTransactions("{}");
+            verify(onchainTransactionsService).addFromOnchainTransactions(onchainTransactions);
         }
     }
 }

@@ -9,6 +9,7 @@ import de.cotto.bitbook.lnd.features.SweepTransactionsService;
 import de.cotto.bitbook.lnd.features.UnspentOutputsService;
 import de.cotto.bitbook.lnd.model.Channel;
 import de.cotto.bitbook.lnd.model.ClosedChannel;
+import de.cotto.bitbook.lnd.model.OnchainTransaction;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -25,6 +26,8 @@ public class LndService {
     private final ClosedChannelsParser closedChannelsParser;
     private final ChannelsService channelsService;
     private final ChannelsParser channelsParser;
+    private final OnchainTransactionsParser onchainTransactionsParser;
+    private final OnchainTransactionsService onchainTransactionsService;
 
     public LndService(
             ObjectMapper objectMapper,
@@ -32,7 +35,11 @@ public class LndService {
             UnspentOutputsService unspentOutputsService,
             SweepTransactionsService sweepTransactionsService,
             ClosedChannelsParser closedChannelsParser,
-            ChannelsService channelsService, ChannelsParser channelsParser) {
+            ChannelsService channelsService,
+            ChannelsParser channelsParser,
+            OnchainTransactionsParser onchainTransactionsParser,
+            OnchainTransactionsService onchainTransactionsService
+    ) {
         this.objectMapper = objectMapper;
         this.closedChannelsService = closedChannelsService;
         this.unspentOutputsService = unspentOutputsService;
@@ -40,6 +47,8 @@ public class LndService {
         this.closedChannelsParser = closedChannelsParser;
         this.channelsService = channelsService;
         this.channelsParser = channelsParser;
+        this.onchainTransactionsParser = onchainTransactionsParser;
+        this.onchainTransactionsService = onchainTransactionsService;
     }
 
     public long addFromSweeps(String json) {
@@ -60,6 +69,11 @@ public class LndService {
     public long addFromClosedChannels(String json) {
         Set<ClosedChannel> closedChannels = parse(json, closedChannelsParser::parse);
         return closedChannelsService.addFromClosedChannels(closedChannels);
+    }
+
+    public long addFromOnchainTransactions(String json) {
+        Set<OnchainTransaction> onchainTransactions = parse(json, onchainTransactionsParser::parse);
+        return onchainTransactionsService.addFromOnchainTransactions(onchainTransactions);
     }
 
     private <T> Set<T> parse(String json, Function<JsonNode, Set<T>> parseFunction) {

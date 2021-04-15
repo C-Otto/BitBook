@@ -53,6 +53,15 @@ public class LndCommands {
         return "Added information for %d closed channels".formatted(closedChannels);
     }
 
+    @ShellMethod("Add information from on-chain transactions obtained by `lncli listchaintxns`")
+    public String lndAddFromOnchainTransactions(File jsonFile) throws IOException {
+        long numberOfTransactions = lndService.addFromOnchainTransactions(readFile(jsonFile));
+        if (numberOfTransactions == 0) {
+            return "Unable to find usable transactions in file";
+        }
+        return "Added information from %d transactions".formatted(numberOfTransactions);
+    }
+
     private String readFile(File jsonFile) throws IOException {
         return Files.readString(jsonFile.toPath(), StandardCharsets.US_ASCII);
     }
