@@ -45,21 +45,22 @@ class LndCommandsTest {
 
     @Test
     void lndAddUnspentOutputs() throws IOException {
-        when(lndService.addUnspentOutputs(any())).thenReturn(123L);
+        when(lndService.addFromUnspentOutputs(any())).thenReturn(123L);
         String json = "{\"foo\": \"bar\"}";
         File file = createTempFile(json);
 
-        assertThat(lndCommands.lndAddUnspentOutputs(file)).isEqualTo("Marked 123 addresses as owned by lnd");
+        assertThat(lndCommands.lndAddFromUnspentOutputs(file)).isEqualTo("Marked 123 addresses as owned by lnd");
 
-        verify(lndService).addUnspentOutputs(json);
+        verify(lndService).addFromUnspentOutputs(json);
     }
 
     @Test
     void lndAddUnspentOutputs_failure() throws IOException {
-        when(lndService.addUnspentOutputs(any())).thenReturn(0L);
+        when(lndService.addFromUnspentOutputs(any())).thenReturn(0L);
         File file = File.createTempFile("temp", "bitbook");
 
-        assertThat(lndCommands.lndAddUnspentOutputs(file)).isEqualTo("Unable to find unspent output address in file");
+        assertThat(lndCommands.lndAddFromUnspentOutputs(file))
+                .isEqualTo("Unable to find unspent output address in file");
     }
 
     private File createTempFile(String json) throws IOException {

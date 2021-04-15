@@ -28,9 +28,9 @@ public class LndCommands {
     }
 
     @ShellMethod("Add information from lnd unspent outputs obtained by `lncli listunspent`")
-    public String lndAddUnspentOutputs(File jsonFile) throws IOException {
+    public String lndAddFromUnspentOutputs(File jsonFile) throws IOException {
         String content = Files.readString(jsonFile.toPath(), StandardCharsets.US_ASCII);
-        long numberOfSweepTransactions = lndService.addUnspentOutputs(content);
+        long numberOfSweepTransactions = lndService.addFromUnspentOutputs(content);
         if (numberOfSweepTransactions == 0) {
             return "Unable to find unspent output address in file";
         }

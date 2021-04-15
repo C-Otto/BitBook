@@ -56,7 +56,7 @@ public class LndService {
                 .count();
     }
 
-    public long addUnspentOutputs(String json) {
+    public long addFromUnspentOutputs(String json) {
         Set<String> addresses = parse(json, this::parseAddressesFromUnspentOutputs).orElse(Set.of());
         addresses.forEach(addressOwnershipService::setAddressAsOwned);
         addresses.forEach(address -> addressDescriptionService.set(address, DEFAULT_ADDRESS_DESCRIPTION));
