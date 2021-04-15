@@ -12,6 +12,7 @@ import de.cotto.bitbook.lnd.features.UnspentOutputsService;
 import de.cotto.bitbook.lnd.model.CloseType;
 import de.cotto.bitbook.lnd.model.ClosedChannel;
 import de.cotto.bitbook.lnd.model.Initiator;
+import de.cotto.bitbook.lnd.model.Resolution;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -159,7 +160,17 @@ public class LndService {
                         channelNode.get("close_type").textValue(),
                         channelNode.get("close_initiator").textValue()
                 ))
+                .withResolutions(getResolutions(channelNode))
                 .build();
+    }
+
+    private Set<Resolution> getResolutions(JsonNode channelNode) {
+        Set<Resolution> result = new LinkedHashSet<>();
+        for (JsonNode resolutionNode : channelNode.get("resolutions")) {
+            String sweepTransactionHash = resolutionNode.get("sweep_txid").textValue();
+            result.add(new Resolution(sweepTransactionHash));
+        }
+        return result;
     }
 
     private String parseOpeningTransaction(JsonNode channel) {

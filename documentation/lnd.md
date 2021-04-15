@@ -58,6 +58,7 @@ BitBook offers the command `lnd-add-from-closed-channels` which parses this info
     - type is one out of "cooperative", "cooperative local", "cooperative remote", "force local", "force remote"
   - sets the input address description to "Lightning-Channel with <pubkey>"
   - for addresses which are used to return channel funds, marks these as owned
+  - handles sweep transactions mentioned in HTLC resolutions (see [Sweeps](#sweeps))
 - for the opening transaction:
   - sets the description to "Opening Channel with <pubkey> (<type>)"
     - type is one out of "local", "remote", "unknown"

@@ -13,6 +13,8 @@ import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.CLOSED_CHANNEL;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.CLOSING_TRANSACTION;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.OPENING_TRANSACTION;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.SETTLEMENT_ADDRESS;
+import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.SWEEP_TRANSACTION_HASH;
+import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.WITH_RESOLUTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ClosedChannelTest {
@@ -91,6 +93,12 @@ public class ClosedChannelTest {
     }
 
     @Test
+    void getResolutions() {
+        assertThat(WITH_RESOLUTION.getResolutions())
+                .containsExactlyInAnyOrder(new Resolution(SWEEP_TRANSACTION_HASH));
+    }
+
+    @Test
     void testToString() {
         assertThat(CLOSED_CHANNEL).hasToString(
                 "ClosedChannel{" +
@@ -100,7 +108,8 @@ public class ClosedChannelTest {
                 "remotePubkey='pubkey', " +
                 "settledBalance=   0.000004  , " +
                 "openInitiator=remote, " +
-                "closeType=cooperative remote" +
+                "closeType=cooperative remote, " +
+                "resolutions=[]" +
                 "}"
         );
     }

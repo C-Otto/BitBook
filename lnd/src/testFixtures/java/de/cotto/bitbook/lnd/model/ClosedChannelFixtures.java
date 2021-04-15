@@ -70,4 +70,17 @@ public class ClosedChannelFixtures {
                     )
             ))
             .build();
+
+    public static final String SWEEP_TRANSACTION_HASH = "sweep_transaction_hash";
+    public static final Coins RESOLUTION_AMOUNT = Coins.ofSatoshis(987_654_321L);
+    public static final ClosedChannel WITH_RESOLUTION = ClosedChannel.builder()
+            .withChainHash(BITCOIN_GENESIS_BLOCK_HASH)
+            .withOpeningTransaction(OPENING_TRANSACTION)
+            .withClosingTransaction(CLOSING_TRANSACTION)
+            .withRemotePubkey(REMOTE_PUBKEY)
+            .withSettledBalance(SETTLED_BALANCE)
+            .withOpenInitiator(OPEN_INITIATOR)
+            .withCloseType(CloseType.COOPERATIVE_REMOTE)
+            .withResolution(new Resolution(SWEEP_TRANSACTION_HASH))
+            .build();
 }
