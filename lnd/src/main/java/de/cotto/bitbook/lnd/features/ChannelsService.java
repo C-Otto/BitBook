@@ -1,0 +1,67 @@
+package de.cotto.bitbook.lnd.features;
+
+import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.lnd.model.Channel;
+import de.cotto.bitbook.ownership.AddressOwnershipService;
+import org.springframework.stereotype.Component;
+
+import java.util.Set;
+
+import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
+
+@Component
+public class ChannelsService {
+    private final AddressDescriptionService addressDescriptionService;
+    private final TransactionDescriptionService transactionDescriptionService;
+    private final AddressOwnershipService addressOwnershipService;
+
+    public ChannelsService(
+            AddressDescriptionService addressDescriptionService,
+            TransactionDescriptionService transactionDescriptionService,
+            AddressOwnershipService addressOwnershipService
+    ) {
+        this.addressDescriptionService = addressDescriptionService;
+        this.transactionDescriptionService = transactionDescriptionService;
+        this.addressOwnershipService = addressOwnershipService;
+    }
+
+    public long addFromChannels(Set<Channel> channels) {
+        for (Channel channel : channels) {
+            setTransactionDescription(channel);
+            setAddressDescription(channel);
+            setChannelOwnership(channel);
+        }
+        return channels.size();
+    }
+
+    private void setChannelOwnership(Channel channel) {
+        String channelAddress = channel.getChannelAddress();
+        if (channel.isInitiator()) {
+            addressOwnershipService.setAddressAsOwned(channelAddress);
+        }
+        if (!OWNED.equals(addressOwnershipService.getOwnershipStatus(channelAddress))) {
+            addressOwnershipService.setAddressAsForeign(channelAddress);
+        }
+    }
+
+    private void setTransactionDescription(Channel channel) {
+        String localOrRemote;
+        if (channel.isInitiator()) {
+            localOrRemote = "local";
+        } else {
+            localOrRemote = "remote";
+        }
+        transactionDescriptionService.set(
+                channel.getOpeningTransaction().getHash(),
+                "Opening Channel with %s (%s)".formatted(channel.getRemotePubkey(), localOrRemote)
+        );
+    }
+
+    private void setAddressDescription(Channel channel) {
+        addressDescriptionService.set(
+                channel.getChannelAddress(),
+                "Lightning-Channel with %s".formatted(channel.getRemotePubkey())
+        );
+    }
+}

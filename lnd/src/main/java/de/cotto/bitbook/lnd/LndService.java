@@ -3,9 +3,11 @@ package de.cotto.bitbook.lnd;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.cotto.bitbook.lnd.features.ChannelsService;
 import de.cotto.bitbook.lnd.features.ClosedChannelsService;
 import de.cotto.bitbook.lnd.features.SweepTransactionsService;
 import de.cotto.bitbook.lnd.features.UnspentOutputsService;
+import de.cotto.bitbook.lnd.model.Channel;
 import de.cotto.bitbook.lnd.model.ClosedChannel;
 import org.springframework.stereotype.Component;
 
@@ -21,19 +23,23 @@ public class LndService {
     private final UnspentOutputsService unspentOutputsService;
     private final SweepTransactionsService sweepTransactionsService;
     private final ClosedChannelsParser closedChannelsParser;
+    private final ChannelsService channelsService;
+    private final ChannelsParser channelsParser;
 
     public LndService(
             ObjectMapper objectMapper,
             ClosedChannelsService closedChannelsService,
             UnspentOutputsService unspentOutputsService,
             SweepTransactionsService sweepTransactionsService,
-            ClosedChannelsParser closedChannelsParser
-    ) {
+            ClosedChannelsParser closedChannelsParser,
+            ChannelsService channelsService, ChannelsParser channelsParser) {
         this.objectMapper = objectMapper;
         this.closedChannelsService = closedChannelsService;
         this.unspentOutputsService = unspentOutputsService;
         this.sweepTransactionsService = sweepTransactionsService;
         this.closedChannelsParser = closedChannelsParser;
+        this.channelsService = channelsService;
+        this.channelsParser = channelsParser;
     }
 
     public long addFromSweeps(String json) {
@@ -44,6 +50,11 @@ public class LndService {
     public long addFromUnspentOutputs(String json) {
         Set<String> addresses = parse(json, this::parseAddressesFromUnspentOutputs);
         return unspentOutputsService.addFromUnspentOutputs(addresses);
+    }
+
+    public long addFromChannels(String json) {
+        Set<Channel> channels = parse(json, channelsParser::parse);
+        return channelsService.addFromChannels(channels);
     }
 
     public long addFromClosedChannels(String json) {
