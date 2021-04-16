@@ -70,7 +70,7 @@ public class TransactionsCommands {
             return "Expected base58 or bech32 address";
         }
         AddressTransactions transactions = addressTransactionsService.getTransactions(addressString);
-        String description = addressDescriptionService.get(addressString).getDescription();
+        String description = addressDescriptionService.getDescription(addressString);
         StringBuilder result = new StringBuilder(51);
         result.append("Address: ").append(addressString)
                 .append(' ')
