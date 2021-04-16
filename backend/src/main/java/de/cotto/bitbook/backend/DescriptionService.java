@@ -17,6 +17,10 @@ public class DescriptionService<T extends StringWithDescription<T>> {
         return dao.get(key);
     }
 
+    public String getDescription(String key) {
+        return get(key).getDescription();
+    }
+
     protected void set(T stringWithDescription) {
         if (stringWithDescription.getDescription().isBlank()) {
             return;

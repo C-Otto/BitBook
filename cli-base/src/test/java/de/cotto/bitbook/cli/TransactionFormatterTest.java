@@ -81,8 +81,7 @@ class TransactionFormatterTest {
         when(addressFormatter.getFormattedOwnershipStatus(any())).thenReturn("?");
         when(addressDescriptionService.get(any()))
                 .then(invocation -> new AddressWithDescription(invocation.getArgument(0)));
-        when(transactionDescriptionService.get(any()))
-                .then(invocation -> new TransactionWithDescription(invocation.getArgument(0), transactionDescription));
+        when(transactionDescriptionService.getDescription(any())).thenReturn(transactionDescription);
 
         String formattedInputs = formattedInputOutput(INPUT_2, price) + "\n" + formattedInputOutput(INPUT_1, price);
         String formattedOutputs =
@@ -114,8 +113,6 @@ class TransactionFormatterTest {
         void setUp() {
             price = mockPrice(Price.of(123));
             when(addressFormatter.getFormattedOwnershipStatus(any())).thenReturn("?");
-            when(transactionDescriptionService.get(any()))
-                    .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
             when(addressDescriptionService.get(any()))
                     .then(invocation -> new AddressWithDescription(invocation.getArgument(0)));
         }

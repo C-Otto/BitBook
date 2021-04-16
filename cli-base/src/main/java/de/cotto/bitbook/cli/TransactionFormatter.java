@@ -2,7 +2,6 @@ package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
-import de.cotto.bitbook.backend.model.TransactionWithDescription;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.price.model.Price;
 import de.cotto.bitbook.backend.transaction.model.Coins;
@@ -42,8 +41,7 @@ public class TransactionFormatter {
         String formattedTime = transaction.getTime().format(DateTimeFormatter.ISO_DATE_TIME);
         Price price = priceService.getPrice(transaction.getTime());
         String fees = formatWithPrice(transaction.getFees(), price);
-        TransactionWithDescription transactionWithDescription =
-                transactionDescriptionService.get(transaction.getHash());
+        String transactionDescription = transactionDescriptionService.getDescription(transaction.getHash());
         return """
                Transaction:\t%s
                Description:\t%s
@@ -52,7 +50,7 @@ public class TransactionFormatter {
                Inputs:%n%s
                Outputs:%n%s
                """.formatted(transaction.getHash(),
-                transactionWithDescription.getDescription(),
+                transactionDescription,
                 transaction.getBlockHeight(),
                 formattedTime,
                 fees,

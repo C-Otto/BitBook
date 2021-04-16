@@ -2,7 +2,6 @@ package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
-import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
@@ -121,7 +120,7 @@ class TransactionsCommandsTest {
                 List.of(new Input(Coins.ofSatoshis(1_000_000), address)),
                 List.of()
         );
-        when(addressDescriptionService.get(address)).thenReturn(new AddressWithDescription(address));
+        when(addressDescriptionService.getDescription(address)).thenReturn("");
         when(addressFormatter.getFormattedOwnershipStatus(address)).thenReturn("?");
         AddressTransactions addressTransactions1 = new AddressTransactions(
                 ADDRESS,
@@ -151,8 +150,7 @@ class TransactionsCommandsTest {
     @Test
     void getAddressTransactions_with_description() {
         when(addressFormatter.getFormattedOwnershipStatus(ADDRESS)).thenReturn("?");
-        when(addressDescriptionService.get(ADDRESS))
-                .thenReturn(new AddressWithDescription(ADDRESS, "description"));
+        when(addressDescriptionService.getDescription(ADDRESS)).thenReturn("description");
         when(addressTransactionsService.getTransactions(ADDRESS)).thenReturn(ADDRESS_TRANSACTIONS);
         when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
                 .thenReturn(Set.of(TRANSACTION, TRANSACTION_2));
@@ -165,7 +163,6 @@ class TransactionsCommandsTest {
 
     @Test
     void getAddressTransactions_requests_all_prices_before_formatting_details() {
-        when(addressDescriptionService.get(ADDRESS)).thenReturn(new AddressWithDescription(ADDRESS));
         when(addressTransactionsService.getTransactions(ADDRESS))
                 .thenReturn(new AddressTransactions(ADDRESS, Set.of(TRANSACTION_HASH), LAST_CHECKED_AT_BLOCK_HEIGHT));
         when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH))).thenReturn(Set.of(TRANSACTION));
@@ -206,8 +203,7 @@ class TransactionsCommandsTest {
     }
 
     private void prepareMocks() {
-        when(addressDescriptionService.get(any()))
-                .then(invocation -> new AddressWithDescription(invocation.getArgument(0)));
+        when(addressDescriptionService.getDescription(any())).thenReturn("");
         when(addressFormatter.getFormattedOwnershipStatus(ADDRESS)).thenReturn("?");
         when(transactionFormatter.formatSingleLineForAddress(any(), any()))
                 .then(invocation -> invocation.getArgument(0) + "/" + invocation.getArgument(1));

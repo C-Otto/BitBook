@@ -33,6 +33,20 @@ class AddressDescriptionServiceTest {
     }
 
     @Test
+    void getDescription_empty() {
+        AddressWithDescription expected = new AddressWithDescription(ADDRESS);
+        when(addressWithDescriptionDao.get(ADDRESS)).thenReturn(expected);
+        assertThat(service.getDescription(ADDRESS)).isEqualTo("");
+    }
+
+    @Test
+    void getDescription() {
+        AddressWithDescription expected = new AddressWithDescription(ADDRESS, "foo");
+        when(addressWithDescriptionDao.get(ADDRESS)).thenReturn(expected);
+        assertThat(service.getDescription(ADDRESS)).isEqualTo("foo");
+    }
+
+    @Test
     void set() {
         String description = "bar";
         service.set(ADDRESS, description);

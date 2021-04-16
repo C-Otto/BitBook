@@ -33,6 +33,20 @@ class TransactionDescriptionServiceTest {
     }
 
     @Test
+    void getDescription_empty() {
+        TransactionWithDescription expected = new TransactionWithDescription(TRANSACTION_HASH);
+        when(dao.get(TRANSACTION_HASH)).thenReturn(expected);
+        assertThat(service.getDescription(TRANSACTION_HASH)).isEqualTo("");
+    }
+
+    @Test
+    void getDescription() {
+        TransactionWithDescription expected = new TransactionWithDescription(TRANSACTION_HASH, "foo");
+        when(dao.get(TRANSACTION_HASH)).thenReturn(expected);
+        assertThat(service.getDescription(TRANSACTION_HASH)).isEqualTo("foo");
+    }
+
+    @Test
     void set() {
         String description = "bar";
         service.set(TRANSACTION_HASH, description);
