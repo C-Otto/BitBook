@@ -194,7 +194,8 @@ OK
 Similary, you can also set a description for a transaction:
 
 ```
-set-transaction-description f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5 "Stuff from Pete"
+BitBook$ set-transaction-description f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5 "Stuff from Pete"
+OK
 ```
 
 This information is then included whenever the transaction hash is shown:

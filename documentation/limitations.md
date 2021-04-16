@@ -24,4 +24,4 @@ Also see [issue #5](https://github.com/C-Otto/BitBook/issues/5).
 
 ## Pagination
 For addresses for which many transaction hashes are known, BitBook currently is unable to use most API's responses.
-This implementation details is addressed in [issue #6](https://github.com/C-Otto/BitBook/issues/6).
+This implementation detail is addressed in [issue #6](https://github.com/C-Otto/BitBook/issues/6).
