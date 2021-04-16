@@ -65,24 +65,27 @@ class OnchainTransactionsServiceTest {
         verify(addressOwnershipService, Mockito.times(2)).setAddressAsOwned(OUTPUT_ADDRESS_2);
     }
 
-    @Test
-    void sets_ownership_for_funding_transaction() {
-        when(transactionService.getTransactionDetails(FUNDING_TRANSACTION.getTransactionHash()))
-                .thenReturn(FUNDING_TRANSACTION_DETAILS);
-        assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(FUNDING_TRANSACTION))).isEqualTo(1);
-        verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_2);
-    }
+    @Nested
+    class FundingTransactionSuccess {
+        @Test
+        void sets_ownership_for_funding_transaction() {
+            when(transactionService.getTransactionDetails(FUNDING_TRANSACTION.getTransactionHash()))
+                    .thenReturn(FUNDING_TRANSACTION_DETAILS);
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(FUNDING_TRANSACTION))).isEqualTo(1);
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_2);
+        }
 
-    @Test
-    void sets_description_for_funding_transaction() {
-        when(transactionService.getTransactionDetails(FUNDING_TRANSACTION.getTransactionHash()))
-                .thenReturn(FUNDING_TRANSACTION_DETAILS);
-        assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(FUNDING_TRANSACTION))).isEqualTo(1);
-        verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_2, DEFAULT_DESCRIPTION);
+        @Test
+        void sets_description_for_funding_transaction() {
+            when(transactionService.getTransactionDetails(FUNDING_TRANSACTION.getTransactionHash()))
+                    .thenReturn(FUNDING_TRANSACTION_DETAILS);
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(FUNDING_TRANSACTION))).isEqualTo(1);
+            verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_2, DEFAULT_DESCRIPTION);
+        }
     }
 
     @Nested
-    class Failure {
+    class FundingTransactionFailure {
         @Test
         void nothing_for_funding_transaction_but_with_label() {
             OnchainTransaction onchainTransaction = new OnchainTransaction(
