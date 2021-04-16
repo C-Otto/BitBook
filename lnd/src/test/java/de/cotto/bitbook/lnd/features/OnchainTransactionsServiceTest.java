@@ -143,15 +143,13 @@ class OnchainTransactionsServiceTest {
             when(transactionService.getTransactionDetails(OPENING_TRANSACTION.getTransactionHash()))
                     .thenReturn(OPENING_TRANSACTION_DETAILS);
             String unknownOutputAddress = OUTPUT_ADDRESS_1;
-            String channelAddress = OUTPUT_ADDRESS_2;
 
             when(addressOwnershipService.getOwnershipStatus(unknownOutputAddress)).thenReturn(UNKNOWN);
             when(addressDescriptionService.getDescription(unknownOutputAddress)).thenReturn("");
 
             setupInputMocksForOpeningTransaction();
 
-            when(addressOwnershipService.getOwnershipStatus(channelAddress)).thenReturn(OWNED);
-            when(addressDescriptionService.getDescription(channelAddress))
+            when(addressDescriptionService.getDescription(OUTPUT_ADDRESS_2))
                     .thenReturn(ChannelsService.ADDRESS_DESCRIPTION_PREFIX + "foo");
         }
 
@@ -162,9 +160,21 @@ class OnchainTransactionsServiceTest {
         }
 
         @Test
+        void sets_ownership_for_channel_output_of_channel_opening_transaction() {
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION))).isEqualTo(1);
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_2);
+        }
+
+        @Test
         void sets_description_for_change_output_of_channel_opening_transaction() {
             assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION))).isEqualTo(1);
             verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_1, DEFAULT_DESCRIPTION);
+        }
+
+        @Test
+        void does_not_set_description_for_channel_output_of_channel_opening_transaction() {
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION))).isEqualTo(1);
+            verify(addressDescriptionService, never()).set(OUTPUT_ADDRESS_2, DEFAULT_DESCRIPTION);
         }
     }
 
