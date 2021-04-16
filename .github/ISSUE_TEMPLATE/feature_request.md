@@ -1,14 +1,14 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: ''
-labels: ''
+title: 'Feature Request: '
+labels: 'enhancement'
 assignees: ''
 
 ---
 
-Thank you for suggesting an idea, I value your feedback.
-Please let me know how BitBook can help you!
+*Thank you for suggesting an idea, I value your feedback.
+Please let me know how BitBook can help you!*
 
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
