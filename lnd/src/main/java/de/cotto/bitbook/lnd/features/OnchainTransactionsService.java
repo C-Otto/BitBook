@@ -91,12 +91,14 @@ public class OnchainTransactionsService {
         if (channelOpenOutput == null || hasUnexpectedChannelCapacity(amount, transaction, channelOpenOutput)) {
             return 0;
         }
-        setDescriptionAndOwnershipForOtherOutputs(transaction);
+        addressOwnershipService.setAddressAsOwned(channelOpenOutput.getAddress());
+        setDescriptionAndOwnershipForOtherOutputs(transaction, channelOpenOutput);
         return 1;
     }
 
-    private void setDescriptionAndOwnershipForOtherOutputs(Transaction transactionDetails) {
+    private void setDescriptionAndOwnershipForOtherOutputs(Transaction transactionDetails, Output channelOpenOutput) {
         transactionDetails.getOutputs().stream()
+                .filter(output -> !channelOpenOutput.equals(output))
                 .map(InputOutput::getAddress)
                 .filter(address -> UNKNOWN.equals(addressOwnershipService.getOwnershipStatus(address)))
                 .forEach(address -> {
