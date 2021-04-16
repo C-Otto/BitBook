@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.cotto.bitbook.lnd.features.ChannelsService;
 import de.cotto.bitbook.lnd.features.ClosedChannelsService;
+import de.cotto.bitbook.lnd.features.OnchainTransactionsService;
 import de.cotto.bitbook.lnd.features.SweepTransactionsService;
 import de.cotto.bitbook.lnd.features.UnspentOutputsService;
 import de.cotto.bitbook.lnd.model.OnchainTransaction;
