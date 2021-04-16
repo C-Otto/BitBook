@@ -49,6 +49,14 @@ public class Coins implements Comparable<Coins> {
         return compareTo(NONE) < 0;
     }
 
+    public boolean isNonPositive() {
+        return !isPositive();
+    }
+
+    public boolean isNonNegative() {
+        return !isNegative();
+    }
+
     @Override
     public String toString() {
         String formatted = getWithoutColor();

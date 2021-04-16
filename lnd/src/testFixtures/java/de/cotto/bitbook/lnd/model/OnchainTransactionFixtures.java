@@ -30,4 +30,13 @@ public class OnchainTransactionFixtures {
             Coins.ofSatoshis(21_513)
     );
     public static final Transaction OPENING_TRANSACTION_DETAILS = TRANSACTION;
+
+    public static final Transaction POOL_ACCOUNT_CREATION_DETAILS = TRANSACTION;
+    public static final String POOL_ACCOUNT_ID = "123abc456";
+    public static final OnchainTransaction POOL_ACCOUNT_CREATION = new OnchainTransaction(
+            TRANSACTION_HASH,
+            " poold -- AccountCreation(acct_key=" + POOL_ACCOUNT_ID + ")",
+            Coins.ofSatoshis(-1_234 - 999),
+            Coins.ofSatoshis(999)
+    );
 }

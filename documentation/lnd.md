@@ -128,7 +128,14 @@ Furthermore, the description "lnd" is added.
    - the amount referenced in the transaction matches the channel balance
    - the channel address has a description as set by BitBook
   
-   *Important:* To satisfy the first criterion, you should run the other lnd commands first. 
+   *Important:* To satisfy the first criterion, you should run the other lnd commands first.
+
+3. **pool Account Creation Transactions**
+
+   If you use lnd with [pool](https://github.com/lightninglabs/pool), BitBook can read information about transactions
+   that create a new pool account. If such a transaction is found, all inputs and outputs are automatically marked as
+   owned. For lnd addresses the description "lnd" is set. For the pool address, the address description is set to
+   "pool account <account-id>", and the transaction description is set to "Creating pool account <account-id>".
 
 To run the command:
 1. first create the JSON file using lnd: `$ lncli listchaintxns > lnd-onchain-transactions.json`
