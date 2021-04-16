@@ -1,6 +1,7 @@
 package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.backend.transaction.model.InputOutput;
@@ -25,15 +26,18 @@ public class OnchainTransactionsService {
     private final AddressOwnershipService addressOwnershipService;
     private final AddressDescriptionService addressDescriptionService;
     private final TransactionService transactionService;
+    private final TransactionDescriptionService transactionDescriptionService;
 
     public OnchainTransactionsService(
             AddressOwnershipService addressOwnershipService,
             AddressDescriptionService addressDescriptionService,
-            TransactionService transactionService
+            TransactionService transactionService,
+            TransactionDescriptionService transactionDescriptionService
     ) {
         this.addressOwnershipService = addressOwnershipService;
         this.addressDescriptionService = addressDescriptionService;
         this.transactionService = transactionService;
+        this.transactionDescriptionService = transactionDescriptionService;
     }
 
     public long addFromOnchainTransactions(Set<OnchainTransaction> onchainTransactions) {
@@ -51,44 +55,38 @@ public class OnchainTransactionsService {
         for (OnchainTransaction onchainTransaction : onchainTransactions) {
             result += handleFundingTransaction(onchainTransaction);
             result += handleOpeningTransaction(onchainTransaction);
+            result += handlePoolCreationTransaction(onchainTransaction);
         }
         return result;
     }
 
-    @SuppressWarnings("PMD.AvoidLiteralsInIfCondition")
     private long handleFundingTransaction(OnchainTransaction onchainTransaction) {
         Coins amount = onchainTransaction.getAmount();
-        boolean hasFees = onchainTransaction.getFees().isPositive();
-        boolean negativeAmount = amount.isNegative();
-        boolean hasLabel = !onchainTransaction.getLabel().isBlank();
-        if (hasFees || negativeAmount || hasLabel) {
+        if (onchainTransaction.hasFees() || amount.isNegative() || onchainTransaction.hasLabel()) {
             return 0;
         }
         Transaction transactionDetails =
                 transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
-        List<String> addressesWithAmount = getMatchingOutputAddresses(transactionDetails, amount);
-        if (addressesWithAmount.size() == 1) {
-            String address = addressesWithAmount.get(0);
-            addressOwnershipService.setAddressAsOwned(address);
-            addressDescriptionService.set(address, DEFAULT_DESCRIPTION);
-            return 1;
+        String address = getIfExactlyOne(getAddressForMatchingOutput(transactionDetails, amount)).orElse(null);
+        if (address == null) {
+            return 0;
         }
-        return 0;
+        setAddressAsOwnedWithDescription(address);
+        return 1;
     }
 
     private long handleOpeningTransaction(OnchainTransaction onchainTransaction) {
-        Coins amount = onchainTransaction.getAmount();
-        boolean nonNegativeAmount = !amount.isNegative();
-        boolean hasLabel = !onchainTransaction.getLabel().isBlank();
-        if (nonNegativeAmount || hasLabel) {
+        boolean nonNegativeAmount = onchainTransaction.getAmount().isNonNegative();
+        if (nonNegativeAmount || onchainTransaction.hasLabel()) {
             return 0;
         }
         Transaction transaction = transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
         if (hasUnownedInput(transaction) || hasMismatchedInputDescription(transaction)) {
             return 0;
         }
+        Coins expectedAmount = onchainTransaction.getAbsoluteAmountWithoutFees();
         Output channelOpenOutput = getChannelOpenOutput(transaction).orElse(null);
-        if (channelOpenOutput == null || hasUnexpectedChannelCapacity(amount, transaction, channelOpenOutput)) {
+        if (channelOpenOutput == null || hasUnexpectedChannelCapacity(channelOpenOutput, expectedAmount)) {
             return 0;
         }
         addressOwnershipService.setAddressAsOwned(channelOpenOutput.getAddress());
@@ -101,19 +99,11 @@ public class OnchainTransactionsService {
                 .filter(output -> !channelOpenOutput.equals(output))
                 .map(InputOutput::getAddress)
                 .filter(address -> UNKNOWN.equals(addressOwnershipService.getOwnershipStatus(address)))
-                .forEach(address -> {
-                    addressOwnershipService.setAddressAsOwned(address);
-                    addressDescriptionService.set(address, DEFAULT_DESCRIPTION);
-                });
+                .forEach(this::setAddressAsOwnedWithDescription);
     }
 
-    private boolean hasUnexpectedChannelCapacity(
-            Coins amount,
-            Transaction transactionDetails,
-            Output channelOpenOutput
-    ) {
-        Coins expectedChannelCapacity = amount.add(transactionDetails.getFees()).absolute();
-        return !expectedChannelCapacity.equals(channelOpenOutput.getValue());
+    private boolean hasUnexpectedChannelCapacity(Output channelOpenOutput, Coins absoluteAmountWithoutFees) {
+        return !absoluteAmountWithoutFees.equals(channelOpenOutput.getValue());
     }
 
     private Optional<Output> getChannelOpenOutput(Transaction transactionDetails) {
@@ -137,9 +127,58 @@ public class OnchainTransactionsService {
                 .anyMatch(ownershipStatus -> !OWNED.equals(ownershipStatus));
     }
 
-    private List<String> getMatchingOutputAddresses(Transaction transactionDetails, Coins amount) {
+    private long handlePoolCreationTransaction(OnchainTransaction onchainTransaction) {
+        if (onchainTransaction.getAmount().isNonNegative()) {
+            return 0;
+        }
+        if (!onchainTransaction.getLabel().startsWith(" poold -- AccountCreation(acct_key=")) {
+            return 0;
+        }
+        Transaction transaction = transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
+        Coins poolAmount = onchainTransaction.getAbsoluteAmountWithoutFees();
+        String poolAddress = getIfExactlyOne(getAddressForMatchingOutput(transaction, poolAmount)).orElse(null);
+        if (poolAddress == null) {
+            return 0;
+        }
+        setForPoolAccountCreation(transaction, poolAddress, onchainTransaction.getLabel());
+        return 1;
+    }
+
+    private void setForPoolAccountCreation(Transaction transaction, String poolAddress, String label) {
+        String accountId = getAccountId(label);
+        transactionDescriptionService.set(transaction.getHash(), "Creating pool account " + accountId);
+        addressOwnershipService.setAddressAsOwned(poolAddress);
+        addressDescriptionService.set(poolAddress, "pool account " + accountId);
+
+        transaction.getInputs().stream()
+                .map(InputOutput::getAddress)
+                .forEach(this::setAddressAsOwnedWithDescription);
+        transaction.getOutputs().stream()
+                .map(InputOutput::getAddress)
+                .filter(address -> !poolAddress.equals(address))
+                .forEach(this::setAddressAsOwnedWithDescription);
+    }
+
+    private String getAccountId(String label) {
+        return label.substring(label.indexOf('=') + 1, label.length() - 1);
+    }
+
+    private void setAddressAsOwnedWithDescription(String address) {
+        addressOwnershipService.setAddressAsOwned(address);
+        addressDescriptionService.set(address, DEFAULT_DESCRIPTION);
+    }
+
+    @SuppressWarnings("PMD.AvoidLiteralsInIfCondition")
+    private <T> Optional<T> getIfExactlyOne(List<T> list) {
+        if (list.size() != 1) {
+            return Optional.empty();
+        }
+        return Optional.of(list.get(0));
+    }
+
+    private List<String> getAddressForMatchingOutput(Transaction transactionDetails, Coins expectedValue) {
         return transactionDetails.getOutputs().stream()
-                .filter(output -> amount.equals(output.getValue()))
+                .filter(output -> expectedValue.equals(output.getValue()))
                 .map(Output::getAddress)
                 .collect(toList());
     }

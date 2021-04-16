@@ -25,12 +25,24 @@ public class OnchainTransaction {
         return label;
     }
 
+    public boolean hasLabel() {
+        return !label.isBlank();
+    }
+
     public Coins getAmount() {
         return amount;
     }
 
     public Coins getFees() {
         return fees;
+    }
+
+    public boolean hasFees() {
+        return fees.isPositive();
+    }
+
+    public Coins getAbsoluteAmountWithoutFees() {
+        return amount.add(fees).absolute();
     }
 
     @Override

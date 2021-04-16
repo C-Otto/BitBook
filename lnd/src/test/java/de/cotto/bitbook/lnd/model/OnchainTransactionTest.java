@@ -21,6 +21,21 @@ class OnchainTransactionTest {
     }
 
     @Test
+    void hasLabel() {
+        assertThat(ONCHAIN_TRANSACTION.hasLabel()).isEqualTo(true);
+    }
+
+    @Test
+    void hasLabel_false() {
+        assertThat(new OnchainTransaction(
+                TRANSACTION_HASH,
+                "",
+                Coins.ofSatoshis(500),
+                Coins.ofSatoshis(100)
+        ).hasLabel()).isEqualTo(false);
+    }
+
+    @Test
     void getAmount() {
         assertThat(ONCHAIN_TRANSACTION.getAmount()).isEqualTo(Coins.ofSatoshis(500));
     }
@@ -28,6 +43,31 @@ class OnchainTransactionTest {
     @Test
     void getFees() {
         assertThat(ONCHAIN_TRANSACTION.getFees()).isEqualTo(Coins.ofSatoshis(100));
+    }
+
+    @Test
+    void hasFees() {
+        assertThat(ONCHAIN_TRANSACTION.hasFees()).isEqualTo(true);
+    }
+
+    @Test
+    void hasFees_false() {
+        assertThat(new OnchainTransaction(
+                TRANSACTION_HASH,
+                "label",
+                Coins.ofSatoshis(500),
+                Coins.NONE
+        ).hasFees()).isEqualTo(false);
+    }
+
+    @Test
+    void getAbsoluteAmountWithoutFees() {
+        assertThat(new OnchainTransaction(
+                TRANSACTION_HASH,
+                "",
+                Coins.ofSatoshis(-500),
+                Coins.ofSatoshis(100)
+        ).getAbsoluteAmountWithoutFees()).isEqualTo(Coins.ofSatoshis(400));
     }
 
     @Test

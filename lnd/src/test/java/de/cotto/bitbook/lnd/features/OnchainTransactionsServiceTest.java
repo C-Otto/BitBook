@@ -1,6 +1,7 @@
 package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
@@ -28,6 +29,9 @@ import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.FUNDING_TRAN
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.FUNDING_TRANSACTION_DETAILS;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.OPENING_TRANSACTION;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.OPENING_TRANSACTION_DETAILS;
+import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.POOL_ACCOUNT_CREATION;
+import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.POOL_ACCOUNT_CREATION_DETAILS;
+import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.POOL_ACCOUNT_ID;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 import static de.cotto.bitbook.ownership.OwnershipStatus.UNKNOWN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,6 +57,9 @@ class OnchainTransactionsServiceTest {
 
     @Mock
     private AddressDescriptionService addressDescriptionService;
+
+    @Mock
+    private TransactionDescriptionService transactionDescriptionService;
 
     @Mock
     private TransactionService transactionService;
@@ -251,6 +258,111 @@ class OnchainTransactionsServiceTest {
             when(addressDescriptionService.getDescription(OUTPUT_ADDRESS_2)).thenReturn("Lightning-Channel with xxx");
             assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(openingTransaction))).isEqualTo(0);
             verify(addressOwnershipService, never()).setAddressAsOwned(any());
+        }
+    }
+
+    @Nested
+    class PoolAccountCreationSuccess {
+        @BeforeEach
+        void setUp() {
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash()))
+                    .thenReturn(POOL_ACCOUNT_CREATION_DETAILS);
+        }
+
+        @Test
+        void returns_number_of_accepted_transactions() {
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(POOL_ACCOUNT_CREATION)))
+                    .isEqualTo(1);
+        }
+
+        @Test
+        void sets_transaction_description() {
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(POOL_ACCOUNT_CREATION));
+            verify(transactionDescriptionService, atLeastOnce()).set(
+                    POOL_ACCOUNT_CREATION_DETAILS.getHash(),
+                    "Creating pool account " + POOL_ACCOUNT_ID
+            );
+        }
+
+        @Test
+        void sets_description_for_pool_address() {
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(POOL_ACCOUNT_CREATION));
+            verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_2, "pool account " + POOL_ACCOUNT_ID);
+        }
+
+        @Test
+        void sets_ownership_for_pool_address() {
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(POOL_ACCOUNT_CREATION));
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_2);
+        }
+
+        @Test
+        void sets_description_for_other_outputs() {
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(POOL_ACCOUNT_CREATION));
+            verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_1, DEFAULT_DESCRIPTION);
+        }
+
+        @Test
+        void sets_ownership_for_other_outputs() {
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(POOL_ACCOUNT_CREATION));
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_1);
+        }
+
+        @Test
+        void sets_ownership_for_inputs() {
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(POOL_ACCOUNT_CREATION));
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(INPUT_ADDRESS_1);
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(INPUT_ADDRESS_2);
+        }
+
+        @Test
+        void sets_descriptions_for_inputs() {
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(POOL_ACCOUNT_CREATION));
+            verify(addressDescriptionService, atLeastOnce()).set(INPUT_ADDRESS_1, DEFAULT_DESCRIPTION);
+            verify(addressDescriptionService, atLeastOnce()).set(INPUT_ADDRESS_2, DEFAULT_DESCRIPTION);
+        }
+    }
+
+    @Nested
+    class PoolAccountCreationFailure {
+        @Test
+        void positive_amount() {
+            OnchainTransaction transaction = new OnchainTransaction(
+                        TRANSACTION_HASH,
+                        " poold -- AccountCreation(acct_key=" + POOL_ACCOUNT_ID + ")",
+                        Coins.ofSatoshis(123),
+                        Coins.NONE
+                );
+            assertFailure(transaction);
+        }
+
+        @Test
+        void wrong_label() {
+            OnchainTransaction transaction = new OnchainTransaction(
+                    TRANSACTION_HASH,
+                    "poold -- AccountCreation(acct_key=" + POOL_ACCOUNT_ID + ")", // leading space missing
+                    Coins.ofSatoshis(-1_234 - 999),
+                    Coins.ofSatoshis(999)
+            );
+            assertFailure(transaction);
+        }
+
+        @Test
+        void mismatching_amount_for_pool_address() {
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash()))
+                    .thenReturn(POOL_ACCOUNT_CREATION_DETAILS);
+            OnchainTransaction transaction = new OnchainTransaction(
+                    TRANSACTION_HASH,
+                    " poold -- AccountCreation(acct_key=" + POOL_ACCOUNT_ID + ")",
+                    Coins.ofSatoshis(-1_234 - 999 - 1),
+                    Coins.ofSatoshis(999)
+            );
+            assertFailure(transaction);
+        }
+
+        private void assertFailure(OnchainTransaction transaction) {
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(transaction))).isEqualTo(0);
+            verify(addressDescriptionService, never()).set(any(), any());
         }
     }
 
