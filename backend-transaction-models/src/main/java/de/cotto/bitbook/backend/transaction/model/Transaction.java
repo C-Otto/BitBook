@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.transaction.model;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -8,8 +9,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 public class Transaction {
     private static final LocalDateTime UNKNOWN_DATE_TIME = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC);
@@ -114,6 +117,18 @@ public class Transaction {
 
     public boolean isInvalid() {
         return hash.isBlank();
+    }
+
+    public Set<String> getAllAddresses() {
+        return Sets.union(getInputAddresses(), getOutputAddresses());
+    }
+
+    public Set<String> getInputAddresses() {
+        return inputs.stream().map(InputOutput::getAddress).collect(toSet());
+    }
+
+    public Set<String> getOutputAddresses() {
+        return outputs.stream().map(InputOutput::getAddress).collect(toSet());
     }
 
     @Override

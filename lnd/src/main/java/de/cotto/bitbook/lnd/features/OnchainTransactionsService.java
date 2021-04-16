@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 import static de.cotto.bitbook.ownership.OwnershipStatus.UNKNOWN;
@@ -22,6 +23,9 @@ import static java.util.stream.Collectors.toList;
 @Component
 public class OnchainTransactionsService {
     private static final String DEFAULT_DESCRIPTION = "lnd";
+    private static final Pattern POOL_ACCOUNT_CLOSE_PATTERN = Pattern.compile(
+            " poold -- AccountModification\\(acct_key=[0-9a-f]*, expiry=[falsetru]+, deposit=false, is_close=true\\)"
+    );
 
     private final AddressOwnershipService addressOwnershipService;
     private final AddressDescriptionService addressDescriptionService;
@@ -56,6 +60,7 @@ public class OnchainTransactionsService {
             result += handleFundingTransaction(onchainTransaction);
             result += handleOpeningTransaction(onchainTransaction);
             result += handlePoolCreationTransaction(onchainTransaction);
+            result += handlePoolCloseTransaction(onchainTransaction);
         }
         return result;
     }
@@ -114,15 +119,13 @@ public class OnchainTransactionsService {
     }
 
     private boolean hasMismatchedInputDescription(Transaction transactionDetails) {
-        return transactionDetails.getInputs().stream()
-                .map(InputOutput::getAddress)
+        return transactionDetails.getInputAddresses().stream()
                 .map(addressDescriptionService::getDescription)
                 .anyMatch(description -> !DEFAULT_DESCRIPTION.equals(description));
     }
 
     private boolean hasUnownedInput(Transaction transactionDetails) {
-        return transactionDetails.getInputs().stream()
-                .map(InputOutput::getAddress)
+        return transactionDetails.getInputAddresses().stream()
                 .map(addressOwnershipService::getOwnershipStatus)
                 .anyMatch(ownershipStatus -> !OWNED.equals(ownershipStatus));
     }
@@ -150,17 +153,43 @@ public class OnchainTransactionsService {
         addressOwnershipService.setAddressAsOwned(poolAddress);
         addressDescriptionService.set(poolAddress, "pool account " + accountId);
 
-        transaction.getInputs().stream()
-                .map(InputOutput::getAddress)
-                .forEach(this::setAddressAsOwnedWithDescription);
-        transaction.getOutputs().stream()
-                .map(InputOutput::getAddress)
+        transaction.getInputAddresses().forEach(this::setAddressAsOwnedWithDescription);
+        transaction.getOutputAddresses().stream()
                 .filter(address -> !poolAddress.equals(address))
                 .forEach(this::setAddressAsOwnedWithDescription);
     }
 
+    private long handlePoolCloseTransaction(OnchainTransaction onchainTransaction) {
+        if (onchainTransaction.getAmount().isNonPositive() || onchainTransaction.hasFees()) {
+            return 0;
+        }
+        if (!POOL_ACCOUNT_CLOSE_PATTERN.matcher(onchainTransaction.getLabel()).matches()) {
+            return 0;
+        }
+        Transaction transaction = transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
+        Output lndOutput = getIfExactlyOne(transaction.getOutputs()).orElse(null);
+        Coins poolAmount = onchainTransaction.getAmount();
+        if (lndOutput == null || !lndOutput.getValue().equals(poolAmount)) {
+            return 0;
+        }
+        setForPoolAccountClose(transaction, onchainTransaction.getLabel());
+        return 1;
+    }
+
+    private void setForPoolAccountClose(Transaction transaction, String label) {
+        String accountId = getAccountId(label);
+        transactionDescriptionService.set(transaction.getHash(), "Closing pool account " + accountId);
+        transaction.getAllAddresses().forEach(addressOwnershipService::setAddressAsOwned);
+        transaction.getInputAddresses()
+                .forEach(address -> addressDescriptionService.set(address, "pool account " + accountId));
+        transaction.getOutputAddresses()
+                .forEach(address -> addressDescriptionService.set(address, DEFAULT_DESCRIPTION));
+    }
+
     private String getAccountId(String label) {
-        return label.substring(label.indexOf('=') + 1, label.length() - 1);
+        int start = label.indexOf('=') + 1;
+        int poolAccountKeyLength = 66;
+        return label.substring(start, start + poolAccountKeyLength);
     }
 
     private void setAddressAsOwnedWithDescription(String address) {
