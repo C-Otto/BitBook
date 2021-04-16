@@ -10,7 +10,7 @@ The output includes the block height of the block that includes the transaction,
 when this transaction was first seen (which may be identical to the time the block was mined).
 
 The fiat value shown next to the coin amount is based on the exchange rate at the time shown above.
-The fiat exchange rate is only requested once per day, which is why the shown value may not be precise.
+The fiat exchange rate is only requested once per day, which is why the shown value may be imprecise.
 
 The inputs and outputs are aggregated per address.
 The symbol to the right of the address shows the ownership status (`?` if not set).
@@ -30,7 +30,7 @@ Outputs:
 ```
 
 Note that BitBook only shows confirmed transactions with a confirmation depth of at least 6 confirmations.
-This is done to avoid having outdated information in the case of chain reorgs.
+This is done to avoid having outdated information in the case of chain reorganizations.
 
 ## Get Address Transactions
 Using the `get-address-transactions` command you get information about all transactions connected to the address:
@@ -96,7 +96,7 @@ You can reset ownership information for an address using `reset-ownership <addre
 
 ### List Owned Addresses
 The command `list-owned-addresses` can be used to list the addresses you marked as `owned`.
-The output includes the current balance with the current fiat value, and the addresses descriptions (if set).
+The output includes the current balance with the current fiat value, and the addresses' descriptions (if set).
 The output is sorted by value, so that the addresses with the highest number of coins are shown at the bottom of the
 list.
 
@@ -178,8 +178,8 @@ f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5:   -0.1238648  
 ```
 
 The command output is a list of transactions, similar to what you see in [Get Address Transactions](#get-address-transactions).
-The coin amount indicates the change from/to unknown addresses caused by the transaction, where zero values are not
-included in the output.
+The coin amount indicates the change from/to unknown addresses caused by the transaction, where transactions with
+a value of zero are not included in the output.
 
 This information is aggregated over all of your owned addresses, so that transactions between your owned addresses do
 not show up (fees are considered to be sent to a foreign address).
@@ -189,7 +189,7 @@ are shown at the bottom.
 
 **As described in the [example](example.md), you could go through the list of
 transactions (using [Get Transaction Details](#get-transaction-details)) and add ownership information until the
-returned list ist empty.**
+returned list is empty.**
 
 The fiat value shown next to the coin amount is based on the exchange rate at the day of the corresponding transaction.
 Descriptions set for transactions are included in the output.
@@ -201,23 +201,28 @@ cause a delay (see [Get Address Transactions](#get-address-transactions)).
 You can set textual descriptions to addresses and transactions so that this additional information is shown in the
 commands' outputs in addition to the address/transaction hash.
 
+**Note that you have to use quotes (`"` or `'`) if the description includes a space!**
+
 ```
 BitBook$ set-address-description 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS "Pete Peterson"
 OK
-set-transaction-description f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5 "Stuff from Pete"
+BitBook$ set-transaction-description f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5 "Stuff from Pete"
+OK
 ```
 
 You can also remove descriptions using `remove-address-description` and `remove-transaction-description`.
 
 ## Tab Completion
 All commands taking address or transaction hashes as arguments support tab completion.
-For addresses, completion works for addresses that are either "known" (by, possibly indirectly,
-using `get-address-transactions`), or if the address is listed as an input or output of a known transaction.
+For addresses, completion works for addresses that are either "known" (for example, because the details have been
+received using `get-address-transactions`), or if the address is listed as an input or output of a known transaction.
 
-For transactions the hashes are completed for known transactions (`get-transaction-details`), and for hashes associated
-with an address (`get-address-transactions`).
+Transaction hashes are completed for known transactions (for example, received using `get-transaction-details`), and
+for hashes associated with an address (for example, because it is listed in the output of a `get-address-transactions`
+invocation).
 
 As such, if you see an address/transaction on screen, you can always complete it using tab completion.
+You may also use copy-paste. Invalid characters (like `:` or spaces) are automatically ignored.
 
 In addition to this, you can also use the description to complete the command:
 

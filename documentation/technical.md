@@ -3,7 +3,7 @@ In addition to tracking my coins, I started this project to experiment with seve
 tools and techniques. As such, BitBook is based on recent versions of Java and Gradle,
 and incorporates several tools like Errorprone that aren't strictly necessary.
 
-I appreciate constructive criticisms about the choice of frameworks, implementation 
+I appreciate constructive criticism about the choice of frameworks, implementation 
 details, and just about anything else. **Please help me learn and improve!
 Please create issues, provide pull requests, send mails, reach out via Twitter, ...!**
 
@@ -33,8 +33,8 @@ there's quite a lot of code that helps accomplish this.
 #### APIs and Providers
 A provider is responsible to provide the requested information, which usually means sending HTTP (REST) requests to
 some API and returning the parsed responses as Java objects.
-We use Feign to implement the actual HTTP clients, and Jackson for deserialization.
-Additionally, we use resilience4j to add circuit-breakers and rate-limiters.
+BitBook uses Feign to implement the actual HTTP clients, and Jackson for deserialization.
+Additionally, BitBook uses resilience4j to add circuit-breakers and rate-limiters.
 
 Currently, the following providers are implemented:
 ```
@@ -63,11 +63,12 @@ providers (APIs) based on their recent performance/failure rates.
 
 Most "visible" requests also cause "invisible" requests that are served in the background (using the 'lowest' priority).
 The results are persisted in the database, so that future requests can be served much faster.
-As an example, when requesting details about a transaction, the price at time of the transaction is requested in the
+As an example, when requesting details about a transaction, the price at the time of the transaction is requested in the
 background.
 
 The request classes make use of `CompletableFuture` and `Consumer<R>` to forward request results to the code that
-requested the information (to show it to the user) or should do something with it (persist results to database).
+requested the information. This is necessary so that the results can be shown to the user, or so that follow-up
+operations (persisting to database, requesting more information) can be triggered.
 
 As there may be several requests for the same piece of information (which may be merged/re-used/...), the code
 responsible for the queue organization and result forwarding is rather complex.
@@ -81,7 +82,7 @@ As an example, I'm unable to use case-insensitive tab completion (see [issue #20
 
 Furthermore, tab completion only works if the completion suggestion contains the phrase in front of `<tab>`, i.e.
 `foo<tab>` will only show suggestions that include `foo`. In order to make tab completion work for descriptions,
-I had to resort to a weird hack involving a null byte seperator (see `AbstractCompletionProvider`).
+I had to resort to a weird hack involving a null byte separator (see `AbstractCompletionProvider`).
 Note that this is also the case if the phrase (`foo`) is included in the description of the completion suggestion.
 
-I'd also like to end the program using CTRL+D, which doesn't seem to be possible.
+I'd also like to be able to end the program using CTRL+D, which doesn't seem to be possible.

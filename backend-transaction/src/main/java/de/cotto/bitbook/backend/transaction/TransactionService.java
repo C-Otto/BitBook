@@ -20,7 +20,7 @@ import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
 public class TransactionService {
     /**
      * Only persist information about transactions that are that many blocks deep,
-     * so that chain reorgs do not invalidate persisted data.
+     * so that chain reorganization do not invalidate persisted data.
      */
     private static final int CONFIRMATION_LIMIT = 6;
 
@@ -107,7 +107,7 @@ public class TransactionService {
             // unconfirmed transaction, in mempool
             return true;
         }
-        // too recent, may get lost in chain reorg
+        // too recent, may get lost in chain reorganization
         return blockHeight > getChainBlockHeight() - CONFIRMATION_LIMIT;
     }
 
