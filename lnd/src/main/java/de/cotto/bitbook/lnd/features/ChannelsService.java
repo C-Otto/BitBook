@@ -12,6 +12,8 @@ import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 
 @Component
 public class ChannelsService {
+    public static final String ADDRESS_DESCRIPTION_PREFIX = "Lightning-Channel with ";
+
     private final AddressDescriptionService addressDescriptionService;
     private final TransactionDescriptionService transactionDescriptionService;
     private final AddressOwnershipService addressOwnershipService;
@@ -61,7 +63,7 @@ public class ChannelsService {
     private void setAddressDescription(Channel channel) {
         addressDescriptionService.set(
                 channel.getChannelAddress(),
-                "Lightning-Channel with %s".formatted(channel.getRemotePubkey())
+                ADDRESS_DESCRIPTION_PREFIX + channel.getRemotePubkey()
         );
     }
 }
