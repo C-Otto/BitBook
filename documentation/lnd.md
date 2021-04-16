@@ -114,9 +114,21 @@ opening transactions. You can make use of this information by using the command 
 
 Currently, the following transaction types are supported:
 
-#### Funding Transactions
-For transactions that send funds to lnd's wallet, the target address is marked as owned.
+1. **Funding Transactions**
+   
+   For transactions that send funds to lnd's wallet, the target address is marked as owned.
 Furthermore, the description "lnd" is added.
+
+2. **Channel Opening Transactions**
+   
+   For transactions where one of the outputs is a lightning channel that is already marked as owned, the other
+   output addresses are also marked as owned if:
+
+   - all inputs are owned and have the description "lnd"
+   - the amount referenced in the transaction matches the channel balance
+   - the channel address has a description as set by BitBook
+  
+   *Important:* To satisfy the first criterion, you should run the other lnd commands first. 
 
 To run the command:
 1. first create the JSON file using lnd: `$ lncli listchaintxns > lnd-onchain-transactions.json`
