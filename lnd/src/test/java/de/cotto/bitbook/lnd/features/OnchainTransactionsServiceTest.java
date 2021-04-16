@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
@@ -22,6 +21,7 @@ import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADD
 import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_2;
+import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_1;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_2;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
@@ -29,6 +29,9 @@ import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.FUNDING_TRAN
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.FUNDING_TRANSACTION_DETAILS;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.OPENING_TRANSACTION;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.OPENING_TRANSACTION_DETAILS;
+import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.POOL_ACCOUNT_CLOSE;
+import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.POOL_ACCOUNT_CLOSE_DETAILS;
+import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.POOL_ACCOUNT_CLOSE_EXPIRY;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.POOL_ACCOUNT_CREATION;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.POOL_ACCOUNT_CREATION_DETAILS;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.POOL_ACCOUNT_ID;
@@ -41,6 +44,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -69,7 +73,7 @@ class OnchainTransactionsServiceTest {
         when(transactionService.getTransactionDetails(FUNDING_TRANSACTION.getTransactionHash()))
                 .thenReturn(FUNDING_TRANSACTION_DETAILS);
         onchainTransactionsService.addFromOnchainTransactions(Set.of(FUNDING_TRANSACTION));
-        verify(addressOwnershipService, Mockito.times(2)).setAddressAsOwned(OUTPUT_ADDRESS_2);
+        verify(addressOwnershipService, times(2)).setAddressAsOwned(OUTPUT_ADDRESS_2);
     }
 
     @Nested
@@ -352,17 +356,120 @@ class OnchainTransactionsServiceTest {
             when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash()))
                     .thenReturn(POOL_ACCOUNT_CREATION_DETAILS);
             OnchainTransaction transaction = new OnchainTransaction(
-                    TRANSACTION_HASH,
-                    " poold -- AccountCreation(acct_key=" + POOL_ACCOUNT_ID + ")",
-                    Coins.ofSatoshis(-1_234 - 999 - 1),
-                    Coins.ofSatoshis(999)
+                    POOL_ACCOUNT_CREATION.getTransactionHash(),
+                    POOL_ACCOUNT_CREATION.getLabel(),
+                    POOL_ACCOUNT_CREATION.getAmount().subtract(Coins.ofSatoshis(1)),
+                    POOL_ACCOUNT_CREATION.getFees()
+            );
+            assertFailure(transaction);
+        }
+    }
+
+    @Nested
+    class PoolAccountCloseSuccess {
+        @BeforeEach
+        void setUp() {
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash()))
+                    .thenReturn(POOL_ACCOUNT_CLOSE_DETAILS);
+        }
+
+        @Test
+        void returns_number_of_accepted_transactions() {
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(POOL_ACCOUNT_CLOSE)))
+                    .isEqualTo(1);
+        }
+
+        @Test
+        void account_expiry() {
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(POOL_ACCOUNT_CLOSE_EXPIRY)))
+                    .isEqualTo(1);
+        }
+
+        @Test
+        void sets_transaction_description() {
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(POOL_ACCOUNT_CLOSE));
+            verify(transactionDescriptionService, atLeastOnce()).set(
+                    POOL_ACCOUNT_CLOSE_DETAILS.getHash(),
+                    "Closing pool account " + POOL_ACCOUNT_ID
+            );
+        }
+
+        @Test
+        void sets_description_for_pool_addresses() {
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(POOL_ACCOUNT_CLOSE));
+            verify(addressDescriptionService, atLeastOnce()).set(INPUT_ADDRESS_1, "pool account " + POOL_ACCOUNT_ID);
+        }
+
+        @Test
+        void sets_ownership_for_pool_addresses() {
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(POOL_ACCOUNT_CLOSE));
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(INPUT_ADDRESS_1);
+        }
+
+        @Test
+        void sets_description_for_outputs() {
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(POOL_ACCOUNT_CLOSE));
+            verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_1, DEFAULT_DESCRIPTION);
+        }
+
+        @Test
+        void sets_ownership_for_outputs() {
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(POOL_ACCOUNT_CLOSE));
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_1);
+        }
+    }
+
+    @Nested
+    class PoolAccountCloseFailure {
+        @Test
+        void negative_amount() {
+            OnchainTransaction transaction = new OnchainTransaction(
+                    POOL_ACCOUNT_CLOSE.getTransactionHash(),
+                    POOL_ACCOUNT_CLOSE.getLabel(),
+                    Coins.ofSatoshis(-123),
+                    Coins.NONE
             );
             assertFailure(transaction);
         }
 
-        private void assertFailure(OnchainTransaction transaction) {
-            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(transaction))).isEqualTo(0);
-            verify(addressDescriptionService, never()).set(any(), any());
+        @Test
+        void wrong_label() {
+            String label = "poold -- AccountModification(acct_key=" // leading space missing
+                           + POOL_ACCOUNT_ID
+                           + ", expiry=false, deposit=false, is_close=true)";
+            OnchainTransaction transaction = new OnchainTransaction(
+                    POOL_ACCOUNT_CLOSE.getTransactionHash(),
+                    label,
+                    POOL_ACCOUNT_CLOSE.getAmount(),
+                    POOL_ACCOUNT_CLOSE.getFees()
+            );
+            assertFailure(transaction);
+        }
+
+        @Test
+        void mismatching_amount_for_pool_address() {
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash()))
+                    .thenReturn(POOL_ACCOUNT_CLOSE_DETAILS);
+            OnchainTransaction transaction = new OnchainTransaction(
+                    POOL_ACCOUNT_CLOSE.getTransactionHash(),
+                    POOL_ACCOUNT_CLOSE.getLabel(),
+                    POOL_ACCOUNT_CLOSE.getAmount().add(Coins.ofSatoshis(1)),
+                    POOL_ACCOUNT_CLOSE.getFees()
+            );
+            assertFailure(transaction);
+        }
+
+        @Test
+        void two_outputs() {
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash()))
+                    .thenReturn(TRANSACTION);
+            OnchainTransaction transaction = new OnchainTransaction(
+                    POOL_ACCOUNT_CLOSE.getTransactionHash(),
+                    POOL_ACCOUNT_CLOSE.getLabel(),
+                    OUTPUT_VALUE_1.add(OUTPUT_VALUE_2),
+                    POOL_ACCOUNT_CLOSE.getFees()
+            );
+            assertFailure(transaction);
         }
     }
 
@@ -371,5 +478,10 @@ class OnchainTransactionsServiceTest {
         when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_2)).thenReturn(OWNED);
         when(addressDescriptionService.getDescription(INPUT_ADDRESS_1)).thenReturn(DEFAULT_DESCRIPTION);
         when(addressDescriptionService.getDescription(INPUT_ADDRESS_2)).thenReturn(DEFAULT_DESCRIPTION);
+    }
+
+    private void assertFailure(OnchainTransaction transaction) {
+        assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(transaction))).isEqualTo(0);
+        verify(addressDescriptionService, never()).set(any(), any());
     }
 }

@@ -3,8 +3,10 @@ package de.cotto.bitbook.lnd.model;
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 
+import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_1;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_2;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
+import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_3;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
 
 public class OnchainTransactionFixtures {
@@ -32,11 +34,30 @@ public class OnchainTransactionFixtures {
     public static final Transaction OPENING_TRANSACTION_DETAILS = TRANSACTION;
 
     public static final Transaction POOL_ACCOUNT_CREATION_DETAILS = TRANSACTION;
-    public static final String POOL_ACCOUNT_ID = "123abc456";
+    public static final String POOL_ACCOUNT_ID = "001a2021f4013201230af5013021302130f501a302130412fa1230213041030123";
     public static final OnchainTransaction POOL_ACCOUNT_CREATION = new OnchainTransaction(
             TRANSACTION_HASH,
             " poold -- AccountCreation(acct_key=" + POOL_ACCOUNT_ID + ")",
             Coins.ofSatoshis(-1_234 - 999),
             Coins.ofSatoshis(999)
+    );
+
+    public static final Transaction POOL_ACCOUNT_CLOSE_DETAILS = TRANSACTION_3;
+    public static final OnchainTransaction POOL_ACCOUNT_CLOSE = new OnchainTransaction(
+            TRANSACTION_HASH,
+            " poold -- AccountModification(acct_key="
+            + POOL_ACCOUNT_ID
+            + ", expiry=false, deposit=false, is_close=true)",
+            OUTPUT_VALUE_1,
+            Coins.NONE
+    );
+
+    public static final OnchainTransaction POOL_ACCOUNT_CLOSE_EXPIRY = new OnchainTransaction(
+            TRANSACTION_HASH,
+            " poold -- AccountModification(acct_key="
+            + POOL_ACCOUNT_ID
+            + ", expiry=true, deposit=false, is_close=true)",
+            OUTPUT_VALUE_1,
+            Coins.NONE
     );
 }

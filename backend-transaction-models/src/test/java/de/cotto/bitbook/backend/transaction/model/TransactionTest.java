@@ -17,6 +17,7 @@ import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_VAL
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_1;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_2;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_1;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.DATE_TIME;
@@ -124,6 +125,27 @@ class TransactionTest {
         );
         Coins difference = Coins.NONE.subtract(coinsIn);
         assertThat(transaction.getDifferenceForAddress(ADDRESS)).isEqualTo(difference);
+    }
+
+    @Test
+    void getAllAddresses() {
+        assertThat(TRANSACTION.getAllAddresses()).containsExactlyInAnyOrder(
+                INPUT_ADDRESS_1, INPUT_ADDRESS_2, OUTPUT_ADDRESS_1, OUTPUT_ADDRESS_2
+        );
+    }
+
+    @Test
+    void getAllInputAddresses() {
+        assertThat(TRANSACTION.getInputAddresses()).containsExactlyInAnyOrder(
+                INPUT_ADDRESS_1, INPUT_ADDRESS_2
+        );
+    }
+
+    @Test
+    void getAllOutputAddresses() {
+        assertThat(TRANSACTION.getOutputAddresses()).containsExactlyInAnyOrder(
+                OUTPUT_ADDRESS_1, OUTPUT_ADDRESS_2
+        );
     }
 
     @Test
