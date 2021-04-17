@@ -31,17 +31,20 @@ public class OnchainTransactionsService {
     private final AddressDescriptionService addressDescriptionService;
     private final TransactionService transactionService;
     private final TransactionDescriptionService transactionDescriptionService;
+    private final SweepTransactionsService sweepTransactionsService;
 
     public OnchainTransactionsService(
             AddressOwnershipService addressOwnershipService,
             AddressDescriptionService addressDescriptionService,
             TransactionService transactionService,
-            TransactionDescriptionService transactionDescriptionService
+            TransactionDescriptionService transactionDescriptionService,
+            SweepTransactionsService sweepTransactionsService
     ) {
         this.addressOwnershipService = addressOwnershipService;
         this.addressDescriptionService = addressDescriptionService;
         this.transactionService = transactionService;
         this.transactionDescriptionService = transactionDescriptionService;
+        this.sweepTransactionsService = sweepTransactionsService;
     }
 
     public long addFromOnchainTransactions(Set<OnchainTransaction> onchainTransactions) {
@@ -59,6 +62,7 @@ public class OnchainTransactionsService {
         for (OnchainTransaction onchainTransaction : onchainTransactions) {
             result += handleFundingTransaction(onchainTransaction);
             result += handleOpeningTransaction(onchainTransaction);
+            result += handleSweepTransaction(onchainTransaction);
             result += handlePoolCreationTransaction(onchainTransaction);
             result += handlePoolCloseTransaction(onchainTransaction);
         }
@@ -128,6 +132,14 @@ public class OnchainTransactionsService {
         return transactionDetails.getInputAddresses().stream()
                 .map(addressOwnershipService::getOwnershipStatus)
                 .anyMatch(ownershipStatus -> !OWNED.equals(ownershipStatus));
+    }
+
+    private long handleSweepTransaction(OnchainTransaction onchainTransaction) {
+        boolean amountMatchesFee = onchainTransaction.getAmount().absolute().equals(onchainTransaction.getFees());
+        if (onchainTransaction.hasLabel() || !amountMatchesFee || !onchainTransaction.hasFees()) {
+            return 0;
+        }
+        return sweepTransactionsService.addFromSweeps(Set.of(onchainTransaction.getTransactionHash()));
     }
 
     private long handlePoolCreationTransaction(OnchainTransaction onchainTransaction) {
