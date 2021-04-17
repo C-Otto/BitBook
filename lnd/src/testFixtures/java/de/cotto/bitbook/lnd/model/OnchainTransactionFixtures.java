@@ -35,49 +35,49 @@ public class OnchainTransactionFixtures {
     );
     public static final Transaction OPENING_TRANSACTION_DETAILS = TRANSACTION;
 
-    public static final Transaction POOL_ACCOUNT_CREATION_DETAILS = TRANSACTION;
     public static final String POOL_ACCOUNT_ID = "001a2021f4013201230af5013021302130f501a302130412fa1230213041030123";
+
+    public static final Transaction POOL_ACCOUNT_CREATION_DETAILS = TRANSACTION;
+    private static final String ACCOUNT_CREATION_PREFIX = " poold -- AccountCreation(acct_key=";
+    private static final String ACCOUNT_CREATION_SUFFIX = ")";
     public static final OnchainTransaction POOL_ACCOUNT_CREATION = new OnchainTransaction(
             TRANSACTION_HASH,
-            " poold -- AccountCreation(acct_key=" + POOL_ACCOUNT_ID + ")",
+            ACCOUNT_CREATION_PREFIX + POOL_ACCOUNT_ID + ACCOUNT_CREATION_SUFFIX,
             Coins.ofSatoshis(-1_234 - 999),
             Coins.ofSatoshis(999)
     );
 
     public static final Transaction POOL_ACCOUNT_CLOSE_DETAILS = TRANSACTION_3;
+
+    private static final String MODIFICATION_PREFIX = " poold -- AccountModification(acct_key=";
+    private static final String CLOSE_SUFFIX = ", expiry=false, deposit=false, is_close=true)";
     public static final OnchainTransaction POOL_ACCOUNT_CLOSE = new OnchainTransaction(
             TRANSACTION_HASH,
-            " poold -- AccountModification(acct_key="
-            + POOL_ACCOUNT_ID
-            + ", expiry=false, deposit=false, is_close=true)",
+            MODIFICATION_PREFIX + POOL_ACCOUNT_ID + CLOSE_SUFFIX,
             OUTPUT_VALUE_1,
             Coins.NONE
     );
 
+    private static final String CLOSE_SUFFIX_EXPIRY = ", expiry=true, deposit=false, is_close=true)";
     public static final OnchainTransaction POOL_ACCOUNT_CLOSE_EXPIRY = new OnchainTransaction(
             TRANSACTION_HASH,
-            " poold -- AccountModification(acct_key="
-            + POOL_ACCOUNT_ID
-            + ", expiry=true, deposit=false, is_close=true)",
+            MODIFICATION_PREFIX + POOL_ACCOUNT_ID + CLOSE_SUFFIX_EXPIRY,
             OUTPUT_VALUE_1,
             Coins.NONE
     );
 
     public static final Transaction POOL_ACCOUNT_DEPOSIT_DETAILS = TRANSACTION;
+    private static final String DEPOSIT_SUFFIX = ", expiry=false, deposit=true, is_close=false)";
     public static final OnchainTransaction POOL_ACCOUNT_DEPOSIT = new OnchainTransaction(
             TRANSACTION_HASH,
-            " poold -- AccountModification(acct_key="
-            + POOL_ACCOUNT_ID
-            + ", expiry=false, deposit=true, is_close=false)",
+            MODIFICATION_PREFIX + POOL_ACCOUNT_ID + DEPOSIT_SUFFIX,
             OUTPUT_VALUE_2.subtract(INPUT_VALUE_2),
             Coins.NONE
     );
 
     public static final OnchainTransaction POOL_ACCOUNT_DEPOSIT_WITH_FEES = new OnchainTransaction(
             TRANSACTION_HASH,
-            " poold -- AccountModification(acct_key="
-            + POOL_ACCOUNT_ID
-            + ", expiry=false, deposit=true, is_close=false)",
+            MODIFICATION_PREFIX + POOL_ACCOUNT_ID + DEPOSIT_SUFFIX,
             OUTPUT_VALUE_2.subtract(INPUT_VALUE_2),
             FEES
     );
