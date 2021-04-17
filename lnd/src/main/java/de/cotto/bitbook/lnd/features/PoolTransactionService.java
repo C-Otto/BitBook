@@ -53,7 +53,7 @@ public class PoolTransactionService extends AbstractTransactionsService {
         }
         Transaction transaction = transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
         Coins poolAmount = onchainTransaction.getAbsoluteAmountWithoutFees();
-        String poolAddress = getIfExactlyOne(getAddressForMatchingOutput(transaction, poolAmount)).orElse(null);
+        String poolAddress = getIfExactlyOne(getAddressesForMatchingOutputs(transaction, poolAmount)).orElse(null);
         if (poolAddress == null) {
             return 0;
         }
@@ -81,7 +81,9 @@ public class PoolTransactionService extends AbstractTransactionsService {
                 .map(InputOutput::getValue)
                 .reduce(Coins.NONE, Coins::add);
         Coins expectedPoolAmount = subtractedAmount.add(otherInputs).subtract(transaction.getFees());
-        String poolAddress = getIfExactlyOne(getAddressForMatchingOutput(transaction, expectedPoolAmount)).orElse(null);
+        String poolAddress = getIfExactlyOne(
+                getAddressesForMatchingOutputs(transaction, expectedPoolAmount)
+        ).orElse(null);
         if (poolAddress == null) {
             return 0;
         }

@@ -32,8 +32,14 @@ public class AbstractTransactionsService {
         return Optional.of(list.get(0));
     }
 
-    protected List<String> getAddressForMatchingOutput(Transaction transactionDetails, Coins expectedValue) {
-        return transactionDetails.getOutputs().stream()
+    protected List<Output> getMatchingOutputs(Transaction transaction, Coins expectedValue) {
+        return transaction.getOutputs().stream()
+                .filter(output -> expectedValue.equals(output.getValue()))
+                .collect(toList());
+    }
+
+    protected List<String> getAddressesForMatchingOutputs(Transaction transaction, Coins expectedValue) {
+        return transaction.getOutputs().stream()
                 .filter(output -> expectedValue.equals(output.getValue()))
                 .map(Output::getAddress)
                 .collect(toList());

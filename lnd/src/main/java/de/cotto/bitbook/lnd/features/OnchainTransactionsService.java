@@ -54,6 +54,7 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
             result += handleOpeningTransaction(onchainTransaction);
             result += handlePoolTransaction(onchainTransaction);
             result += handleSweepTransaction(onchainTransaction);
+            result += handleSpendTransaction(onchainTransaction);
         }
         return result;
     }
@@ -69,7 +70,7 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
         }
         Transaction transactionDetails =
                 transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
-        String address = getIfExactlyOne(getAddressForMatchingOutput(transactionDetails, amount)).orElse(null);
+        String address = getIfExactlyOne(getAddressesForMatchingOutputs(transactionDetails, amount)).orElse(null);
         if (address == null) {
             return 0;
         }
@@ -96,9 +97,9 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
         return 1;
     }
 
-    private void setDescriptionAndOwnershipForOtherOutputs(Transaction transactionDetails, Output channelOpenOutput) {
-        transactionDetails.getOutputs().stream()
-                .filter(output -> !channelOpenOutput.equals(output))
+    private void setDescriptionAndOwnershipForOtherOutputs(Transaction transaction, Output outputToSkip) {
+        transaction.getOutputs().stream()
+                .filter(output -> !outputToSkip.equals(output))
                 .map(InputOutput::getAddress)
                 .filter(address -> UNKNOWN.equals(addressOwnershipService.getOwnershipStatus(address)))
                 .forEach(this::setAddressAsOwnedWithDescription);
@@ -133,5 +134,25 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
             return 0;
         }
         return sweepTransactionsService.addFromSweeps(Set.of(onchainTransaction.getTransactionHash()));
+    }
+
+    private long handleSpendTransaction(OnchainTransaction onchainTransaction) {
+        Coins amount = onchainTransaction.getAmount();
+        if (onchainTransaction.hasLabel() || !onchainTransaction.hasFees() || amount.isNonNegative()) {
+            return 0;
+        }
+        Transaction transaction = transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
+        boolean unownedInput = transaction.getInputAddresses().stream()
+                .anyMatch(address -> !OWNED.equals(addressOwnershipService.getOwnershipStatus(address)));
+        if (unownedInput) {
+            return 0;
+        }
+        Coins expectedOutputAmount = onchainTransaction.getAbsoluteAmountWithoutFees();
+        Output targetOutput = getIfExactlyOne(getMatchingOutputs(transaction, expectedOutputAmount)).orElse(null);
+        if (targetOutput == null) {
+            return 0;
+        }
+        setDescriptionAndOwnershipForOtherOutputs(transaction, targetOutput);
+        return 1;
     }
 }

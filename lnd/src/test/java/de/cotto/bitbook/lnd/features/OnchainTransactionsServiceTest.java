@@ -28,6 +28,8 @@ import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.FUNDING_TRAN
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.ONCHAIN_TRANSACTION;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.OPENING_TRANSACTION;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.OPENING_TRANSACTION_DETAILS;
+import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.SPEND_TRANSACTION;
+import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.SPEND_TRANSACTION_DETAILS;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 import static de.cotto.bitbook.ownership.OwnershipStatus.UNKNOWN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -165,25 +167,29 @@ class OnchainTransactionsServiceTest {
 
         @Test
         void sets_ownership_for_change_output_of_channel_opening_transaction() {
-            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION))).isEqualTo(1);
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION)))
+                    .isGreaterThanOrEqualTo(1);
             verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_1);
         }
 
         @Test
         void sets_ownership_for_channel_output_of_channel_opening_transaction() {
-            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION))).isEqualTo(1);
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION)))
+                    .isGreaterThanOrEqualTo(1);
             verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_2);
         }
 
         @Test
         void sets_description_for_change_output_of_channel_opening_transaction() {
-            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION))).isEqualTo(1);
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION)))
+                    .isGreaterThanOrEqualTo(1);
             verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_1, DEFAULT_DESCRIPTION);
         }
 
         @Test
         void does_not_set_description_for_channel_output_of_channel_opening_transaction() {
-            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION))).isEqualTo(1);
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION)))
+                    .isGreaterThanOrEqualTo(1);
             verify(addressDescriptionService, never()).set(OUTPUT_ADDRESS_2, DEFAULT_DESCRIPTION);
         }
     }
@@ -232,8 +238,17 @@ class OnchainTransactionsServiceTest {
         void transaction_with_unexpected_description_for_input() {
             setupInputMocksForOpeningTransaction();
             when(addressDescriptionService.getDescription(INPUT_ADDRESS_2)).thenReturn("lnd?");
-            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION))).isEqualTo(0);
-            verify(addressOwnershipService, never()).setAddressAsOwned(any());
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION));
+            verify(addressOwnershipService, never()).setAddressAsOwned(OUTPUT_ADDRESS_2);
+        }
+
+        @Test
+        void transaction_without_description_for_channel_output() {
+            setupInputMocksForOpeningTransaction();
+            when(addressDescriptionService.getDescription(OUTPUT_ADDRESS_1)).thenReturn("");
+            when(addressDescriptionService.getDescription(OUTPUT_ADDRESS_2)).thenReturn("");
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION));
+            verify(addressOwnershipService, never()).setAddressAsOwned(OUTPUT_ADDRESS_2);
         }
 
         @Test
@@ -241,8 +256,8 @@ class OnchainTransactionsServiceTest {
             setupInputMocksForOpeningTransaction();
             when(addressDescriptionService.getDescription(OUTPUT_ADDRESS_1)).thenReturn("");
             when(addressDescriptionService.getDescription(OUTPUT_ADDRESS_2)).thenReturn("Lightning-Channel with_xxx");
-            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION))).isEqualTo(0);
-            verify(addressOwnershipService, never()).setAddressAsOwned(any());
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION));
+            verify(addressOwnershipService, never()).setAddressAsOwned(OUTPUT_ADDRESS_2);
         }
 
         @Test
@@ -319,6 +334,89 @@ class OnchainTransactionsServiceTest {
             );
             assertFailure(transaction);
             verifyNoInteractions(sweepTransactionsService);
+        }
+    }
+
+    @Nested
+    class Spend {
+        @Test
+        void success() {
+            mockForSuccess();
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(SPEND_TRANSACTION))).isEqualTo(1);
+        }
+
+        @Test
+        void marks_change_output_as_owned() {
+            mockForSuccess();
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(SPEND_TRANSACTION));
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_1);
+        }
+
+        @Test
+        void sets_description_for_change_output() {
+            mockForSuccess();
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(SPEND_TRANSACTION));
+            verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_1, DEFAULT_DESCRIPTION);
+        }
+
+        @Test
+        void no_fee() {
+            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(Transaction.UNKNOWN);
+            OnchainTransaction transaction = new OnchainTransaction(
+                    SPEND_TRANSACTION.getTransactionHash(),
+                    SPEND_TRANSACTION.getLabel(),
+                    SPEND_TRANSACTION.getAmount(),
+                    Coins.NONE
+            );
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(transaction))).isEqualTo(0);
+        }
+
+        @Test
+        void has_label() {
+            OnchainTransaction transaction = new OnchainTransaction(
+                    SPEND_TRANSACTION.getTransactionHash(),
+                    "x",
+                    SPEND_TRANSACTION.getAmount(),
+                    SPEND_TRANSACTION.getFees()
+            );
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(transaction))).isEqualTo(0);
+        }
+
+        @Test
+        void nonnegative_amount() {
+            OnchainTransaction transaction = new OnchainTransaction(
+                    SPEND_TRANSACTION.getTransactionHash(),
+                    SPEND_TRANSACTION.getLabel(),
+                    Coins.ofSatoshis(123),
+                    SPEND_TRANSACTION.getFees()
+            );
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(transaction))).isEqualTo(0);
+        }
+
+        @Test
+        void unowned_input() {
+            mockForSuccess();
+            when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_2)).thenReturn(UNKNOWN);
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(SPEND_TRANSACTION))).isEqualTo(0);
+        }
+
+        @Test
+        void no_matching_output() {
+            mockForSuccess();
+            OnchainTransaction transaction = new OnchainTransaction(
+                    SPEND_TRANSACTION.getTransactionHash(),
+                    SPEND_TRANSACTION.getLabel(),
+                    SPEND_TRANSACTION.getAmount().add(Coins.ofSatoshis(1)),
+                    SPEND_TRANSACTION.getFees()
+            );
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(transaction))).isEqualTo(0);
+        }
+
+        private void mockForSuccess() {
+            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(SPEND_TRANSACTION_DETAILS);
+            when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_1)).thenReturn(OWNED);
+            when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_2)).thenReturn(OWNED);
+            lenient().when(addressOwnershipService.getOwnershipStatus(OUTPUT_ADDRESS_1)).thenReturn(UNKNOWN);
         }
     }
 
