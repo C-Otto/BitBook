@@ -26,6 +26,9 @@ public class OnchainTransactionsService {
     private static final Pattern POOL_ACCOUNT_CLOSE_PATTERN = Pattern.compile(
             " poold -- AccountModification\\(acct_key=[0-9a-f]*, expiry=[falsetru]+, deposit=false, is_close=true\\)"
     );
+    private static final Pattern POOL_ACCOUNT_DEPOSIT_PATTERN = Pattern.compile(
+            " poold -- AccountModification\\(acct_key=[0-9a-f]*, expiry=false, deposit=true, is_close=false\\)"
+    );
 
     private final AddressOwnershipService addressOwnershipService;
     private final AddressDescriptionService addressDescriptionService;
@@ -64,6 +67,7 @@ public class OnchainTransactionsService {
             result += handleOpeningTransaction(onchainTransaction);
             result += handleSweepTransaction(onchainTransaction);
             result += handlePoolCreationTransaction(onchainTransaction);
+            result += handlePoolDepositTransaction(onchainTransaction);
             result += handlePoolCloseTransaction(onchainTransaction);
         }
         return result;
@@ -160,8 +164,45 @@ public class OnchainTransactionsService {
     }
 
     private void setForPoolAccountCreation(Transaction transaction, String poolAddress, String label) {
+        addForPoolCreationOrDeposit(transaction, poolAddress, label, "Creating pool account ");
+    }
+
+    private long handlePoolDepositTransaction(OnchainTransaction onchainTransaction) {
+        if (onchainTransaction.getAmount().isNonNegative()) {
+            return 0;
+        }
+        if (!POOL_ACCOUNT_DEPOSIT_PATTERN.matcher(onchainTransaction.getLabel()).matches()) {
+            return 0;
+        }
+        Transaction transaction = transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
+        Coins subtractedAmount = Coins.NONE.subtract(onchainTransaction.getAmount());
+        Coins otherInputs = transaction.getInputs().stream()
+                .filter(input -> !DEFAULT_DESCRIPTION.equals(
+                        addressDescriptionService.getDescription(input.getAddress())
+                ))
+                .map(InputOutput::getValue)
+                .reduce(Coins.NONE, Coins::add);
+        Coins expectedPoolAmount = subtractedAmount.add(otherInputs).subtract(transaction.getFees());
+        String poolAddress = getIfExactlyOne(getAddressForMatchingOutput(transaction, expectedPoolAmount)).orElse(null);
+        if (poolAddress == null) {
+            return 0;
+        }
+        setForPoolAccountDeposit(transaction, poolAddress, onchainTransaction.getLabel());
+        return 1;
+    }
+
+    private void setForPoolAccountDeposit(Transaction transaction, String poolAddress, String label) {
+        addForPoolCreationOrDeposit(transaction, poolAddress, label, "Deposit into pool account ");
+    }
+
+    private void addForPoolCreationOrDeposit(
+            Transaction transaction,
+            String poolAddress,
+            String label,
+            String descriptionPrefix
+    ) {
         String accountId = getAccountId(label);
-        transactionDescriptionService.set(transaction.getHash(), "Creating pool account " + accountId);
+        transactionDescriptionService.set(transaction.getHash(), descriptionPrefix + accountId);
         addressOwnershipService.setAddressAsOwned(poolAddress);
         addressDescriptionService.set(poolAddress, "pool account " + accountId);
 

@@ -3,8 +3,10 @@ package de.cotto.bitbook.lnd.model;
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 
+import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_VALUE_2;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_1;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_2;
+import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.FEES;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_3;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
@@ -59,5 +61,24 @@ public class OnchainTransactionFixtures {
             + ", expiry=true, deposit=false, is_close=true)",
             OUTPUT_VALUE_1,
             Coins.NONE
+    );
+
+    public static final Transaction POOL_ACCOUNT_DEPOSIT_DETAILS = TRANSACTION;
+    public static final OnchainTransaction POOL_ACCOUNT_DEPOSIT = new OnchainTransaction(
+            TRANSACTION_HASH,
+            " poold -- AccountModification(acct_key="
+            + POOL_ACCOUNT_ID
+            + ", expiry=false, deposit=true, is_close=false)",
+            OUTPUT_VALUE_2.subtract(INPUT_VALUE_2),
+            Coins.NONE
+    );
+
+    public static final OnchainTransaction POOL_ACCOUNT_DEPOSIT_WITH_FEES = new OnchainTransaction(
+            TRANSACTION_HASH,
+            " poold -- AccountModification(acct_key="
+            + POOL_ACCOUNT_ID
+            + ", expiry=false, deposit=true, is_close=false)",
+            OUTPUT_VALUE_2.subtract(INPUT_VALUE_2),
+            FEES
     );
 }
