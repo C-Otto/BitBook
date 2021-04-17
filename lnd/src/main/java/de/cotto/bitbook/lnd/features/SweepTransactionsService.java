@@ -53,11 +53,7 @@ public class SweepTransactionsService {
     }
 
     private boolean isSweepTransaction(Transaction transaction) {
-        boolean hasSingleOutput = transaction.getOutputs().size() == 1;
-        if (!hasSingleOutput && !transaction.equals(Transaction.UNKNOWN)) {
-            logger.warn("Not a sweep transaction: {}", transaction);
-        }
-        return hasSingleOutput;
+        return transaction.getOutputs().size() == 1;
     }
 
     private Transaction addAddressDescriptions(Transaction transaction) {

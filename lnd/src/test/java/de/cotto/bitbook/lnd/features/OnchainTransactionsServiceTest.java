@@ -68,6 +68,9 @@ class OnchainTransactionsServiceTest {
     @Mock
     private TransactionService transactionService;
 
+    @Mock
+    private SweepTransactionsService sweepTransactionsService;
+
     @Test
     void loops_until_fixed_point_is_reached() {
         when(transactionService.getTransactionDetails(FUNDING_TRANSACTION.getTransactionHash()))
@@ -470,6 +473,60 @@ class OnchainTransactionsServiceTest {
                     POOL_ACCOUNT_CLOSE.getFees()
             );
             assertFailure(transaction);
+        }
+    }
+
+    @Nested
+    class Sweep {
+        @Test
+        void forwards_to_sweep_transaction_service() {
+            when(transactionService.getTransactionDetails(anyString())).thenReturn(Transaction.UNKNOWN);
+            when(sweepTransactionsService.addFromSweeps(Set.of(TRANSACTION_HASH))).thenReturn(123L);
+            OnchainTransaction transaction = new OnchainTransaction(
+                    TRANSACTION_HASH,
+                    "",
+                    Coins.ofSatoshis(-123),
+                    Coins.ofSatoshis(123)
+            );
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(transaction))).isEqualTo(123);
+        }
+
+        @Test
+        void amount_does_not_match_fee() {
+            when(transactionService.getTransactionDetails(anyString())).thenReturn(Transaction.UNKNOWN);
+            OnchainTransaction transaction = new OnchainTransaction(
+                    TRANSACTION_HASH,
+                    "",
+                    Coins.ofSatoshis(-101),
+                    Coins.ofSatoshis(100)
+            );
+            assertFailure(transaction);
+            verifyNoInteractions(sweepTransactionsService);
+        }
+
+        @Test
+        void amount_zero() {
+            when(transactionService.getTransactionDetails(anyString())).thenReturn(Transaction.UNKNOWN);
+            OnchainTransaction transaction = new OnchainTransaction(
+                    TRANSACTION_HASH,
+                    "",
+                    Coins.NONE,
+                    Coins.NONE
+            );
+            assertFailure(transaction);
+            verifyNoInteractions(sweepTransactionsService);
+        }
+
+        @Test
+        void has_label() {
+            OnchainTransaction transaction = new OnchainTransaction(
+                    TRANSACTION_HASH,
+                    "hello",
+                    Coins.ofSatoshis(-123),
+                    Coins.ofSatoshis(123)
+            );
+            assertFailure(transaction);
+            verifyNoInteractions(sweepTransactionsService);
         }
     }
 
