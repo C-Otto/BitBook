@@ -27,27 +27,26 @@ public class OnchainTransactionFixtures {
     );
     public static final Transaction FUNDING_TRANSACTION_DETAILS = TRANSACTION;
 
+    public static final Transaction OPENING_TRANSACTION_DETAILS = TRANSACTION;
     public static final OnchainTransaction OPENING_TRANSACTION = new OnchainTransaction(
             TRANSACTION_HASH,
             "",
-            Coins.ofSatoshis(-1_234 - 21_513),
-            Coins.ofSatoshis(21_513)
+            Coins.NONE.subtract(OUTPUT_VALUE_2).subtract(OPENING_TRANSACTION_DETAILS.getFees()),
+            OPENING_TRANSACTION_DETAILS.getFees()
     );
-    public static final Transaction OPENING_TRANSACTION_DETAILS = TRANSACTION;
 
     public static final String POOL_ACCOUNT_ID = "001a2021f4013201230af5013021302130f501a302130412fa1230213041030123";
 
     public static final Transaction POOL_ACCOUNT_CREATION_DETAILS = TRANSACTION;
     private static final String ACCOUNT_CREATION_PREFIX = " poold -- AccountCreation(acct_key=";
     private static final String ACCOUNT_CREATION_SUFFIX = ")";
+    public static final Transaction POOL_ACCOUNT_CLOSE_DETAILS = TRANSACTION_3;
     public static final OnchainTransaction POOL_ACCOUNT_CREATION = new OnchainTransaction(
             TRANSACTION_HASH,
             ACCOUNT_CREATION_PREFIX + POOL_ACCOUNT_ID + ACCOUNT_CREATION_SUFFIX,
             Coins.ofSatoshis(-1_234 - 999),
             Coins.ofSatoshis(999)
     );
-
-    public static final Transaction POOL_ACCOUNT_CLOSE_DETAILS = TRANSACTION_3;
 
     private static final String MODIFICATION_PREFIX = " poold -- AccountModification(acct_key=";
     private static final String CLOSE_SUFFIX = ", expiry=false, deposit=false, is_close=true)";
@@ -80,5 +79,13 @@ public class OnchainTransactionFixtures {
             MODIFICATION_PREFIX + POOL_ACCOUNT_ID + DEPOSIT_SUFFIX,
             OUTPUT_VALUE_2.subtract(INPUT_VALUE_2),
             FEES
+    );
+
+    public static final Transaction SPEND_TRANSACTION_DETAILS = TRANSACTION;
+    public static final OnchainTransaction SPEND_TRANSACTION = new OnchainTransaction(
+            TRANSACTION_HASH,
+            "",
+            Coins.NONE.subtract(OUTPUT_VALUE_2).subtract(FEES),
+            SPEND_TRANSACTION_DETAILS.getFees()
     );
 }
