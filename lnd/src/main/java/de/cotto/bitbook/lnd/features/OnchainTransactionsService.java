@@ -10,6 +10,8 @@ import de.cotto.bitbook.lnd.model.OnchainTransaction;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.springframework.stereotype.Component;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -38,25 +40,29 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
     }
 
     public long addFromOnchainTransactions(Set<OnchainTransaction> onchainTransactions) {
-        long oldResult;
-        long result = -1;
+        Map<OnchainTransaction, Long> oldSuccesses;
+        Map<OnchainTransaction, Long> successes = new LinkedHashMap<>();
         do {
-            oldResult = result;
-            result = runOnce(onchainTransactions);
-        } while (result != oldResult);
-        return result;
+            oldSuccesses = successes;
+            successes = runOnce(onchainTransactions);
+        } while (!oldSuccesses.equals(successes));
+        return successes.size();
     }
 
-    private long runOnce(Set<OnchainTransaction> onchainTransactions) {
-        long result = 0;
+    private Map<OnchainTransaction, Long> runOnce(Set<OnchainTransaction> onchainTransactions) {
+        Map<OnchainTransaction, Long> successes = new LinkedHashMap<>();
         for (OnchainTransaction onchainTransaction : onchainTransactions) {
+            long result = 0;
             result += handleFundingTransaction(onchainTransaction);
             result += handleOpeningTransaction(onchainTransaction);
             result += handlePoolTransaction(onchainTransaction);
             result += handleSweepTransaction(onchainTransaction);
             result += handleSpendTransaction(onchainTransaction);
+            if (result > 0) {
+                successes.put(onchainTransaction, result);
+            }
         }
-        return result;
+        return successes;
     }
 
     private long handlePoolTransaction(OnchainTransaction onchainTransaction) {
