@@ -461,7 +461,7 @@ class OnchainTransactionsServiceTest {
 
         @Test
         void two_outputs() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash()))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash()))
                     .thenReturn(TRANSACTION);
             OnchainTransaction transaction = new OnchainTransaction(
                     POOL_ACCOUNT_CLOSE.getTransactionHash(),
