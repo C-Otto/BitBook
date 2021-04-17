@@ -80,7 +80,9 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
 
     private long handleOpeningTransaction(OnchainTransaction onchainTransaction) {
         boolean nonNegativeAmount = onchainTransaction.getAmount().isNonNegative();
-        if (nonNegativeAmount || onchainTransaction.hasLabel()) {
+        boolean notOpenChannelLabel = onchainTransaction.hasLabel()
+                                      && !onchainTransaction.getLabel().startsWith("0:openchannel:");
+        if (nonNegativeAmount || notOpenChannelLabel) {
             return 0;
         }
         Transaction transaction = transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
@@ -130,7 +132,9 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
 
     private long handleSweepTransaction(OnchainTransaction onchainTransaction) {
         boolean amountMatchesFee = onchainTransaction.getAmount().absolute().equals(onchainTransaction.getFees());
-        if (onchainTransaction.hasLabel() || !amountMatchesFee || !onchainTransaction.hasFees()) {
+        boolean unexpectedLabel = onchainTransaction.hasLabel()
+                                  && !onchainTransaction.getLabel().startsWith("0:sweep:");
+        if (unexpectedLabel || !amountMatchesFee || !onchainTransaction.hasFees()) {
             return 0;
         }
         return sweepTransactionsService.addFromSweeps(Set.of(onchainTransaction.getTransactionHash()));

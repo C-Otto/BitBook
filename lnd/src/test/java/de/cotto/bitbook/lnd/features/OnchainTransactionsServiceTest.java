@@ -28,6 +28,7 @@ import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.FUNDING_TRAN
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.ONCHAIN_TRANSACTION;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.OPENING_TRANSACTION;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.OPENING_TRANSACTION_DETAILS;
+import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.OPENING_TRANSACTION_WITH_LABEL;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.SPEND_TRANSACTION;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.SPEND_TRANSACTION_DETAILS;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
@@ -173,6 +174,12 @@ class OnchainTransactionsServiceTest {
         }
 
         @Test
+        void with_label() {
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION_WITH_LABEL)))
+                    .isGreaterThanOrEqualTo(1);
+        }
+
+        @Test
         void sets_ownership_for_channel_output_of_channel_opening_transaction() {
             assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION)))
                     .isGreaterThanOrEqualTo(1);
@@ -299,6 +306,18 @@ class OnchainTransactionsServiceTest {
         }
 
         @Test
+        void with_label() {
+            when(sweepTransactionsService.addFromSweeps(Set.of(TRANSACTION_HASH))).thenReturn(123L);
+            OnchainTransaction transaction = new OnchainTransaction(
+                    TRANSACTION_HASH,
+                    "0:sweep:foo",
+                    Coins.ofSatoshis(-123),
+                    Coins.ofSatoshis(123)
+            );
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(transaction))).isEqualTo(123);
+        }
+
+        @Test
         void amount_does_not_match_fee() {
             when(transactionService.getTransactionDetails(anyString())).thenReturn(Transaction.UNKNOWN);
             OnchainTransaction transaction = new OnchainTransaction(
@@ -325,7 +344,7 @@ class OnchainTransactionsServiceTest {
         }
 
         @Test
-        void has_label() {
+        void has_unexpected_label() {
             OnchainTransaction transaction = new OnchainTransaction(
                     TRANSACTION_HASH,
                     "hello",

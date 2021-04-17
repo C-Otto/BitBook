@@ -35,6 +35,13 @@ public class OnchainTransactionFixtures {
             OPENING_TRANSACTION_DETAILS.getFees()
     );
 
+    public static final OnchainTransaction OPENING_TRANSACTION_WITH_LABEL = new OnchainTransaction(
+            OPENING_TRANSACTION.getTransactionHash(),
+            "0:openchannel:foo",
+            OPENING_TRANSACTION.getAmount(),
+            OPENING_TRANSACTION.getFees()
+    );
+
     public static final String POOL_ACCOUNT_ID = "001a2021f4013201230af5013021302130f501a302130412fa1230213041030123";
 
     public static final Transaction POOL_ACCOUNT_CREATION_DETAILS = TRANSACTION;
