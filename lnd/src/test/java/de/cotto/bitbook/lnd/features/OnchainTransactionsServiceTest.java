@@ -295,26 +295,26 @@ class OnchainTransactionsServiceTest {
         @Test
         void forwards_to_sweep_transaction_service() {
             when(transactionService.getTransactionDetails(anyString())).thenReturn(Transaction.UNKNOWN);
-            when(sweepTransactionsService.addFromSweeps(Set.of(TRANSACTION_HASH))).thenReturn(123L);
+            when(sweepTransactionsService.addFromSweeps(Set.of(TRANSACTION_HASH))).thenReturn(1L);
             OnchainTransaction transaction = new OnchainTransaction(
                     TRANSACTION_HASH,
                     "",
                     Coins.ofSatoshis(-123),
                     Coins.ofSatoshis(123)
             );
-            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(transaction))).isEqualTo(123);
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(transaction))).isEqualTo(1L);
         }
 
         @Test
         void with_label() {
-            when(sweepTransactionsService.addFromSweeps(Set.of(TRANSACTION_HASH))).thenReturn(123L);
+            when(sweepTransactionsService.addFromSweeps(Set.of(TRANSACTION_HASH))).thenReturn(1L);
             OnchainTransaction transaction = new OnchainTransaction(
                     TRANSACTION_HASH,
                     "0:sweep:foo",
                     Coins.ofSatoshis(-123),
                     Coins.ofSatoshis(123)
             );
-            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(transaction))).isEqualTo(123);
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(transaction))).isEqualTo(1L);
         }
 
         @Test
