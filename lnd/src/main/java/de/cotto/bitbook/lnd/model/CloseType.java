@@ -30,6 +30,10 @@ public enum CloseType {
         return COOPERATIVE;
     }
 
+    public boolean isCooperative() {
+        return this == COOPERATIVE || this == COOPERATIVE_LOCAL || this == COOPERATIVE_REMOTE;
+    }
+
     @Override
     public String toString() {
         return stringRepresentation;
