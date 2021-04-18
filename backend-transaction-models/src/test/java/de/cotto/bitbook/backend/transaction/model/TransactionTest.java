@@ -19,6 +19,7 @@ import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_2
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_1;
+import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_2;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.DATE_TIME;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.FEES;
@@ -146,6 +147,29 @@ class TransactionTest {
         assertThat(TRANSACTION.getOutputAddresses()).containsExactlyInAnyOrder(
                 OUTPUT_ADDRESS_1, OUTPUT_ADDRESS_2
         );
+    }
+
+    @Test
+    void getOutputWithValue_found() {
+        assertThat(TRANSACTION.getOutputWithValue(OUTPUT_VALUE_2)).contains(OUTPUT_2);
+    }
+
+    @Test
+    void getOutputWithValue_not_found() {
+        assertThat(TRANSACTION.getOutputWithValue(OUTPUT_VALUE_2.add(Coins.ofSatoshis(1)))).isEmpty();
+    }
+
+    @Test
+    void getOutputWithValue_not_unique() {
+        Transaction transaction = new Transaction(
+                TRANSACTION_HASH,
+                BLOCK_HEIGHT,
+                DATE_TIME,
+                Coins.NONE,
+                List.of(new Input(OUTPUT_VALUE_1.add(OUTPUT_VALUE_1), "a")),
+                List.of(OUTPUT_1, OUTPUT_1)
+        );
+        assertThat(transaction.getOutputWithValue(OUTPUT_VALUE_1)).isEmpty();
     }
 
     @Test

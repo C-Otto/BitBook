@@ -11,6 +11,8 @@ import de.cotto.bitbook.lnd.model.OnchainTransaction;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Component
@@ -53,7 +55,7 @@ public class PoolTransactionService extends AbstractTransactionsService {
         }
         Transaction transaction = transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
         Coins poolAmount = onchainTransaction.getAbsoluteAmountWithoutFees();
-        String poolAddress = getIfExactlyOne(getAddressesForMatchingOutputs(transaction, poolAmount)).orElse(null);
+        String poolAddress = transaction.getOutputWithValue(poolAmount).map(InputOutput::getAddress).orElse(null);
         if (poolAddress == null) {
             return 0;
         }
@@ -80,10 +82,8 @@ public class PoolTransactionService extends AbstractTransactionsService {
                 ))
                 .map(InputOutput::getValue)
                 .reduce(Coins.NONE, Coins::add);
-        Coins expectedPoolAmount = subtractedAmount.add(otherInputs).subtract(transaction.getFees());
-        String poolAddress = getIfExactlyOne(
-                getAddressesForMatchingOutputs(transaction, expectedPoolAmount)
-        ).orElse(null);
+        Coins expectedAmount = subtractedAmount.add(otherInputs).subtract(transaction.getFees());
+        String poolAddress = transaction.getOutputWithValue(expectedAmount).map(InputOutput::getAddress).orElse(null);
         if (poolAddress == null) {
             return 0;
         }
@@ -143,5 +143,13 @@ public class PoolTransactionService extends AbstractTransactionsService {
         int start = label.indexOf('=') + 1;
         int poolAccountKeyLength = 66;
         return label.substring(start, start + poolAccountKeyLength);
+    }
+
+    @SuppressWarnings("PMD.AvoidLiteralsInIfCondition")
+    protected <T> Optional<T> getIfExactlyOne(List<T> list) {
+        if (list.size() != 1) {
+            return Optional.empty();
+        }
+        return Optional.of(list.get(0));
     }
 }

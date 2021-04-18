@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,7 +28,7 @@ class LndCommandsTest {
     @Test
     void lndAddFromSweeps() throws IOException {
         when(lndService.addFromSweeps(any())).thenReturn(123L);
-        File file = createTempFileWithContent();
+        File file = TempFileUtil.createTempFileWithContent(JSON);
 
         assertThat(lndCommands.lndAddFromSweeps(file)).isEqualTo("Added information for 123 sweep transactions");
 
@@ -39,7 +38,7 @@ class LndCommandsTest {
     @Test
     void lndAddFromSweeps_failure() throws IOException {
         when(lndService.addFromSweeps(any())).thenReturn(0L);
-        File file = createTempFile();
+        File file = TempFileUtil.createTempFile();
 
         assertThat(lndCommands.lndAddFromSweeps(file)).isEqualTo("Unable to find sweep transactions in file");
     }
@@ -47,7 +46,7 @@ class LndCommandsTest {
     @Test
     void addFromUnspentOutputs() throws IOException {
         when(lndService.addFromUnspentOutputs(any())).thenReturn(123L);
-        File file = createTempFileWithContent();
+        File file = TempFileUtil.createTempFileWithContent(JSON);
 
         assertThat(lndCommands.lndAddFromUnspentOutputs(file)).isEqualTo("Marked 123 addresses as owned by lnd");
 
@@ -57,7 +56,7 @@ class LndCommandsTest {
     @Test
     void lndAddFromUnspentOutputs_failure() throws IOException {
         when(lndService.addFromUnspentOutputs(any())).thenReturn(0L);
-        File file = createTempFile();
+        File file = TempFileUtil.createTempFile();
 
         assertThat(lndCommands.lndAddFromUnspentOutputs(file))
                 .isEqualTo("Unable to find unspent output address in file");
@@ -66,7 +65,7 @@ class LndCommandsTest {
     @Test
     void lndAddFromChannels() throws IOException {
         when(lndService.addFromChannels(any())).thenReturn(123L);
-        File file = createTempFileWithContent();
+        File file = TempFileUtil.createTempFileWithContent(JSON);
 
         assertThat(lndCommands.lndAddFromChannels(file)).isEqualTo("Added information for 123 channels");
 
@@ -76,7 +75,7 @@ class LndCommandsTest {
     @Test
     void lndAddFromChannels_failure() throws IOException {
         when(lndService.addFromChannels(any())).thenReturn(0L);
-        File file = createTempFile();
+        File file = TempFileUtil.createTempFile();
 
         assertThat(lndCommands.lndAddFromChannels(file)).isEqualTo("Unable to find channel in file");
     }
@@ -84,7 +83,7 @@ class LndCommandsTest {
     @Test
     void lndAddFromClosedChannels() throws IOException {
         when(lndService.addFromClosedChannels(any())).thenReturn(123L);
-        File file = createTempFileWithContent();
+        File file = TempFileUtil.createTempFileWithContent(JSON);
 
         assertThat(lndCommands.lndAddFromClosedChannels(file)).isEqualTo("Added information for 123 closed channels");
 
@@ -94,7 +93,7 @@ class LndCommandsTest {
     @Test
     void lndAddFromClosedChannels_failure() throws IOException {
         when(lndService.addFromClosedChannels(any())).thenReturn(0L);
-        File file = createTempFile();
+        File file = TempFileUtil.createTempFile();
 
         assertThat(lndCommands.lndAddFromClosedChannels(file)).isEqualTo("Unable to find closed channel in file");
     }
@@ -102,7 +101,7 @@ class LndCommandsTest {
     @Test
     void lndAddFromOnchainTransactions() throws IOException {
         when(lndService.addFromOnchainTransactions(any())).thenReturn(123L);
-        File file = createTempFileWithContent();
+        File file = TempFileUtil.createTempFileWithContent(JSON);
 
         assertThat(lndCommands.lndAddFromOnchainTransactions(file))
                 .isEqualTo("Added information from 123 transactions");
@@ -113,19 +112,9 @@ class LndCommandsTest {
     @Test
     void lndAddFromOnchainTransactions_failure() throws IOException {
         when(lndService.addFromOnchainTransactions(any())).thenReturn(0L);
-        File file = createTempFile();
+        File file = TempFileUtil.createTempFile();
 
         assertThat(lndCommands.lndAddFromOnchainTransactions(file))
                 .isEqualTo("Unable to find usable transactions in file");
-    }
-
-    private File createTempFileWithContent() throws IOException {
-        File file = createTempFile();
-        Files.writeString(file.toPath(), JSON);
-        return file;
-    }
-
-    private File createTempFile() throws IOException {
-        return File.createTempFile("temp", "bitbook");
     }
 }

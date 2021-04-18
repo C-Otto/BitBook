@@ -6,11 +6,9 @@ import de.cotto.bitbook.backend.transaction.model.Transaction;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ClosedChannel {
     private static final String BITCOIN_GENESIS_BLOCK_HASH
@@ -100,15 +98,8 @@ public class ClosedChannel {
         return new ClosedChannelBuilder();
     }
 
-    @SuppressWarnings("PMD.AvoidLiteralsInIfCondition")
     public Optional<String> getSettlementAddress() {
-        List<Output> candidates = closingTransaction.getOutputs().stream()
-                .filter(output -> settledBalance.equals(output.getValue()))
-                .collect(Collectors.toList());
-        if (candidates.size() == 1) {
-            return Optional.of(candidates.get(0).getAddress());
-        }
-        return Optional.empty();
+        return closingTransaction.getOutputWithValue(settledBalance).map(Output::getAddress);
     }
 
     @Override
