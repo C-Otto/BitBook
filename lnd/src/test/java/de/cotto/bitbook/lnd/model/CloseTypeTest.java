@@ -36,6 +36,20 @@ class CloseTypeTest {
     }
 
     @Test
+    void isCooperative_false() {
+        assertThat(FORCE_LOCAL.isCooperative()).isFalse();
+        assertThat(FORCE_REMOTE.isCooperative()).isFalse();
+    }
+
+    @Test
+    @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
+    void isCooperative_true() {
+        assertThat(COOPERATIVE.isCooperative()).isTrue();
+        assertThat(COOPERATIVE_LOCAL.isCooperative()).isTrue();
+        assertThat(COOPERATIVE_REMOTE.isCooperative()).isTrue();
+    }
+
+    @Test
     void fromStringAndInitiator_cooperative_unknown() {
         assertThat(CloseType.fromStringAndInitiator("COOPERATIVE_CLOSE", "INITIATOR_UNKNOWN"))
                 .isEqualTo(COOPERATIVE);

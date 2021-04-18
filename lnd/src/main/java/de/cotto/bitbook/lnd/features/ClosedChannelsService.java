@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
+
 @Component
 public class ClosedChannelsService {
     private static final String DEFAULT_ADDRESS_DESCRIPTION = "lnd";
@@ -46,6 +48,7 @@ public class ClosedChannelsService {
 
         setTransactionDescriptions(closedChannel);
         setForSettlementAddress(closedChannel);
+        setOtherOutputAsForeignForCooperativeClose(closedChannel);
         setChannelAddressOwnershipAndDescription(channelAddress, closedChannel.getOpenInitiator(), remotePubkey);
         addFromHtlcSweepTransactions(closedChannel);
         return closedChannel;
@@ -78,6 +81,14 @@ public class ClosedChannelsService {
         });
     }
 
+    private void setOtherOutputAsForeignForCooperativeClose(ClosedChannel closedChannel) {
+        if (closedChannel.getCloseType().isCooperative()) {
+            closedChannel.getClosingTransaction().getOutputAddresses().stream()
+                    .filter(address -> !OWNED.equals(addressOwnershipService.getOwnershipStatus(address)))
+                    .forEach(addressOwnershipService::setAddressAsForeign);
+        }
+    }
+
     private void setChannelAddressOwnershipAndDescription(
             String channelAddress,
             Initiator openInitiator,
@@ -92,7 +103,7 @@ public class ClosedChannelsService {
             addressOwnershipService.setAddressAsOwned(channelAddress);
         } else if (openInitiator.equals(Initiator.REMOTE)) {
             OwnershipStatus ownershipStatus = addressOwnershipService.getOwnershipStatus(channelAddress);
-            if (!OwnershipStatus.OWNED.equals(ownershipStatus)) {
+            if (!OWNED.equals(ownershipStatus)) {
                 addressOwnershipService.setAddressAsForeign(channelAddress);
             }
         }
