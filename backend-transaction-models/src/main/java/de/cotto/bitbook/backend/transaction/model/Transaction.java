@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
@@ -129,6 +130,17 @@ public class Transaction {
 
     public Set<String> getOutputAddresses() {
         return outputs.stream().map(InputOutput::getAddress).collect(toSet());
+    }
+
+    @SuppressWarnings("PMD.AvoidLiteralsInIfCondition")
+    public Optional<Output> getOutputWithValue(Coins expectedValue) {
+        List<Output> candidates = getOutputs().stream()
+                .filter(output -> expectedValue.equals(output.getValue()))
+                .collect(toList());
+        if (candidates.size() == 1) {
+            return Optional.of(candidates.get(0));
+        }
+        return Optional.empty();
     }
 
     @Override

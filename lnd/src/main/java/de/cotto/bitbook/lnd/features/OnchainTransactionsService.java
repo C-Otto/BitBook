@@ -74,9 +74,9 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
         if (onchainTransaction.hasFees() || amount.isNegative() || onchainTransaction.hasLabel()) {
             return 0;
         }
-        Transaction transactionDetails =
+        Transaction transaction =
                 transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
-        String address = getIfExactlyOne(getAddressesForMatchingOutputs(transactionDetails, amount)).orElse(null);
+        String address = transaction.getOutputWithValue(amount).map(InputOutput::getAddress).orElse(null);
         if (address == null) {
             return 0;
         }
@@ -158,7 +158,7 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
             return 0;
         }
         Coins expectedOutputAmount = onchainTransaction.getAbsoluteAmountWithoutFees();
-        Output targetOutput = getIfExactlyOne(getMatchingOutputs(transaction, expectedOutputAmount)).orElse(null);
+        Output targetOutput = transaction.getOutputWithValue(expectedOutputAmount).orElse(null);
         if (targetOutput == null) {
             return 0;
         }

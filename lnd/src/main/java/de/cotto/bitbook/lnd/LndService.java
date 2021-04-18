@@ -1,6 +1,5 @@
 package de.cotto.bitbook.lnd;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.cotto.bitbook.lnd.features.ChannelsService;
@@ -13,14 +12,11 @@ import de.cotto.bitbook.lnd.model.ClosedChannel;
 import de.cotto.bitbook.lnd.model.OnchainTransaction;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.function.Function;
 
 @Component
-public class LndService {
-    private final ObjectMapper objectMapper;
+public class LndService extends AbstractJsonService {
     private final ClosedChannelsService closedChannelsService;
     private final UnspentOutputsService unspentOutputsService;
     private final SweepTransactionsService sweepTransactionsService;
@@ -41,7 +37,7 @@ public class LndService {
             OnchainTransactionsParser onchainTransactionsParser,
             OnchainTransactionsService onchainTransactionsService
     ) {
-        this.objectMapper = objectMapper;
+        super(objectMapper);
         this.closedChannelsService = closedChannelsService;
         this.unspentOutputsService = unspentOutputsService;
         this.sweepTransactionsService = sweepTransactionsService;
@@ -75,18 +71,6 @@ public class LndService {
     public long addFromOnchainTransactions(String json) {
         Set<OnchainTransaction> onchainTransactions = parse(json, onchainTransactionsParser::parse);
         return onchainTransactionsService.addFromOnchainTransactions(onchainTransactions);
-    }
-
-    private <T> Set<T> parse(String json, Function<JsonNode, Set<T>> parseFunction) {
-        try (JsonParser parser = objectMapper.createParser(json)) {
-            JsonNode rootNode = parser.getCodec().readTree(parser);
-            if (rootNode == null) {
-                return Set.of();
-            }
-            return parseFunction.apply(rootNode);
-        } catch (IOException e) {
-            return Set.of();
-        }
     }
 
     private Set<String> parseSweepTransactionHashes(JsonNode rootNode) {
