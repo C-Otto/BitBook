@@ -7,6 +7,7 @@ import de.cotto.bitbook.backend.price.model.Price;
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.backend.transaction.model.InputOutput;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
+import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -22,31 +23,38 @@ public class TransactionFormatter {
     private final AddressFormatter addressFormatter;
     private final PriceService priceService;
     private final PriceFormatter priceFormatter;
+    private final AddressOwnershipService addressOwnershipService;
 
     public TransactionFormatter(
             AddressDescriptionService addressDescriptionService,
             TransactionDescriptionService transactionDescriptionService,
             AddressFormatter addressFormatter,
             PriceService priceService,
-            PriceFormatter priceFormatter
+            PriceFormatter priceFormatter,
+            AddressOwnershipService addressOwnershipService
     ) {
         this.addressDescriptionService = addressDescriptionService;
         this.transactionDescriptionService = transactionDescriptionService;
         this.addressFormatter = addressFormatter;
         this.priceService = priceService;
         this.priceFormatter = priceFormatter;
+        this.addressOwnershipService = addressOwnershipService;
     }
 
     public String format(Transaction transaction) {
         String formattedTime = transaction.getTime().format(DateTimeFormatter.ISO_DATE_TIME);
         Price price = priceService.getPrice(transaction.getTime());
         String fees = formatWithPrice(transaction.getFees(), price);
+        Coins differenceToOwnedAddresses =
+                transaction.getDifferenceForAddresses(addressOwnershipService.getOwnedAddresses());
+        String contribution = formatWithPrice(differenceToOwnedAddresses, price);
         String transactionDescription = transactionDescriptionService.getDescription(transaction.getHash());
         return """
                Transaction:\t%s
                Description:\t%s
                Block:\t\t%d (%s)
                Fees:\t\t%s
+               Contribution:\t%s
                Inputs:%n%s
                Outputs:%n%s
                """.formatted(transaction.getHash(),
@@ -54,6 +62,7 @@ public class TransactionFormatter {
                 transaction.getBlockHeight(),
                 formattedTime,
                 fees,
+                contribution,
                 formatInputsOutputs(transaction.getInputs(), price),
                 formatInputsOutputs(transaction.getOutputs(), price)
         );
