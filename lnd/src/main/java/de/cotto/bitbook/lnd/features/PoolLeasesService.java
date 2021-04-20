@@ -58,8 +58,7 @@ public class PoolLeasesService {
     @SuppressWarnings("PMD.LinguisticNaming")
     private PoolLease setChannelAddressDescriptionAndOwnership(PoolLease poolLease) {
         String channelAddress = getChannelAddress(poolLease);
-        addressDescriptionService.set(channelAddress, "Lightning Channel with " + poolLease.getPubKey()
-        );
+        addressDescriptionService.set(channelAddress, "Lightning Channel with " + poolLease.getPubKey());
         addressOwnershipService.setAddressAsOwned(channelAddress);
         return poolLease;
     }
