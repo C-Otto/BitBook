@@ -37,16 +37,6 @@ public class ChannelsService {
         return channels.size();
     }
 
-    private void setChannelOwnership(Channel channel) {
-        String channelAddress = channel.getChannelAddress();
-        if (channel.isInitiator()) {
-            addressOwnershipService.setAddressAsOwned(channelAddress);
-        }
-        if (!OWNED.equals(addressOwnershipService.getOwnershipStatus(channelAddress))) {
-            addressOwnershipService.setAddressAsForeign(channelAddress);
-        }
-    }
-
     private void setTransactionDescription(Channel channel) {
         String localOrRemote;
         if (channel.isInitiator()) {
@@ -65,5 +55,15 @@ public class ChannelsService {
                 channel.getChannelAddress(),
                 ADDRESS_DESCRIPTION_PREFIX + channel.getRemotePubkey()
         );
+    }
+
+    private void setChannelOwnership(Channel channel) {
+        String channelAddress = channel.getChannelAddress();
+        if (channel.isInitiator()) {
+            addressOwnershipService.setAddressAsOwned(channelAddress);
+        }
+        if (!OWNED.equals(addressOwnershipService.getOwnershipStatus(channelAddress))) {
+            addressOwnershipService.setAddressAsForeign(channelAddress);
+        }
     }
 }
