@@ -11,6 +11,7 @@ import de.cotto.bitbook.backend.transaction.model.Input;
 import de.cotto.bitbook.backend.transaction.model.InputOutput;
 import de.cotto.bitbook.backend.transaction.model.Output;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
+import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 
 import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_1;
 import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_2;
@@ -31,6 +33,7 @@ import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_VAL
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_1;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_2;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_1;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_2;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
@@ -61,6 +64,9 @@ class TransactionFormatterTest {
     @Mock
     private PriceFormatter priceFormatter;
 
+    @Mock
+    private AddressOwnershipService addressOwnershipService;
+
     @Test
     void format() {
         when(priceFormatter.format(any(), any()))
@@ -86,11 +92,14 @@ class TransactionFormatterTest {
         String formattedInputs = formattedInputOutput(INPUT_2, price) + "\n" + formattedInputOutput(INPUT_1, price);
         String formattedOutputs =
                 formattedInputOutput(OUTPUT_1, price) + "\n" + formattedInputOutput(OUTPUT_2, price);
+        when(addressOwnershipService.getOwnedAddresses()).thenReturn(Set.of(INPUT_ADDRESS_1, OUTPUT_ADDRESS_2));
+        Coins contribution = Coins.NONE.subtract(INPUT_VALUE_1).add(OUTPUT_VALUE_2);
         String expected = """
                 Transaction:\t%s
                 Description:\t%s
                 Block:\t\t%d (%s)
                 Fees:\t\t%s
+                Contribution:\t%s
                 Inputs:%n%s
                 Outputs:%n%s
                 """.formatted(
@@ -99,6 +108,7 @@ class TransactionFormatterTest {
                 TRANSACTION.getBlockHeight(),
                 DATE_TIME.format(DateTimeFormatter.ISO_DATE_TIME),
                 formattedCoinsWithPrice(TRANSACTION.getFees(), price),
+                formattedCoinsWithPrice(contribution, price),
                 formattedInputs,
                 formattedOutputs
         );

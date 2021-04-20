@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_2;
@@ -115,17 +116,16 @@ class TransactionTest {
     @Test
     void getDifferenceForAddress_negative() {
         Coins coinsIn = Coins.ofSatoshis(10);
-        Coins coinsOut = Coins.ofSatoshis(5);
-        Transaction transaction = new Transaction(
-                TRANSACTION_HASH,
-                BLOCK_HEIGHT,
-                DATE_TIME,
-                coinsIn.subtract(coinsOut),
-                List.of(new Input(coinsIn, ADDRESS)),
-                List.of(new Output(coinsOut, ADDRESS_2))
-        );
+        Transaction transaction = getTransaction(coinsIn, Coins.ofSatoshis(5));
         Coins difference = Coins.NONE.subtract(coinsIn);
         assertThat(transaction.getDifferenceForAddress(ADDRESS)).isEqualTo(difference);
+    }
+
+    @Test
+    void getDifferenceForAddresses() {
+        Transaction transaction = getTransaction(Coins.ofSatoshis(10), Coins.ofSatoshis(5));
+        Coins expectedDifference = Coins.NONE.subtract(transaction.getFees());
+        assertThat(transaction.getDifferenceForAddresses(Set.of(ADDRESS, ADDRESS_2))).isEqualTo(expectedDifference);
     }
 
     @Test
@@ -293,6 +293,17 @@ class TransactionTest {
     void wrong_sum_of_coins() {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
                 new Transaction(TRANSACTION_HASH, BLOCK_HEIGHT, DATE_TIME, FEES, List.of(), List.of())
+        );
+    }
+
+    private Transaction getTransaction(Coins inFromAddress, Coins outToAddress2) {
+        return new Transaction(
+                TRANSACTION_HASH,
+                BLOCK_HEIGHT,
+                DATE_TIME,
+                inFromAddress.subtract(outToAddress2),
+                List.of(new Input(inFromAddress, ADDRESS)),
+                List.of(new Output(outToAddress2, ADDRESS_2))
         );
     }
 }
