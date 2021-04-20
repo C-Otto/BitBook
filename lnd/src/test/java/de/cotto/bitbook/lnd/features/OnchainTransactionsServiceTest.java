@@ -1,6 +1,7 @@
 package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
@@ -57,6 +58,9 @@ class OnchainTransactionsServiceTest {
 
     @Mock
     private AddressDescriptionService addressDescriptionService;
+
+    @Mock
+    private TransactionDescriptionService transactionDescriptionService;
 
     @Mock
     private TransactionService transactionService;
@@ -164,6 +168,7 @@ class OnchainTransactionsServiceTest {
 
             when(addressDescriptionService.getDescription(OUTPUT_ADDRESS_2))
                     .thenReturn(ChannelsService.ADDRESS_DESCRIPTION_PREFIX + "foo");
+            when(transactionDescriptionService.getDescription(OPENING_TRANSACTION.getTransactionHash())).thenReturn("");
         }
 
         @Test
@@ -195,9 +200,30 @@ class OnchainTransactionsServiceTest {
 
         @Test
         void does_not_set_description_for_channel_output_of_channel_opening_transaction() {
-            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION)))
-                    .isGreaterThanOrEqualTo(1);
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION));
             verify(addressDescriptionService, never()).set(OUTPUT_ADDRESS_2, DEFAULT_DESCRIPTION);
+        }
+
+        @Test
+        void sets_initiator_in_transaction_description() {
+            String transactionHash = OPENING_TRANSACTION.getTransactionHash();
+            when(transactionDescriptionService.getDescription(transactionHash))
+                    .thenReturn("Opening Channel with 123pubkey456 (unknown)");
+
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION));
+
+            verify(transactionDescriptionService, atLeastOnce())
+                    .set(transactionHash, "Opening Channel with 123pubkey456 (local)");
+        }
+
+        @Test
+        void sets_initiator_in_transaction_description_existing_transaction_does_not_match() {
+            String transactionHash = OPENING_TRANSACTION.getTransactionHash();
+            when(transactionDescriptionService.getDescription(transactionHash)).thenReturn("something else");
+
+            onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION));
+
+            verify(transactionDescriptionService, never()).set(any(), any());
         }
     }
 

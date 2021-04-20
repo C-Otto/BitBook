@@ -1,6 +1,7 @@
 package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.backend.transaction.model.InputOutput;
@@ -22,7 +23,6 @@ import static de.cotto.bitbook.ownership.OwnershipStatus.UNKNOWN;
 public class OnchainTransactionsService extends AbstractTransactionsService {
     private static final String DEFAULT_DESCRIPTION = "lnd";
 
-    private final TransactionService transactionService;
     private final SweepTransactionsService sweepTransactionsService;
     private final PoolTransactionService poolTransactionService;
 
@@ -31,10 +31,10 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
             AddressDescriptionService addressDescriptionService,
             TransactionService transactionService,
             SweepTransactionsService sweepTransactionsService,
-            PoolTransactionService poolTransactionService
+            PoolTransactionService poolTransactionService,
+            TransactionDescriptionService transactionDescriptionService
     ) {
-        super(addressOwnershipService, addressDescriptionService);
-        this.transactionService = transactionService;
+        super(addressOwnershipService, addressDescriptionService, transactionDescriptionService, transactionService);
         this.sweepTransactionsService = sweepTransactionsService;
         this.poolTransactionService = poolTransactionService;
     }
@@ -91,7 +91,8 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
         if (nonNegativeAmount || notOpenChannelLabel) {
             return 0;
         }
-        Transaction transaction = transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
+        String transactionHash = onchainTransaction.getTransactionHash();
+        Transaction transaction = transactionService.getTransactionDetails(transactionHash);
         if (hasUnownedInput(transaction) || hasMismatchedInputDescription(transaction)) {
             return 0;
         }
@@ -101,8 +102,18 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
             return 0;
         }
         addressOwnershipService.setAddressAsOwned(channelOpenOutput.getAddress());
+        setInitiatorInTransactionDescription(transactionHash);
         setDescriptionAndOwnershipForOtherOutputs(transaction, channelOpenOutput);
         return 1;
+    }
+
+    private void setInitiatorInTransactionDescription(String transactionHash) {
+        String expectedPrefix = "Opening Channel with ";
+        String existingDescription = transactionDescriptionService.getDescription(transactionHash);
+        if (existingDescription.startsWith(expectedPrefix) && existingDescription.endsWith(" (unknown)")) {
+            String updatedDescription = existingDescription.replaceFirst(" \\(unknown\\)", " (local)");
+            transactionDescriptionService.set(transactionHash, updatedDescription);
+        }
     }
 
     private void setDescriptionAndOwnershipForOtherOutputs(Transaction transaction, Output outputToSkip) {
