@@ -17,11 +17,16 @@ The symbol to the right of the address shows the ownership status (`?` if not se
 
 The output also shows descriptions for the addresses and transaction itself, if set.
 
+The amount shown as "Contribution" gives the sum of all coins that this transaction
+ - takes out of your owned addresses (negative), and 
+ - puts back into your owned addresses (positive).
+
 ```
 Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
-Description:    This is the transaction description 
+Description:    This is the transaction description
 Block:          677171 (2021-03-31T16:23:14)
 Fees:              0.00023186 [        11.61€]
+Contribution:      0.124      [     6,210.66€] 
 Inputs:
            3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd ?    0.12319446 [     6,170.32€]                     
            39Kyuxzgs4jm61MYgJYeJNHfUq5RanKBHf ✗    0.0010374  [        51.96€]                     
@@ -140,6 +145,7 @@ Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Description:    
 Block:          677171 (2021-03-31T16:23:14)
 Fees:              0.00023186 [        11.61€]
+Contribution:      0.124      [     6,210.66€]
 Inputs:
            3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd ?    0.12319446 [     6,170.32€]                     
            39Kyuxzgs4jm61MYgJYeJNHfUq5RanKBHf ?    0.0010374  [        51.96€]                     
