@@ -54,14 +54,6 @@ public class ClosedChannelsService {
         return closedChannel;
     }
 
-    private void addFromHtlcSweepTransactions(ClosedChannel closedChannel) {
-        Set<String> sweepTransactionHashes = closedChannel.getResolutions().stream()
-                .map(Resolution::getSweepTransactionHash)
-                .filter(sweepTransactonHash -> !sweepTransactonHash.isBlank())
-                .collect(Collectors.toSet());
-        sweepTransactionsService.addFromSweeps(sweepTransactionHashes);
-    }
-
     private void setTransactionDescriptions(ClosedChannel closedChannel) {
         String remotePubkey = closedChannel.getRemotePubkey();
         transactionDescriptionService.set(
@@ -98,6 +90,10 @@ public class ClosedChannelsService {
         setChannelAddressOwnership(channelAddress, openInitiator);
     }
 
+    private void setChannelAddressDescription(String channelAddress, String remotePubkey) {
+        addressDescriptionService.set(channelAddress, "Lightning-Channel with " + remotePubkey);
+    }
+
     private void setChannelAddressOwnership(String channelAddress, Initiator openInitiator) {
         if (openInitiator.equals(Initiator.LOCAL)) {
             addressOwnershipService.setAddressAsOwned(channelAddress);
@@ -109,7 +105,11 @@ public class ClosedChannelsService {
         }
     }
 
-    private void setChannelAddressDescription(String channelAddress, String remotePubkey) {
-        addressDescriptionService.set(channelAddress, "Lightning-Channel with " + remotePubkey);
+    private void addFromHtlcSweepTransactions(ClosedChannel closedChannel) {
+        Set<String> sweepTransactionHashes = closedChannel.getResolutions().stream()
+                .map(Resolution::getSweepTransactionHash)
+                .filter(sweepTransactionHash -> !sweepTransactionHash.isBlank())
+                .collect(Collectors.toSet());
+        sweepTransactionsService.addFromSweeps(sweepTransactionHashes);
     }
 }
