@@ -12,6 +12,7 @@ Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Description:    
 Block:          677171 (2021-03-31T16:23:14)
 Fees:              0.00023186 [        11.61€]
+Contribution:      0          [         0.00€]
 Inputs:
            3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd ?    0.12319446 [     6,170.32€]                     
            39Kyuxzgs4jm61MYgJYeJNHfUq5RanKBHf ?    0.0010374  [        51.96€]                     
@@ -43,6 +44,7 @@ Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Description:    
 Block:          677171 (2021-03-31T16:23:14)
 Fees:              0.00023186 [        11.61€]
+Contribution:      0.124      [     6,210.66€]
 Inputs:
            3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd ?    0.12319446 [     6,170.32€]                     
            39Kyuxzgs4jm61MYgJYeJNHfUq5RanKBHf ?    0.0010374  [        51.96€]                     
@@ -62,6 +64,7 @@ Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Description:
 Block:          677171 (2021-03-31T16:23:14)
 Fees:              0.00023186 [        11.61€]
+Contribution:      0.124      [     6,210.66€]
 Inputs:
            3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd ✗    0.12319446 [     6,170.32€]                     
            39Kyuxzgs4jm61MYgJYeJNHfUq5RanKBHf ✗    0.0010374  [        51.96€]                     
@@ -90,6 +93,7 @@ Transaction:    f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5
 Description:    
 Block:          677175 (2021-03-31T17:06:30)
 Fees:              0.0001352  [         6.77€]
+Contribution:     -0.124      [    -6,210.66€]
 Inputs:
            35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS ✓    0.124      [     6,210.66€]                     
 Outputs:
@@ -177,6 +181,7 @@ Transaction:    f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5
 Description:    
 Block:          677175 (2021-03-31T17:06:30)
 Fees:              0.0001352  [         6.77€]
+Contribution:     -0.1001352  [    -5,015.37€]
 Inputs:
            35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS ✓    0.124      [     6,210.66€]                     
 Outputs:
