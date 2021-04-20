@@ -11,7 +11,6 @@ import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 import org.springframework.stereotype.Component;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -108,19 +107,10 @@ public class AddressOwnershipService {
             Set<Transaction> transactions,
             Set<String> addresses
     ) {
-        Map<Transaction, Coins> differences = new LinkedHashMap<>();
-        for (String address : addresses) {
-            transactions.stream()
-                    .collect(Collectors.toMap(
-                            Functions.identity(),
-                            transaction -> transaction.getDifferenceForAddress(address)
-                    ))
-                    .forEach((transaction, coins) -> {
-                        Coins added = differences.getOrDefault(transaction, Coins.NONE).add(coins);
-                        differences.put(transaction, added);
-                    });
-        }
-        return differences;
+        return transactions.stream().collect(Collectors.toMap(
+                Functions.identity(),
+                transaction -> transaction.getDifferenceForAddresses(addresses)
+        ));
     }
 
     private void updateWithKnownForeignIgnoringForeignSurplus(
