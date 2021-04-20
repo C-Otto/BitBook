@@ -65,10 +65,6 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
         return successes;
     }
 
-    private long handlePoolTransaction(OnchainTransaction onchainTransaction) {
-        return poolTransactionService.addFromOnchainTransaction(onchainTransaction);
-    }
-
     private long handleFundingTransaction(OnchainTransaction onchainTransaction) {
         Coins amount = onchainTransaction.getAmount();
         if (onchainTransaction.hasFees() || amount.isNegative() || onchainTransaction.hasLabel()) {
@@ -107,6 +103,29 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
         return 1;
     }
 
+    private boolean hasUnownedInput(Transaction transactionDetails) {
+        return transactionDetails.getInputAddresses().stream()
+                .map(addressOwnershipService::getOwnershipStatus)
+                .anyMatch(ownershipStatus -> !OWNED.equals(ownershipStatus));
+    }
+
+    private boolean hasMismatchedInputDescription(Transaction transactionDetails) {
+        return transactionDetails.getInputAddresses().stream()
+                .map(addressDescriptionService::getDescription)
+                .anyMatch(description -> !DEFAULT_DESCRIPTION.equals(description));
+    }
+
+    private Optional<Output> getChannelOpenOutput(Transaction transactionDetails) {
+        return transactionDetails.getOutputs().stream()
+                .filter(output -> addressDescriptionService.getDescription(output.getAddress())
+                        .startsWith(ChannelsService.ADDRESS_DESCRIPTION_PREFIX))
+                .findFirst();
+    }
+
+    private boolean hasUnexpectedChannelCapacity(Output channelOpenOutput, Coins absoluteAmountWithoutFees) {
+        return !absoluteAmountWithoutFees.equals(channelOpenOutput.getValue());
+    }
+
     private void setInitiatorInTransactionDescription(String transactionHash) {
         String expectedPrefix = "Opening Channel with ";
         String existingDescription = transactionDescriptionService.getDescription(transactionHash);
@@ -124,27 +143,8 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
                 .forEach(this::setAddressAsOwnedWithDescription);
     }
 
-    private boolean hasUnexpectedChannelCapacity(Output channelOpenOutput, Coins absoluteAmountWithoutFees) {
-        return !absoluteAmountWithoutFees.equals(channelOpenOutput.getValue());
-    }
-
-    private Optional<Output> getChannelOpenOutput(Transaction transactionDetails) {
-        return transactionDetails.getOutputs().stream()
-                .filter(output -> addressDescriptionService.getDescription(output.getAddress())
-                        .startsWith(ChannelsService.ADDRESS_DESCRIPTION_PREFIX))
-                .findFirst();
-    }
-
-    private boolean hasMismatchedInputDescription(Transaction transactionDetails) {
-        return transactionDetails.getInputAddresses().stream()
-                .map(addressDescriptionService::getDescription)
-                .anyMatch(description -> !DEFAULT_DESCRIPTION.equals(description));
-    }
-
-    private boolean hasUnownedInput(Transaction transactionDetails) {
-        return transactionDetails.getInputAddresses().stream()
-                .map(addressOwnershipService::getOwnershipStatus)
-                .anyMatch(ownershipStatus -> !OWNED.equals(ownershipStatus));
+    private long handlePoolTransaction(OnchainTransaction onchainTransaction) {
+        return poolTransactionService.addFromOnchainTransaction(onchainTransaction);
     }
 
     private long handleSweepTransaction(OnchainTransaction onchainTransaction) {
