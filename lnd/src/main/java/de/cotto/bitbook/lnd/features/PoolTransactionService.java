@@ -24,18 +24,13 @@ public class PoolTransactionService extends AbstractTransactionsService {
             " poold -- AccountModification\\(acct_key=[0-9a-f]*, expiry=false, deposit=true, is_close=false\\)"
     );
 
-    private final TransactionService transactionService;
-    private final TransactionDescriptionService transactionDescriptionService;
-
     public PoolTransactionService(
             TransactionService transactionService,
             AddressDescriptionService addressDescriptionService,
             TransactionDescriptionService transactionDescriptionService,
             AddressOwnershipService addressOwnershipService
     ) {
-        super(addressOwnershipService, addressDescriptionService);
-        this.transactionService = transactionService;
-        this.transactionDescriptionService = transactionDescriptionService;
+        super(addressOwnershipService, addressDescriptionService, transactionDescriptionService, transactionService);
     }
 
     public long addFromOnchainTransaction(OnchainTransaction onchainTransaction) {
