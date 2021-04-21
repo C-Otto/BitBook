@@ -148,3 +148,26 @@ Then, run the command `lnd-add-from-onchain-transactions` as follows:
 BitBook$ lnd-add-from-onchain-transactions /tmp/lnd-listchaintxns.json
 Added information from 671 transactions
 ```
+
+
+### pool leases
+
+In addition to the `lnd` commands above, BitBook can also add information obtained from channel leases created using
+[pool](https://github.com/lightninglabs/pool). For these channels the transaction description is set to
+"Opening Channel with {pubkey}", the channel address is marked as owned, and the channel address description is set to
+"Lightning-Channel with {pubkey}".
+
+Based on the information provided by `pool` BitBook is also able to identify the change address, which is marked as
+owned. If the pool account id is already set for an input address, this description is also used for the change address.
+Otherwise, BitBook sets the description "pool account" for the output.
+
+You first need to create the JSON file using `pool auction leases > pool-auction-leases.json`.
+Then, after transferring the file to the computer running BitBook, you can use the `pool-add-from-leases` command:
+
+```
+BitBook$ pool-add-from-leases /tmp/pool-auction-leases.json
+Added information for 12 leases
+```
+
+Note: Currently only "ask" orders are supported. If you can provide examples for "bid" orders, please share them
+(see [Contributing](contributing.md))!
