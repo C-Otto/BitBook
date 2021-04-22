@@ -1,24 +1,21 @@
 package de.cotto.bitbook.cli;
 
 import com.google.common.base.Functions;
-import com.google.common.collect.Sets;
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
-import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 @ShellComponent
@@ -69,20 +66,20 @@ public class TransactionsCommands {
         if (addressString.isEmpty()) {
             return "Expected base58 or bech32 address";
         }
-        AddressTransactions transactions = addressTransactionsService.getTransactions(addressString);
         String description = addressDescriptionService.getDescription(addressString);
-        StringBuilder result = new StringBuilder(51);
-        result.append("Address: ").append(addressString)
-                .append(' ')
-                .append(addressFormatter.getFormattedOwnershipStatus(addressString))
-                .append("\nDescription: ")
-                .append(description);
-        List<String> hashes = transactions.getTransactionHashes().stream().sorted().collect(toList());
-        result.append("\nTransaction hashes (")
-                .append(hashes.size())
-                .append("):\n")
-                .append(formattedHashesSortedByDifferenceForAddress(hashes, addressString));
-        return StringUtils.stripEnd(result.toString(), "\n");
+        Set<String> hashes = addressTransactionsService.getTransactions(addressString).getTransactionHashes();
+        String result = """
+                Address: %s %s
+                Description: %s
+                Transaction hashes (%d):
+                %s""".formatted(
+                addressString,
+                addressFormatter.getFormattedOwnershipStatus(addressString),
+                description,
+                hashes.size(),
+                formattedHashesSortedByDifferenceForAddress(hashes, addressString)
+        );
+        return StringUtils.stripEnd(result, "\n");
     }
 
     @SuppressWarnings("PMD.LinguisticNaming")
@@ -110,14 +107,11 @@ public class TransactionsCommands {
         return "OK";
     }
 
-    private String formattedHashesSortedByDifferenceForAddress(List<String> hashes, String addressString) {
-        Map<String, Transaction> transactionDetails =
-                transactionService.getTransactionDetails(Sets.newHashSet(hashes)).parallelStream()
-                        .peek(transaction -> priceService.getPrice(transaction.getTime()))
-                        .collect(toMap(Transaction::getHash, Functions.identity()));
-        String details = hashes.stream()
-                .map(hash -> transactionDetails.getOrDefault(hash, Transaction.UNKNOWN))
+    private String formattedHashesSortedByDifferenceForAddress(Set<String> hashes, String addressString) {
+        Set<Transaction> transactionDetails = transactionService.getTransactionDetails(hashes);
+        String details = transactionDetails.parallelStream()
                 .filter(Transaction::isValid)
+                .peek(transaction -> priceService.getPrice(transaction.getTime()))
                 .collect(toMap(
                         Functions.identity(),
                         transaction -> transaction.getDifferenceForAddress(addressString).absolute()))
@@ -125,7 +119,7 @@ public class TransactionsCommands {
                 .sorted(Map.Entry.comparingByValue())
                 .map(entry -> transactionFormatter.formatSingleLineForAddress(entry.getKey(), addressString))
                 .collect(Collectors.joining("\n"));
-        if (transactionDetails.containsValue(Transaction.UNKNOWN)) {
+        if (transactionDetails.size() != hashes.size() || transactionDetails.contains(Transaction.UNKNOWN)) {
             return details + "\n[Details for at least one transaction could not be downloaded]";
         }
         return details;

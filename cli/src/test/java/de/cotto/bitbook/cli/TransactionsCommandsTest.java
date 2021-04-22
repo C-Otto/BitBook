@@ -21,7 +21,6 @@ import java.util.Set;
 
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_UPDATED;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.TRANSACTION_HASH_3;
 import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_1;
@@ -97,16 +96,30 @@ class TransactionsCommandsTest {
     void getAddressTransactions_unknown_transaction_returned_for_two_hashes() {
         prepareMocks();
         when(transactionService.getTransactionDetails(anySet()))
-                .thenReturn(Set.of(Transaction.UNKNOWN, TRANSACTION, TRANSACTION_2));
-        when(addressTransactionsService.getTransactions(any())).thenReturn(ADDRESS_TRANSACTIONS_UPDATED);
+                .thenReturn(Set.of(Transaction.UNKNOWN, TRANSACTION_2));
+        when(addressTransactionsService.getTransactions(any())).thenReturn(ADDRESS_TRANSACTIONS);
 
         String details = transactionsCommands.getAddressTransactions(new CliAddress(ADDRESS));
 
         assertThat(details)
-                .startsWith("Address: " + ADDRESS + " ?\nDescription: \nTransaction hashes (4):")
-                .endsWith("\n[Details for at least one transaction could not be downloaded]")
+                .startsWith("Address: " + ADDRESS + " ?\nDescription: \nTransaction hashes (2):")
+                .contains(TRANSACTION_HASH_2)
+                .endsWith("\n[Details for at least one transaction could not be downloaded]");
+    }
+
+    @Test
+    void getAddressTransactions_does_not_return_all_requested_transactions() {
+        prepareMocks();
+        when(transactionService.getTransactionDetails(anySet()))
+                .thenReturn(Set.of(TRANSACTION));
+        when(addressTransactionsService.getTransactions(any())).thenReturn(ADDRESS_TRANSACTIONS);
+
+        String details = transactionsCommands.getAddressTransactions(new CliAddress(ADDRESS));
+
+        assertThat(details)
+                .startsWith("Address: " + ADDRESS + " ?\nDescription: \nTransaction hashes (2):")
                 .contains(TRANSACTION_HASH)
-                .contains(TRANSACTION_HASH_2);
+                .endsWith("\n[Details for at least one transaction could not be downloaded]");
     }
 
     @Test
