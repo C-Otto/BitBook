@@ -118,7 +118,7 @@ class PrioritizingTransactionProviderTest {
     private Transaction get(int expectedSize) {
         TransactionRequest request = new TransactionRequest(TRANSACTION_HASH, STANDARD);
         workOnRequestsInBackground(expectedSize + 1);
-        return prioritizingTransactionProvider.getTransaction(request);
+        return prioritizingTransactionProvider.getTransaction(request).getResult().orElse(Transaction.UNKNOWN);
     }
 
     private void workOnRequestsInBackground(int expectedSize) {

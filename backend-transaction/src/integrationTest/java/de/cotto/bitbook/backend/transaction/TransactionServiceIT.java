@@ -1,5 +1,7 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.request.PrioritizedRequestWithResult;
+import de.cotto.bitbook.backend.request.ResultFuture;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,22 +11,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_2;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH_2;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -45,51 +43,21 @@ public class TransactionServiceIT {
 
     @BeforeEach
     void setUp() {
-        when(transactionProvider.getTransaction(any())).thenReturn(Transaction.UNKNOWN);
+        ResultFuture<Transaction> resultFuture = new ResultFuture<>();
+        resultFuture.stopWithoutResult();
+        when(transactionProvider.getTransaction(any())).thenReturn(resultFuture);
     }
 
     @Test
     void getTransactionDetails() {
-        when(transactionProvider.getTransaction(any())).thenReturn(TRANSACTION);
+        ResultFuture<Transaction> resultFuture = new ResultFuture<>();
+        resultFuture.provideResult(TRANSACTION);
+        when(transactionProvider.getTransaction(any())).thenReturn(resultFuture);
         when(blockHeightProvider.getBlockHeight()).thenReturn(BLOCK_HEIGHT);
 
         Transaction transaction = transactionService.getTransactionDetails(TRANSACTION_HASH);
 
         assertThat(transaction).isEqualTo(TRANSACTION);
-    }
-
-    @Test
-    void waits_for_already_running_request() {
-        when(blockHeightProvider.getBlockHeight()).thenReturn(BLOCK_HEIGHT);
-        when(transactionProvider.getTransaction(forHash(TRANSACTION_HASH_2))).thenAnswer(
-                (Answer<Transaction>) invocation -> {
-                    Thread.sleep(200);
-                    TransactionRequest request = invocation.getArgument(0);
-                    request.getWithResultFuture().provideResult(TRANSACTION_2);
-                    return TRANSACTION_2;
-                }
-        ).thenAnswer(
-                (Answer<Transaction>) invocation -> {
-                    TransactionRequest request = invocation.getArgument(0);
-                    request.getWithResultFuture().provideResult(Transaction.UNKNOWN);
-                    return Transaction.UNKNOWN;
-                }
-        );
-
-        transactionService.getTransactionDetails(TRANSACTION_HASH_2);
-        transactionService.requestInBackground(Set.of(TRANSACTION_HASH_2));
-        verify(transactionProvider, timeout(50)).getTransaction(forHash(TRANSACTION_HASH_2));
-    }
-
-    @Test
-    void requestInBackground_async() {
-        when(transactionProvider.getTransaction(any())).then((Answer<Transaction>) invocation -> {
-            Thread.sleep(1_000);
-            return Transaction.UNKNOWN;
-        });
-        await().atMost(900, MILLISECONDS).untilAsserted(
-                () -> transactionService.requestInBackground(Set.of(TRANSACTION_HASH))
-        );
     }
 
     @Test
@@ -105,12 +73,15 @@ public class TransactionServiceIT {
     }
 
     @Test
+    @SuppressWarnings("FutureReturnValueIgnored")
     void many_pending_requests() {
-        when(transactionProvider.getTransaction(any())).then(invocation -> {
-            Thread.sleep(10);
-            return Transaction.UNKNOWN;
-        });
         int max = 500;
+        ExecutorService executor = Executors.newFixedThreadPool(max);
+        when(transactionProvider.getTransaction(any())).then(invocation -> {
+            ResultFuture<Transaction> future = new ResultFuture<>();
+            executor.submit(() -> abortFutureAfterDelay(future));
+            return future;
+        });
         Set<String> hashes = IntStream.range(0, max).mapToObj(String::valueOf).collect(Collectors.toSet());
         AtomicReference<Set<Transaction>> results = new AtomicReference<>();
         await().atMost(4, SECONDS).until(() -> {
@@ -120,16 +91,21 @@ public class TransactionServiceIT {
         assertThat(results.get()).isNotEmpty();
     }
 
-    private void mockResult() {
-        when(transactionProvider.getTransaction(any())).then((Answer<Transaction>) invocation -> {
-            TransactionRequest request = invocation.getArgument(0);
-            request.getWithResultFuture().provideResult(TRANSACTION);
-            return TRANSACTION;
-        });
+    private void abortFutureAfterDelay(ResultFuture<Transaction> future) {
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            // ignore
+        }
+        future.stopWithoutResult();
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private TransactionRequest forHash(String transactionHash) {
-        return argThat(request -> request != null && transactionHash.equals(request.getHash()));
+    private void mockResult() {
+        when(transactionProvider.getTransaction(any())).then((Answer<ResultFuture<Transaction>>) invocation -> {
+            TransactionRequest request = invocation.getArgument(0);
+            PrioritizedRequestWithResult<String, Transaction> resultFuture = request.getWithResultFuture();
+            resultFuture.provideResult(TRANSACTION);
+            return resultFuture;
+        });
     }
 }

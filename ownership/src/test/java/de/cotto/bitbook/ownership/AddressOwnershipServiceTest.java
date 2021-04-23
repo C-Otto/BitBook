@@ -95,8 +95,8 @@ class AddressOwnershipServiceTest {
     void getNeighbourTransactions_counts_transactions_only_once() {
         Set<String> addresses = Set.of(INPUT_ADDRESS_1, ADDRESS_2);
         when(ownedAddressesDao.getOwnedAddresses()).thenReturn(addresses);
-        mockTransactionHashes(INPUT_ADDRESS_1, TRANSACTION_HASH, TRANSACTION);
-        mockTransactionHashes(ADDRESS_2, TRANSACTION_HASH, TRANSACTION);
+        mockTransactionHashes(INPUT_ADDRESS_1, TRANSACTION);
+        mockTransactionHashes(ADDRESS_2, TRANSACTION);
 
         assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
                 entry(TRANSACTION, TRANSACTION.getDifferenceForAddress(INPUT_ADDRESS_1).add(TRANSACTION.getFees()))
@@ -117,7 +117,7 @@ class AddressOwnershipServiceTest {
                 List.of(new Input(Coins.ofSatoshis(2), ownedAddress)),
                 List.of(new Output(Coins.ofSatoshis(1), foreignAddress))
         );
-        mockTransactionHashes(ownedAddress, TRANSACTION_HASH, transactionWithFee);
+        mockTransactionHashes(ownedAddress, transactionWithFee);
 
         assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
                 entry(transactionWithFee, Coins.NONE)
@@ -138,7 +138,7 @@ class AddressOwnershipServiceTest {
                 List.of(new Input(Coins.ofSatoshis(2), foreignAddress)),
                 List.of(new Output(Coins.ofSatoshis(1), ownedAddress))
         );
-        mockTransactionHashes(ownedAddress, TRANSACTION_HASH, transactionWithFee);
+        mockTransactionHashes(ownedAddress, transactionWithFee);
 
         assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
                 entry(transactionWithFee, Coins.NONE)
@@ -155,7 +155,7 @@ class AddressOwnershipServiceTest {
                 new Input(Coins.ofSatoshis(1), ownedAddress),
                 new Output(Coins.ofSatoshis(1), foreignAddress)
         );
-        mockTransactionHashes(ADDRESS, TRANSACTION_HASH, transactionToForeignAddress);
+        mockTransactionHashes(ADDRESS, transactionToForeignAddress);
 
         assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
                 entry(transactionToForeignAddress, Coins.NONE)
@@ -169,7 +169,7 @@ class AddressOwnershipServiceTest {
         when(ownedAddressesDao.getOwnedAddresses()).thenReturn(Set.of(ownedAddress));
         when(ownedAddressesDao.getForeignAddresses()).thenReturn(Set.of(foreignAddress));
         Transaction transaction = createTransactionSplittingInput(foreignAddress, ownedAddress, ADDRESS_3);
-        mockTransactionHashes(ownedAddress, TRANSACTION_HASH, transaction);
+        mockTransactionHashes(ownedAddress, transaction);
 
         assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
                 entry(transaction, Coins.NONE)
@@ -184,7 +184,7 @@ class AddressOwnershipServiceTest {
         when(ownedAddressesDao.getOwnedAddresses()).thenReturn(Set.of(ownedAddress));
         when(ownedAddressesDao.getForeignAddresses()).thenReturn(Set.of(foreignAddress));
         Transaction transaction = createTransactionSplittingInput(ownedAddress, foreignAddress, ADDRESS_3);
-        mockTransactionHashes(ownedAddress, TRANSACTION_HASH, transaction);
+        mockTransactionHashes(ownedAddress, transaction);
 
         assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
                 entry(transaction, Coins.ofSatoshis(-1))
@@ -197,8 +197,18 @@ class AddressOwnershipServiceTest {
         String ownedAddress2 = ADDRESS_2;
         when(ownedAddressesDao.getOwnedAddresses()).thenReturn(Set.of(ownedAddress, ownedAddress2));
         Transaction transaction = createTransactionSplittingInput(ownedAddress, ownedAddress2, ADDRESS_3);
-        mockTransactionHashes(ownedAddress, TRANSACTION_HASH, transaction);
-        mockTransactionHashes(ownedAddress2, TRANSACTION_HASH_2, transaction);
+        when(addressTransactionsService.getTransactions(ownedAddress)).thenReturn(new AddressTransactions(
+                ownedAddress,
+                Set.of(TRANSACTION_HASH),
+                LAST_CHECKED_AT_BLOCK_HEIGHT
+        ));
+        when(addressTransactionsService.getTransactions(ownedAddress2)).thenReturn(new AddressTransactions(
+                ownedAddress,
+                Set.of(TRANSACTION_HASH_2),
+                LAST_CHECKED_AT_BLOCK_HEIGHT
+        ));
+        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
+                .thenReturn(Set.of(transaction));
 
         assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
                 entry(transaction, Coins.ofSatoshis(-1))
@@ -213,7 +223,7 @@ class AddressOwnershipServiceTest {
                 new Input(Coins.ofSatoshis(1), ADDRESS),
                 new Output(Coins.ofSatoshis(1), ownedAddress)
         );
-        mockTransactionHashes(ownedAddress, TRANSACTION_HASH, transaction);
+        mockTransactionHashes(ownedAddress, transaction);
 
         assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
                 entry(transaction, Coins.ofSatoshis(1))
@@ -225,10 +235,6 @@ class AddressOwnershipServiceTest {
         Set<String> addresses = Set.of(INPUT_ADDRESS_1, INPUT_ADDRESS_2);
         when(ownedAddressesDao.getOwnedAddresses()).thenReturn(addresses);
         when(addressTransactionsService.getTransactions(INPUT_ADDRESS_1)).thenReturn(ADDRESS_TRANSACTIONS);
-        when(transactionService.getTransactionDetails(
-                Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)
-        )).thenReturn(Set.of(TRANSACTION, TRANSACTION_2));
-
         when(addressTransactionsService.getTransactions(INPUT_ADDRESS_2)).thenReturn(ADDRESS_TRANSACTIONS_2);
         when(transactionService.getTransactionDetails(
                 Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2, TRANSACTION_HASH_3, TRANSACTION_HASH_4)
@@ -313,13 +319,13 @@ class AddressOwnershipServiceTest {
         assertThat(addressOwnershipService.getOwnershipStatus(ADDRESS)).isEqualTo(OWNED);
     }
 
-    private void mockTransactionHashes(String address, String transactionHash, Transaction transaction) {
+    private void mockTransactionHashes(String address, Transaction transaction) {
         when(addressTransactionsService.getTransactions(address)).thenReturn(new AddressTransactions(
                 address,
-                Set.of(transactionHash),
+                Set.of(TRANSACTION_HASH),
                 LAST_CHECKED_AT_BLOCK_HEIGHT
         ));
-        when(transactionService.getTransactionDetails(Set.of(transactionHash))).thenReturn(Set.of(transaction));
+        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH))).thenReturn(Set.of(transaction));
     }
 
     @SuppressWarnings("SameParameterValue")
