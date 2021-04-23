@@ -51,6 +51,46 @@ class ResultFutureTest {
     }
 
     @Test
+    void getFuture() throws Exception {
+        ResultFuture<String> resultFuture = new ResultFuture<>(this::resultConsumer);
+        executor.execute(() -> resultFuture.provideResult("x"));
+        assertThat(resultFuture.getFuture().get(1, SECONDS)).contains("x");
+    }
+
+    @Test
+    void getFuture_stopped() {
+        ResultFuture<String> resultFuture = new ResultFuture<>(this::resultConsumer);
+        executor.execute(resultFuture::stopWithoutResult);
+        await().atMost(1, SECONDS).untilAsserted(
+                () -> assertThat(resultFuture.getFuture()).isCancelled()
+        );
+    }
+
+    @Test
+    void getFuture_is_copy_of_original_future_with_result() {
+        ResultFuture<String> resultFuture = new ResultFuture<>(this::resultConsumer);
+        resultFuture.getFuture().complete("z");
+        resultFuture.provideResult("y");
+        assertThat(resultFuture.getResult()).contains("y");
+    }
+
+    @Test
+    void getFuture_is_copy_of_original_future_copy_is_cancelled() {
+        ResultFuture<String> resultFuture = new ResultFuture<>(this::resultConsumer);
+        resultFuture.getFuture().cancel(true);
+        resultFuture.provideResult("y");
+        assertThat(resultFuture.getResult()).contains("y");
+    }
+
+    @Test
+    void getFuture_is_copy_of_original_future_original_is_cancelled() {
+        ResultFuture<String> resultFuture = new ResultFuture<>(this::resultConsumer);
+        resultFuture.getFuture().complete("z");
+        resultFuture.stopWithoutResult();
+        assertThat(resultFuture.getResult()).isEmpty();
+    }
+
+    @Test
     void withResultConsumer() {
         new ResultFuture<>(this::resultConsumer).provideResult(RESULT);
         assertThat(resultConsumerResult).isEqualTo(RESULT);
