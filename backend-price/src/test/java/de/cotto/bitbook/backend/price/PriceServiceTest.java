@@ -40,14 +40,7 @@ public class PriceServiceTest {
     private PrioritizingPriceProvider prioritizingPriceProvider;
 
     @Test
-    void getPrice_request() {
-        Price expectedPrice = mockPrice();
-        Price price = priceService.getPrice(PriceRequest.forDateStandardPriority(DATE));
-        assertThat(price).isEqualTo(expectedPrice);
-    }
-
-    @Test
-    void getPrice_date_time() {
+    void getPrice() {
         Price expectedPrice = mockPrice();
         Price price = priceService.getPrice(DATE.atTime(12, 13));
         assertThat(price).isEqualTo(expectedPrice);
@@ -72,7 +65,7 @@ public class PriceServiceTest {
                     future.stopWithoutResult();
                     return future;
                 });
-        Price price = priceService.getPrice(request);
+        Price price = priceService.getPrice(DATE.atStartOfDay());
         assertThat(price).isEqualTo(Price.UNKNOWN);
     }
 
@@ -81,7 +74,7 @@ public class PriceServiceTest {
         Set<PriceWithDate> prices = Set.of(new PriceWithDate(Price.of(10), DATE));
         mockResult(PriceRequest.forDateStandardPriority(DATE), prices);
 
-        priceService.getPrice(PriceRequest.forDateStandardPriority(DATE));
+        priceService.getPrice(DATE.atStartOfDay());
 
         verify(priceDao).savePrices(prices);
     }
@@ -91,7 +84,7 @@ public class PriceServiceTest {
         Price expectedPrice = Price.of(10);
         when(priceDao.getPrice(DATE)).thenReturn(Optional.of(expectedPrice));
 
-        Price price = priceService.getPrice(PriceRequest.forDateStandardPriority(DATE));
+        Price price = priceService.getPrice(DATE.atStartOfDay());
 
         verify(prioritizingPriceProvider, never()).getPrices(any());
         assertThat(price).isEqualTo(expectedPrice);
@@ -112,7 +105,7 @@ public class PriceServiceTest {
         );
         mockResult(PriceRequest.forDateStandardPriority(date2), prices);
 
-        priceService.getPrice(PriceRequest.forDateStandardPriority(date2));
+        priceService.getPrice(date2.atStartOfDay());
 
         verify(priceDao).savePrices(prices);
     }

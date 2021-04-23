@@ -26,17 +26,26 @@ public class PriceService {
         this.priceDao = priceDao;
     }
 
-    public Price getPrice(LocalDateTime dateTime) {
-        return getPrice(PriceRequest.forDateStandardPriority(dateTime.toLocalDate()));
+    public Price getCurrentPrice() {
+        return getPrice(PriceRequest.forCurrentPrice());
     }
 
-    public Price getPrice(PriceRequest priceRequest) {
-        Future<Price> priceFuture = getPriceFuture(priceRequest);
-        return ResultFuture.getOrElse(priceFuture, Price.UNKNOWN);
+    @Async
+    public void requestPriceInBackground(LocalDateTime dateTime) {
+        getPrice(PriceRequest.forDateLowestPriority(dateTime.toLocalDate()));
     }
 
     public Map<LocalDate, Price> getPrices(Set<LocalDateTime> dates) {
         return dates.stream().collect(toMap(LocalDateTime::toLocalDate, this::getPrice));
+    }
+
+    public Price getPrice(LocalDateTime dateTime) {
+        return getPrice(PriceRequest.forDateStandardPriority(dateTime.toLocalDate()));
+    }
+
+    private Price getPrice(PriceRequest priceRequest) {
+        Future<Price> priceFuture = getPriceFuture(priceRequest);
+        return ResultFuture.getOrElse(priceFuture, Price.UNKNOWN);
     }
 
     private Future<Price> getPriceFuture(PriceRequest priceRequest) {
@@ -50,15 +59,6 @@ public class PriceService {
                     .thenApply(set -> getForDate(set, priceRequest.getDate()));
         }
         return CompletableFuture.completedFuture(persistedPrice);
-    }
-
-    public Price getCurrentPrice() {
-        return getPrice(PriceRequest.forCurrentPrice());
-    }
-
-    @Async
-    public void requestPriceInBackground(LocalDateTime dateTime) {
-        getPrice(PriceRequest.forDateLowestPriority(dateTime.toLocalDate()));
     }
 
     private Price getForDate(Collection<PriceWithDate> priceWithDates, LocalDate date) {
