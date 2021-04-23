@@ -59,6 +59,19 @@ public class ResultFuture<R> {
         }
     }
 
+    @SuppressWarnings("FutureReturnValueIgnored")
+    public CompletableFuture<R> getFuture() {
+        CompletableFuture<R> future = new CompletableFuture<>();
+        completableFuture.whenComplete((result, exception) -> {
+            if (result == null) {
+                future.completeExceptionally(exception);
+            } else {
+                future.complete(result);
+            }
+        });
+        return future;
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this == other) {
