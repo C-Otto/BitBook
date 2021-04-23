@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.Provider;
 import de.cotto.bitbook.backend.request.PrioritizingProvider;
+import de.cotto.bitbook.backend.request.ResultFuture;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,7 @@ public class PrioritizingTransactionProvider extends PrioritizingProvider<String
         super(providers, "Transaction details");
     }
 
-    public Transaction getTransaction(TransactionRequest transactionRequest) {
-        return getForRequestBlocking(transactionRequest).orElse(Transaction.UNKNOWN);
+    public ResultFuture<Transaction> getTransaction(TransactionRequest transactionRequest) {
+        return getForRequest(transactionRequest);
     }
 }

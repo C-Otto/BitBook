@@ -2,11 +2,14 @@ package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.request.RequestPriority;
+import de.cotto.bitbook.backend.request.ResultFuture;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
@@ -36,49 +39,49 @@ public class TransactionService {
     }
 
     public Set<Transaction> getTransactionDetails(Set<String> transactionHashes) {
-        return transactionHashes.parallelStream().map(this::getTransactionDetails).collect(toSet());
+        return getTransactionDetails(transactionHashes, STANDARD);
     }
 
     public Transaction getTransactionDetails(String transactionHash) {
-        return getTransactionDetails(transactionHash, STANDARD);
+        return getFromFuture(getTransactionDetails(transactionHash, STANDARD));
     }
 
-    public Transaction getTransactionDetails(String transactionHash, RequestPriority requestPriority) {
-        Transaction transaction = getFromPersistenceOrDownload(transactionHash, requestPriority);
-        triggerPriceRequest(transaction);
-        return transaction;
+    private Future<Transaction> getTransactionDetails(String transactionHash, RequestPriority requestPriority) {
+        return getFromPersistenceOrDownload(transactionHash, requestPriority);
+    }
+
+    private Set<Transaction> getTransactionDetails(Set<String> transactionHashes, RequestPriority requestPriority) {
+        Set<Future<Transaction>> futures = transactionHashes.stream()
+                .map(transactionHash -> getTransactionDetails(transactionHash, requestPriority))
+                .collect(toSet());
+        return futures.stream().map(this::getFromFuture).collect(toSet());
     }
 
     @Async
     public void requestInBackground(Set<String> transactionHashes) {
-        transactionHashes.parallelStream()
-                .forEach(transactionHash -> getTransactionDetails(transactionHash, LOWEST));
+        getTransactionDetails(transactionHashes, LOWEST);
     }
 
-    private Transaction getFromPersistenceOrDownload(String transactionHash, RequestPriority requestPriority) {
+    private Future<Transaction> getFromPersistenceOrDownload(String transactionHash, RequestPriority requestPriority) {
         Transaction persistedTransaction = transactionDao.getTransaction(transactionHash);
         if (persistedTransaction.isValid()) {
-            return persistedTransaction;
+            triggerPriceRequest(persistedTransaction);
+            return CompletableFuture.completedFuture(persistedTransaction);
         }
         return downloadAndPersist(transactionHash, requestPriority);
     }
 
-    private Transaction downloadAndPersist(String transactionHash, RequestPriority requestPriority) {
+    private Future<Transaction> downloadAndPersist(String transactionHash, RequestPriority requestPriority) {
         TransactionRequest requestWithResultConsumer =
-                new TransactionRequest(transactionHash, requestPriority, this::persistAndRequestPrice);
-        Transaction transaction = prioritizingTransactionProvider.getTransaction(requestWithResultConsumer);
-        if (isInvalidOrTooRecent(transaction)) {
-            return Transaction.UNKNOWN;
-        }
-        return transaction;
-    }
-
-    private void persistAndRequestPrice(Transaction transaction) {
-        if (isInvalidOrTooRecent(transaction)) {
-            return;
-        }
-        transactionDao.saveTransaction(transaction);
-        triggerPriceRequest(transaction);
+                new TransactionRequest(transactionHash, requestPriority);
+        return prioritizingTransactionProvider.getTransaction(requestWithResultConsumer).getFuture()
+                .thenApply(transaction -> {
+                    if (isInvalidOrTooRecent(transaction)) {
+                        return Transaction.UNKNOWN;
+                    }
+                    persistAndRequestPrice(transaction);
+                    return transaction;
+                });
     }
 
     private boolean isInvalidOrTooRecent(Transaction transaction) {
@@ -95,13 +98,20 @@ public class TransactionService {
         return blockHeight > getChainBlockHeight() - CONFIRMATION_LIMIT;
     }
 
+    private void persistAndRequestPrice(Transaction transaction) {
+        transactionDao.saveTransaction(transaction);
+        triggerPriceRequest(transaction);
+    }
+
     private void triggerPriceRequest(Transaction transaction) {
-        if (transaction.isValid()) {
-            priceService.requestPriceInBackground(transaction.getTime());
-        }
+        priceService.requestPriceInBackground(transaction.getTime());
     }
 
     private int getChainBlockHeight() {
         return blockHeightService.getBlockHeight();
+    }
+
+    private Transaction getFromFuture(Future<Transaction> future) {
+        return ResultFuture.getOrElse(future, Transaction.UNKNOWN);
     }
 }
