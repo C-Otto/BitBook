@@ -11,11 +11,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -25,6 +28,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class PriceServiceTest {
     private static final LocalDate DATE = LocalDate.of(2013, 11, 12);
+    private static final LocalDate DATE_2 = LocalDate.of(2015, 2, 3);
 
     @InjectMocks
     private PriceService priceService;
@@ -114,6 +118,17 @@ public class PriceServiceTest {
     }
 
     @Test
+    void getPrices() {
+        mockResult(PriceRequest.forDateStandardPriority(DATE), Set.of(new PriceWithDate(Price.of(1), DATE)));
+        mockResult(PriceRequest.forDateStandardPriority(DATE_2), Set.of(new PriceWithDate(Price.of(2), DATE_2)));
+
+        Set<LocalDateTime> dateTimes = Set.of(DATE.atTime(2, 3), DATE_2.atTime(4, 5));
+        Map<LocalDate, Price> prices = priceService.getPrices(dateTimes);
+
+        assertThat(prices).contains(entry(DATE, Price.of(1)), entry(DATE_2, Price.of(2)));
+    }
+
+    @Test
     void requestPriceInBackground_with_lowest_priority() {
         PriceRequest request = PriceRequest.forDateLowestPriority(DATE);
         mockResult(request, Set.of());
@@ -153,6 +168,9 @@ public class PriceServiceTest {
 
     private PriceRequest argThatMatches(PriceRequest expectedRequest) {
         return ArgumentMatchers.argThat(request -> {
+            if (request == null) {
+                return false;
+            }
             boolean sameDate = request.getDate().equals(expectedRequest.getDate());
             boolean samePriority = request.getPriority().equals(expectedRequest.getPriority());
             return sameDate && samePriority;

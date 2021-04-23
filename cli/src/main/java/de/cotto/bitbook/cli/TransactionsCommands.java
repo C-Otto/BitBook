@@ -12,11 +12,13 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 
 @ShellComponent
 public class TransactionsCommands {
@@ -108,10 +110,10 @@ public class TransactionsCommands {
     }
 
     private String formattedHashesSortedByDifferenceForAddress(Set<String> hashes, String addressString) {
-        Set<Transaction> transactionDetails = transactionService.getTransactionDetails(hashes);
-        String details = transactionDetails.parallelStream()
+        Set<Transaction> transactions = transactionService.getTransactionDetails(hashes);
+        preloadPrices(transactions);
+        String details = transactions.parallelStream()
                 .filter(Transaction::isValid)
-                .peek(transaction -> priceService.getPrice(transaction.getTime()))
                 .collect(toMap(
                         Functions.identity(),
                         transaction -> transaction.getDifferenceForAddress(addressString).absolute()))
@@ -119,10 +121,15 @@ public class TransactionsCommands {
                 .sorted(Map.Entry.comparingByValue())
                 .map(entry -> transactionFormatter.formatSingleLineForAddress(entry.getKey(), addressString))
                 .collect(Collectors.joining("\n"));
-        if (transactionDetails.size() != hashes.size() || transactionDetails.contains(Transaction.UNKNOWN)) {
+        if (transactions.size() != hashes.size() || transactions.contains(Transaction.UNKNOWN)) {
             return details + "\n[Details for at least one transaction could not be downloaded]";
         }
         return details;
+    }
+
+    private void preloadPrices(Set<Transaction> transactionDetails) {
+        Set<LocalDateTime> transactionTimes = transactionDetails.stream().map(Transaction::getTime).collect(toSet());
+        priceService.getPrices(transactionTimes);
     }
 
 }

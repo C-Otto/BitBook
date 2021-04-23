@@ -183,7 +183,7 @@ class TransactionsCommandsTest {
         transactionsCommands.getAddressTransactions(new CliAddress(ADDRESS));
 
         InOrder inOrder = inOrder(priceService, transactionFormatter);
-        inOrder.verify(priceService).getPrice(TRANSACTION.getTime());
+        inOrder.verify(priceService).getPrices(Set.of(TRANSACTION.getTime()));
         inOrder.verify(transactionFormatter).formatSingleLineForAddress(any(), any());
     }
 
