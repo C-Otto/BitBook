@@ -14,6 +14,6 @@ public class PrioritizingBlockHeightProvider extends PrioritizingProvider<Object
     }
 
     public int getBlockHeight() {
-        return super.getForRequest(BlockHeightRequest.STANDARD_PRIORITY).orElse(INVALID);
+        return getForRequestBlocking(BlockHeightRequest.STANDARD_PRIORITY).orElse(INVALID);
     }
 }

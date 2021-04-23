@@ -77,7 +77,7 @@ class PrioritizingProviderIT {
         Set<Integer> results = forkJoinPool.submit(() ->
                 IntStream.range(0, max).parallel()
                         .mapToObj(i -> new PrioritizedRequest<String, Integer>(Integer.toString(i), STANDARD))
-                        .map(request -> prioritizingProvider.getForRequest(request))
+                        .map(request -> prioritizingProvider.getForRequestBlocking(request))
                         .map(Optional::orElseThrow)
                         .collect(Collectors.toSet())
         ).get();
@@ -90,8 +90,8 @@ class PrioritizingProviderIT {
         provider2.disabled = true;
         executor.execute(
                 () -> {
-                    prioritizingProvider.getForRequest(new PrioritizedRequest<>("lowest", LOWEST));
-                    prioritizingProvider.getForRequest(new PrioritizedRequest<>("standard", STANDARD));
+                    prioritizingProvider.getForRequestBlocking(new PrioritizedRequest<>("lowest", LOWEST));
+                    prioritizingProvider.getForRequestBlocking(new PrioritizedRequest<>("standard", STANDARD));
                 }
         );
         await().atMost(1, SECONDS).until(() -> prioritizingProvider.requestQueue.size() == 2);
@@ -104,7 +104,7 @@ class PrioritizingProviderIT {
     @Test
     void providers_are_used_in_order() {
         executor.execute(
-                () -> prioritizingProvider.getForRequest(new PrioritizedRequest<>("xxx", STANDARD))
+                () -> prioritizingProvider.getForRequestBlocking(new PrioritizedRequest<>("xxx", STANDARD))
         );
         workOnScheduledTasks();
         await().atMost(1, SECONDS).untilAsserted(
@@ -123,7 +123,8 @@ class PrioritizingProviderIT {
 
     @Test
     void lowest_priority_requests_are_queued_and_immediately_return() {
-        Optional<Integer> result = prioritizingProvider.getForRequest(new PrioritizedRequest<>("lowest", LOWEST));
+        Optional<Integer> result =
+                prioritizingProvider.getForRequestBlocking(new PrioritizedRequest<>("lowest", LOWEST));
         assertThat(prioritizingProvider.requestQueue).hasSize(1);
         assertThat(result).isEmpty();
     }
@@ -211,12 +212,12 @@ class PrioritizingProviderIT {
             taskExecutor.execute(() -> {
                 PrioritizedRequest<String, Integer> requestStandard =
                         new PrioritizedRequest<>(KEY, STANDARD, this::consumerStandard);
-                resultStandardRequest.set(prioritizingProvider.getForRequest(requestStandard));
+                resultStandardRequest.set(prioritizingProvider.getForRequestBlocking(requestStandard));
                 standardRequestDone.set(true);
             });
             workOnScheduledTasks();
             await().until(() -> !provider1.seenKeys.isEmpty() || !provider2.seenKeys.isEmpty());
-            prioritizingProvider.getForRequest(new PrioritizedRequest<>(KEY, LOWEST, this::consumerLowest));
+            prioritizingProvider.getForRequestBlocking(new PrioritizedRequest<>(KEY, LOWEST, this::consumerLowest));
 
             // Wait until both are done so that we can assert only one (the first) hits the network.
             await().until(standardRequestDone::get);

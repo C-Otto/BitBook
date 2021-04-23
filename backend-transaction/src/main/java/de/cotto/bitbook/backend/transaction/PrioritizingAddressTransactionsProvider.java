@@ -18,6 +18,6 @@ public class PrioritizingAddressTransactionsProvider
     }
 
     public AddressTransactions getAddressTransactions(AddressTransactionsRequest request) {
-        return getForRequest(request).orElse(AddressTransactions.UNKNOWN);
+        return getForRequestBlocking(request).orElse(AddressTransactions.UNKNOWN);
     }
 }

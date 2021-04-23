@@ -17,6 +17,6 @@ public class PrioritizingPriceProvider extends PrioritizingProvider<LocalDate, C
     }
 
     public Collection<PriceWithDate> getPrices(PriceRequest request) {
-        return getForRequest(request).orElse(Set.of());
+        return getForRequestBlocking(request).orElse(Set.of());
     }
 }
