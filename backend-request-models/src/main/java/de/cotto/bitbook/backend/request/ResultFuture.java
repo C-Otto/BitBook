@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 public class ResultFuture<R> {
@@ -56,6 +57,14 @@ public class ResultFuture<R> {
         } catch (InterruptedException | ExecutionException | CancellationException e) {
             logger.debug("Exception while waiting for result: {}", this, e);
             return Optional.empty();
+        }
+    }
+
+    public static <R> R getOrElse(Future<R> future, R other) {
+        try {
+            return future.get();
+        } catch (InterruptedException | ExecutionException | CancellationException e) {
+            return other;
         }
     }
 
