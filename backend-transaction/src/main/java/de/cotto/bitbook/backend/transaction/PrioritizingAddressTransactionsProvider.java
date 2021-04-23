@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.Provider;
 import de.cotto.bitbook.backend.request.PrioritizingProvider;
+import de.cotto.bitbook.backend.request.ResultFuture;
 import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,7 @@ public class PrioritizingAddressTransactionsProvider
         super(providers, "Transactions for address");
     }
 
-    public AddressTransactions getAddressTransactions(AddressTransactionsRequest request) {
-        return getForRequestBlocking(request).orElse(AddressTransactions.UNKNOWN);
+    public ResultFuture<AddressTransactions> getAddressTransactions(AddressTransactionsRequest request) {
+        return getForRequest(request);
     }
 }

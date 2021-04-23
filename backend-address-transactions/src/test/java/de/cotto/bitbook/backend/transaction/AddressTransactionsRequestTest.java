@@ -1,9 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
-import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 import org.junit.jupiter.api.Test;
-
-import javax.annotation.Nullable;
 
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
@@ -16,10 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 class AddressTransactionsRequestTest {
-
-    @Nullable
-    private AddressTransactions seen;
-
     @Test
     void getKey_standard() {
         assertThat(ADDRESS_TRANSACTIONS_REQUEST.getKey()).isEqualTo(TRANSACTIONS_REQUEST_KEY);
@@ -45,20 +38,6 @@ class AddressTransactionsRequestTest {
         assertThatCode(() ->
             ADDRESS_TRANSACTIONS_LOWEST.getWithResultFuture().provideResult(ADDRESS_TRANSACTIONS)
         ).doesNotThrowAnyException();
-    }
-
-    @Test
-    void getWithResultConsumer() {
-        AddressTransactionsRequest requestWithResultConsumer =
-                ADDRESS_TRANSACTIONS_LOWEST.getWithResultConsumer(this::resultConsumer);
-        requestWithResultConsumer.getWithResultFuture().provideResult(ADDRESS_TRANSACTIONS);
-
-        assertThat(requestWithResultConsumer.getKey()).isEqualTo(TRANSACTIONS_REQUEST_KEY);
-        assertThat(seen).isEqualTo(ADDRESS_TRANSACTIONS);
-    }
-
-    private void resultConsumer(AddressTransactions result) {
-        seen = result;
     }
 
     @Test
