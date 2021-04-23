@@ -48,13 +48,17 @@ public class PrioritizingProvider<K, R> {
         return providedResultName;
     }
 
-    protected Optional<R> getForRequest(PrioritizedRequest<K, R> request) {
+    protected ResultFuture<R> getForRequest(PrioritizedRequest<K, R> request) {
         logger.debug("Queuing {}", request);
+        return enqueue(request);
+    }
+
+    protected Optional<R> getForRequestBlocking(PrioritizedRequest<K, R> request) {
         if (request.getPriority() == RequestPriority.LOWEST) {
-            enqueue(request);
+            getForRequest(request);
             return Optional.empty();
         }
-        return enqueue(request).getResult();
+        return getForRequest(request).getResult();
     }
 
     @Scheduled(fixedDelay = 100)

@@ -14,6 +14,6 @@ public class PrioritizingTransactionProvider extends PrioritizingProvider<String
     }
 
     public Transaction getTransaction(TransactionRequest transactionRequest) {
-        return getForRequest(transactionRequest).orElse(Transaction.UNKNOWN);
+        return getForRequestBlocking(transactionRequest).orElse(Transaction.UNKNOWN);
     }
 }
