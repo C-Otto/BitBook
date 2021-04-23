@@ -45,8 +45,22 @@ class ResultFutureTest {
     void getResult_then_stopWithoutResult() {
         ResultFuture<String> resultFuture = new ResultFuture<>(this::resultConsumer);
         executor.execute(resultFuture::stopWithoutResult);
+        assertThat(resultFuture.getResult()).isEmpty();
+    }
+
+    @Test
+    void getOrElse_then_provideResult() {
+        ResultFuture<String> resultFuture = new ResultFuture<>(this::resultConsumer);
+        executor.execute(() -> resultFuture.provideResult("x"));
+        assertThat(ResultFuture.getOrElse(resultFuture.getFuture(), "z")).contains("x");
+    }
+
+    @Test
+    void getOrElse_then_stopWithoutResult() {
+        ResultFuture<String> resultFuture = new ResultFuture<>(this::resultConsumer);
+        executor.execute(resultFuture::stopWithoutResult);
         await().atMost(1, SECONDS).untilAsserted(
-                () -> assertThat(resultFuture.getResult()).isEmpty()
+                () -> assertThat(ResultFuture.getOrElse(resultFuture.getFuture(), "z")).isEqualTo("z")
         );
     }
 
