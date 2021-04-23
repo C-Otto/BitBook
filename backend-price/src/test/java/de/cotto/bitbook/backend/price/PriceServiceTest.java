@@ -122,6 +122,16 @@ public class PriceServiceTest {
     }
 
     @Test
+    void getPrices_same_date_different_time() {
+        mockResult(PriceRequest.forDateStandardPriority(DATE), Set.of(new PriceWithDate(Price.of(1), DATE)));
+
+        Set<LocalDateTime> dateTimes = Set.of(DATE.atTime(2, 3), DATE.atTime(4, 5));
+        Map<LocalDate, Price> prices = priceService.getPrices(dateTimes);
+
+        assertThat(prices).contains(entry(DATE, Price.of(1)));
+    }
+
+    @Test
     void requestPriceInBackground_with_lowest_priority() {
         PriceRequest request = PriceRequest.forDateLowestPriority(DATE);
         mockResult(request, Set.of());

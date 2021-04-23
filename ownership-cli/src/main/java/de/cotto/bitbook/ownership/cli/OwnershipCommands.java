@@ -21,10 +21,12 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toSet;
 
 @ShellComponent
 public class OwnershipCommands {
@@ -73,6 +75,7 @@ public class OwnershipCommands {
     @ShellMethod("Get transactions connected to own addresses where source/target has unknown ownership")
     public String getNeighbourTransactions() {
         Map<Transaction, Coins> map = addressOwnershipService.getNeighbourTransactions();
+        preloadPrices(map.keySet());
         Map<Coins, List<Map.Entry<Transaction, Coins>>> byCoins = map.entrySet().stream()
                 .collect(groupingBy(Map.Entry::getValue));
         return byCoins.entrySet().stream()
@@ -141,5 +144,9 @@ public class OwnershipCommands {
                         transactionWithCoins.getValue()
                 ))
                 .collect(Collectors.joining("\n"));
+    }
+
+    private void preloadPrices(Set<Transaction> transactions) {
+        priceService.getPrices(transactions.stream().map(Transaction::getTime).collect(toSet()));
     }
 }
