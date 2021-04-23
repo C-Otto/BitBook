@@ -46,7 +46,7 @@ public class PriceServiceIT {
     void getPrice() {
         when(krakenClient.getTrades(DATE_IN_EPOCH_SECONDS)).thenReturn(Optional.of(trades(DATE)));
 
-        Price price = priceService.getPrice(PriceRequest.forDateStandardPriority(DATE));
+        Price price = priceService.getPrice(DATE.atStartOfDay());
 
         verify(krakenClient).getTrades(DATE_IN_EPOCH_SECONDS);
         assertThat(price).isEqualTo(PRICE);
