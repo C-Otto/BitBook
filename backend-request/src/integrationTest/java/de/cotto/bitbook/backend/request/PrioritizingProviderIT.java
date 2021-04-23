@@ -17,16 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
@@ -62,27 +57,6 @@ class PrioritizingProviderIT {
         providers.forEach(provider -> provider.seenKeys.clear());
         provider1 = providers.get(0);
         provider2 = providers.get(1);
-    }
-
-    @Test
-    void many_pending_requests() throws ExecutionException, InterruptedException {
-        ForkJoinPool forkJoinPool = new ForkJoinPool(200);
-        int max = 500;
-        executor.execute(() -> {
-                await().atMost(10, SECONDS).until(() -> prioritizingProvider.requestQueue.size() == max);
-                workOnScheduledTasks();
-            }
-        );
-
-        Set<Integer> results = forkJoinPool.submit(() ->
-                IntStream.range(0, max).parallel()
-                        .mapToObj(i -> new PrioritizedRequest<String, Integer>(Integer.toString(i), STANDARD))
-                        .map(request -> prioritizingProvider.getForRequestBlocking(request))
-                        .map(Optional::orElseThrow)
-                        .collect(Collectors.toSet())
-        ).get();
-
-        assertThat(results).hasSize(3);
     }
 
     @Test

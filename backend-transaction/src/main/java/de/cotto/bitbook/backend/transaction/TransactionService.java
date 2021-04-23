@@ -3,18 +3,14 @@ package de.cotto.bitbook.backend.transaction;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.request.RequestPriority;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.stream.Collectors;
 
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
+import static java.util.stream.Collectors.toSet;
 
 @Component
 public class TransactionService {
@@ -28,7 +24,6 @@ public class TransactionService {
     private final TransactionDao transactionDao;
     private final PriceService priceService;
     private final BlockHeightService blockHeightService;
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public TransactionService(
             PrioritizingTransactionProvider prioritizingTransactionProvider,
@@ -41,18 +36,7 @@ public class TransactionService {
     }
 
     public Set<Transaction> getTransactionDetails(Set<String> transactionHashes) {
-        ForkJoinPool forkJoinPool = new ForkJoinPool(200);
-        try {
-            return forkJoinPool.submit(() ->
-                    transactionHashes.parallelStream().map(this::getTransactionDetails).collect(Collectors.toSet())
-            ).get();
-        } catch (InterruptedException e) {
-            logger.warn("Interrupted while getting transaction details", e);
-            return Set.of(Transaction.UNKNOWN);
-        } catch (ExecutionException e) {
-            logger.warn("Exception while getting transaction details", e);
-            return Set.of(Transaction.UNKNOWN);
-        }
+        return transactionHashes.parallelStream().map(this::getTransactionDetails).collect(toSet());
     }
 
     public Transaction getTransactionDetails(String transactionHash) {
