@@ -4,22 +4,12 @@ import de.cotto.bitbook.backend.request.PrioritizedRequest;
 import de.cotto.bitbook.backend.request.RequestPriority;
 import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 
-import java.util.function.Consumer;
-
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
 
 public final class AddressTransactionsRequest extends PrioritizedRequest<TransactionsRequestKey, AddressTransactions> {
     private AddressTransactionsRequest(TransactionsRequestKey transactionsRequestKey, RequestPriority priority) {
-        this(transactionsRequestKey, priority, result -> {});
-    }
-
-    private AddressTransactionsRequest(
-            TransactionsRequestKey transactionsRequestKey,
-            RequestPriority priority,
-            Consumer<AddressTransactions> resultConsumer
-    ) {
-        super(transactionsRequestKey, priority, resultConsumer);
+        super(transactionsRequestKey, priority, result -> {});
     }
 
     public static AddressTransactionsRequest forLowestPriority(TransactionsRequestKey transactionsRequestKey) {
@@ -35,10 +25,6 @@ public final class AddressTransactionsRequest extends PrioritizedRequest<Transac
             RequestPriority requestPriority
     ) {
         return new AddressTransactionsRequest(transactionsRequestKey, requestPriority);
-    }
-
-    public AddressTransactionsRequest getWithResultConsumer(Consumer<AddressTransactions> resultConsumer) {
-        return new AddressTransactionsRequest(getKey(), getPriority(), resultConsumer);
     }
 
     @Override

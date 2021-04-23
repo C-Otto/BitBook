@@ -35,9 +35,9 @@ class PrioritizingAddressTransactionsProviderTest {
         when(addressTransactionsProvider.get(TRANSACTIONS_REQUEST_KEY)).thenReturn(Optional.of(ADDRESS_TRANSACTIONS));
         workOnRequestsInBackground();
 
-        AddressTransactions result =
-                prioritizingPriceProvider.getAddressTransactions(ADDRESS_TRANSACTIONS_REQUEST);
-        assertThat(result).isEqualTo(ADDRESS_TRANSACTIONS);
+        Optional<AddressTransactions> result =
+                prioritizingPriceProvider.getAddressTransactions(ADDRESS_TRANSACTIONS_REQUEST).getResult();
+        assertThat(result).contains(ADDRESS_TRANSACTIONS);
     }
 
     @Test
@@ -45,9 +45,9 @@ class PrioritizingAddressTransactionsProviderTest {
         when(addressTransactionsProvider.get(TRANSACTIONS_REQUEST_KEY)).thenReturn(Optional.empty());
         workOnRequestsInBackground();
 
-        AddressTransactions result =
-                prioritizingPriceProvider.getAddressTransactions(ADDRESS_TRANSACTIONS_REQUEST);
-        assertThat(result).isEqualTo(AddressTransactions.UNKNOWN);
+        Optional<AddressTransactions> result =
+                prioritizingPriceProvider.getAddressTransactions(ADDRESS_TRANSACTIONS_REQUEST).getResult();
+        assertThat(result).isEmpty();
     }
 
     @Test

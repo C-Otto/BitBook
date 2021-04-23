@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.request.PrioritizedRequestWithResult;
 import de.cotto.bitbook.backend.request.RequestPriority;
 import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,11 +51,10 @@ class AddressTransactionsServiceTest {
         when(addressTransactionsProvider.getAddressTransactions(argIsRequest(requestKey, priority)))
                 .then(invocation -> {
                     AddressTransactionsRequest request = invocation.getArgument(0);
-                    request.getWithResultFuture().provideResult(delayedResult);
-                    if (priority.equals(LOWEST)) {
-                        return UNKNOWN;
-                    }
-                    return delayedResult;
+                    PrioritizedRequestWithResult<TransactionsRequestKey, AddressTransactions> resultFuture =
+                            request.getWithResultFuture();
+                    resultFuture.provideResult(delayedResult);
+                    return resultFuture;
                 });
     }
 
