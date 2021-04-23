@@ -38,8 +38,8 @@ class PrioritizingPriceProviderTest {
         when(priceProvider.get(DATE)).thenReturn(Optional.of(Set.of(expected)));
         workOnRequestsInBackground();
 
-        Collection<PriceWithDate> result =
-                prioritizingPriceProvider.getPrices(PriceRequest.forDateStandardPriority(DATE));
+        PriceRequest request = PriceRequest.forDateStandardPriority(DATE);
+        Collection<PriceWithDate> result = prioritizingPriceProvider.getPrices(request).getResult().orElseThrow();
         assertThat(result).contains(expected);
     }
 
@@ -48,8 +48,8 @@ class PrioritizingPriceProviderTest {
         when(priceProvider.get(DATE)).thenReturn(Optional.empty());
         workOnRequestsInBackground();
 
-        Collection<PriceWithDate> result =
-                prioritizingPriceProvider.getPrices(PriceRequest.forDateStandardPriority(DATE));
+        PriceRequest request = PriceRequest.forDateStandardPriority(DATE);
+        Optional<Collection<PriceWithDate>> result = prioritizingPriceProvider.getPrices(request).getResult();
         assertThat(result).isEmpty();
     }
 
