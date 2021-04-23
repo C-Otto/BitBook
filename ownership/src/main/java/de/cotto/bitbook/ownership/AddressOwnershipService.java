@@ -50,12 +50,13 @@ public class AddressOwnershipService {
     public Map<Transaction, Coins> getNeighbourTransactions() {
         Set<String> ownedAddresses = getOwnedAddresses();
         Set<String> foreignAddresses = addressOwnershipDao.getForeignAddresses();
-        Set<Transaction> transactionsFromToOwned = ownedAddresses.parallelStream()
+        Set<String> transactionHashes = ownedAddresses.parallelStream()
                 .map(addressTransactionsService::getTransactions)
                 .map(AddressTransactions::getTransactionHashes)
-                .map(transactionService::getTransactionDetails)
                 .flatMap(Set::stream)
                 .collect(toSet());
+        Set<Transaction> transactionsFromToOwned = transactionService.getTransactionDetails(transactionHashes);
+
         Map<Transaction, Coins> differencesOwned = getDifferences(transactionsFromToOwned, ownedAddresses);
         Map<Transaction, Coins> differencesForeign = getDifferences(transactionsFromToOwned, foreignAddresses);
         updateWithFeesAsForeign(differencesOwned);
