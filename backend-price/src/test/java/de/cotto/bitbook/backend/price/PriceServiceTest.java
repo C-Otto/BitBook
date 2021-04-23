@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.price;
 
 import de.cotto.bitbook.backend.price.model.Price;
 import de.cotto.bitbook.backend.price.model.PriceWithDate;
+import de.cotto.bitbook.backend.request.PrioritizedRequestWithResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -11,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
@@ -50,14 +52,23 @@ public class PriceServiceTest {
     @Test
     void getCurrentPrice() {
         Price expectedPrice = Price.of(123);
-        PriceWithDate priceWitDdate = new PriceWithDate(expectedPrice, LocalDate.now(ZoneOffset.UTC));
-        mockResult(PriceRequest.forCurrentPrice(), Set.of(priceWitDdate));
+        PriceWithDate priceWithDate = new PriceWithDate(expectedPrice, LocalDate.now(ZoneOffset.UTC));
+        mockResult(PriceRequest.forCurrentPrice(), Set.of(priceWithDate));
         assertThat(priceService.getCurrentPrice()).isEqualTo(Price.of(123));
     }
 
     @Test
     void getPrice_failure() {
-        Price price = priceService.getPrice(PriceRequest.forDateStandardPriority(DATE));
+        PriceRequest request = PriceRequest.forDateStandardPriority(DATE);
+        when(prioritizingPriceProvider.getPrices(argThatMatches(request)))
+                .then(invocation -> {
+                    PriceRequest priceRequest = invocation.getArgument(0);
+                    PrioritizedRequestWithResult<LocalDate, Collection<PriceWithDate>> future =
+                            priceRequest.getWithResultFuture();
+                    future.stopWithoutResult();
+                    return future;
+                });
+        Price price = priceService.getPrice(request);
         assertThat(price).isEqualTo(Price.UNKNOWN);
     }
 
@@ -104,8 +115,23 @@ public class PriceServiceTest {
 
     @Test
     void requestPriceInBackground_with_lowest_priority() {
+        PriceRequest request = PriceRequest.forDateLowestPriority(DATE);
+        mockResult(request, Set.of());
+
         priceService.requestPriceInBackground(DATE.atTime(23, 12));
-        verify(prioritizingPriceProvider).getPrices(argThatMatches(PriceRequest.forDateLowestPriority(DATE)));
+
+        verify(prioritizingPriceProvider).getPrices(argThatMatches(request));
+    }
+
+    @Test
+    void requestPriceInBackground_with_lowest_priority_persists_results() {
+        PriceRequest request = PriceRequest.forDateLowestPriority(DATE);
+        Set<PriceWithDate> priceWithDates = Set.of(new PriceWithDate(Price.of(100), DATE));
+        mockResult(request, priceWithDates);
+
+        priceService.requestPriceInBackground(DATE.atTime(23, 12));
+
+        verify(priceDao).savePrices(priceWithDates);
     }
 
     private Price mockPrice() {
@@ -118,8 +144,10 @@ public class PriceServiceTest {
         when(prioritizingPriceProvider.getPrices(argThatMatches(expectedRequest)))
                 .then(invocation -> {
                     PriceRequest priceRequest = invocation.getArgument(0);
-                    priceRequest.getWithResultFuture().provideResult(result);
-                    return result;
+                    PrioritizedRequestWithResult<LocalDate, Collection<PriceWithDate>> future =
+                            priceRequest.getWithResultFuture();
+                    future.provideResult(result);
+                    return future;
                 });
     }
 
