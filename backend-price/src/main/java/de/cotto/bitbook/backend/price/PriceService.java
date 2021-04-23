@@ -9,8 +9,12 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+
+import static java.util.stream.Collectors.toMap;
 
 @Component
 public class PriceService {
@@ -29,6 +33,10 @@ public class PriceService {
     public Price getPrice(PriceRequest priceRequest) {
         Future<Price> priceFuture = getPriceFuture(priceRequest);
         return ResultFuture.getOrElse(priceFuture, Price.UNKNOWN);
+    }
+
+    public Map<LocalDate, Price> getPrices(Set<LocalDateTime> dates) {
+        return dates.stream().collect(toMap(LocalDateTime::toLocalDate, this::getPrice));
     }
 
     private Future<Price> getPriceFuture(PriceRequest priceRequest) {
