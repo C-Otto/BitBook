@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,6 +27,7 @@ import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRA
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_3;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -137,6 +139,19 @@ class OwnershipCommandsTest {
             ));
             assertThat(ownershipCommands.getNeighbourTransactions())
                     .isEqualTo(TRANSACTION_2 + "/" + Coins.ofSatoshis(1));
+        }
+
+        @Test
+        void preloads_prices() {
+            when(addressOwnershipService.getNeighbourTransactions()).thenReturn(Map.of(
+                    TRANSACTION, Coins.NONE,
+                    TRANSACTION_2, Coins.ofSatoshis(1)
+            ));
+            ownershipCommands.getNeighbourTransactions();
+
+            InOrder inOrder = inOrder(priceService, transactionFormatter);
+            inOrder.verify(priceService).getPrices(Set.of(TRANSACTION.getTime(), TRANSACTION_2.getTime()));
+            inOrder.verify(transactionFormatter).formatSingleLineForValue(any(), any());
         }
     }
 

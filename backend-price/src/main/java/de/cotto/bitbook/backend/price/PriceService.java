@@ -36,7 +36,15 @@ public class PriceService {
     }
 
     public Map<LocalDate, Price> getPrices(Set<LocalDateTime> dates) {
-        return dates.stream().collect(toMap(LocalDateTime::toLocalDate, this::getPrice));
+        Map<LocalDate, Future<Price>> futures = dates.stream()
+                .map(LocalDateTime::toLocalDate)
+                .distinct()
+                .map(PriceRequest::forDateStandardPriority)
+                .collect(toMap(PriceRequest::getDate, this::getPriceFuture));
+        return futures.entrySet().stream().collect(toMap(
+                Map.Entry::getKey,
+                entry -> ResultFuture.getOrElse(entry.getValue(), Price.UNKNOWN)
+        ));
     }
 
     public Price getPrice(LocalDateTime dateTime) {
