@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Map.Entry.comparingByKey;
+import static java.util.Map.Entry.comparingByValue;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toSet;
 
@@ -63,8 +64,8 @@ public class OwnershipCommands {
         return "%s [%s]".formatted(balance, formattedPrice);
     }
 
-    @ShellMethod("List all owned addresses")
-    public String listOwnedAddresses() {
+    @ShellMethod("Get all owned addresses")
+    public String getOwnedAddresses() {
         Price currentPrice = priceService.getCurrentPrice();
         Set<AddressWithDescription> ownedAddressesWithDescription =
                 addressOwnershipService.getOwnedAddressesWithDescription();
@@ -74,8 +75,16 @@ public class OwnershipCommands {
                         Functions.identity(),
                         addressWithDescription -> balanceService.getBalance(addressWithDescription.getAddress())
                 )).entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
+                .sorted(comparingByValue())
                 .map(entry -> formatAddressWithPrice(entry.getKey(), entry.getValue(), currentPrice))
+                .collect(Collectors.joining("\n"));
+    }
+
+    @ShellMethod("Get all transactions that touch at least one owned address")
+    public String getMyTransactions() {
+        return addressOwnershipService.getMyTransactionsWithCoins().entrySet().stream()
+                .sorted(byAbsoluteValueThenHash())
+                .map(entry -> transactionFormatter.formatSingleLineForValue(entry.getKey(), entry.getValue()))
                 .collect(Collectors.joining("\n"));
     }
 
@@ -162,5 +171,10 @@ public class OwnershipCommands {
 
     private void preloadPrices(Set<Transaction> transactions) {
         priceService.getPrices(transactions.stream().map(Transaction::getTime).collect(toSet()));
+    }
+
+    private Comparator<Map.Entry<Transaction, Coins>> byAbsoluteValueThenHash() {
+        return Comparator.comparing((Map.Entry<Transaction, Coins> entry) -> entry.getValue().absolute())
+                .thenComparing(entry -> entry.getKey().getHash());
     }
 }

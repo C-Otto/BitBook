@@ -77,7 +77,7 @@ In the background BitBook automatically fetches transaction and price details fo
 ## Ownership Commands
 You can mark addresses as *owned* or *foreign*.
 The information is included in the output (`✓` for owned addresses, `✗` for foreign addresses).
-Furthermore, commands like `get-balance` and `list-owned-addresses` show you (aggregated) information about all owned
+Furthermore, commands like `get-balance` and `get-owned-addresses` show you (aggregated) information about all owned
 addresses.
 Most importantly, the command [`get-neighbour-transactions`](#get-neighbour-transactions) makes use of this information
 (see below).
@@ -99,14 +99,14 @@ transactions.
 
 You can reset ownership information for an address using `reset-ownership <address>`.
 
-### List Owned Addresses
-The command `list-owned-addresses` can be used to list the addresses you marked as `owned`.
+### Get Owned Addresses
+The command `get-owned-addresses` can be used to list the addresses you marked as `owned`.
 The output includes the current balance with the current fiat value, and the addresses' descriptions (if set).
 The output is sorted by value, so that the addresses with the highest number of coins are shown at the bottom of the
 list.
 
 ```
-BitBook$ list-owned-addresses
+BitBook$ get-owned-addresses
 35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS    0          [         0.00€]                     
 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a    0.0238648  [     1,127.22€] Some Description
 ```
@@ -129,6 +129,20 @@ Note that, in order to compute the balance, all transactions associated with the
 As such, downloading the necessary information (if not already known) might take a while.
 If the list of associated transactions for the/an address is outdated (see [Get Transaction Details](#get-transaction-details)),
 the list is updated as part of this computation.
+
+### Get My Transactions
+The command `get-my-transactions` shows all transactions that are linked to (at least) one of your owned addresses.
+In addition to the transaction details, the output shows the contribution of each transaction to your balance.
+As such, transactions from one of your owned addresses to another (or the same) owned address have a negative
+contribution, which is the transaction fee.
+
+The output is sorted by the absolute value of the contribution, so that the transactions having the most impact on your
+balance are shown at the bottom of the list.
+
+```
+BitBook$ get-my-transactions
+da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f:   -0.12319446 [    -6,170.32€] (block height 677171, 2021-03-31T16:23:15) Some Description
+```
 
 ### Get Neighbour Transactions
 The command `get-neighbour-transactions` provides a rather straightforward output, but under the hood is the most
