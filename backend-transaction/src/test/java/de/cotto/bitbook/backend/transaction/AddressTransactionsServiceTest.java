@@ -11,11 +11,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Set;
+
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactions.UNKNOWN;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
+import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_2;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_UPDATED;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,6 +47,19 @@ class AddressTransactionsServiceTest {
     @Mock
     private BlockHeightService blockHeightService;
 
+    @Test
+    void getTransactionsForAddresses() {
+        when(blockHeightService.getBlockHeight()).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
+        when(addressTransactionsDao.getAddressTransactions(any())).thenReturn(UNKNOWN);
+        TransactionsRequestKey requestKey = new TransactionsRequestKey(ADDRESS, LAST_CHECKED_AT_BLOCK_HEIGHT);
+        mockAddressTransactionsFromProvider(requestKey, STANDARD, ADDRESS_TRANSACTIONS);
+        TransactionsRequestKey requestKey2 = new TransactionsRequestKey(ADDRESS_2, LAST_CHECKED_AT_BLOCK_HEIGHT);
+        mockAddressTransactionsFromProvider(requestKey2, STANDARD, ADDRESS_TRANSACTIONS_2);
+
+        assertThat(addressTransactionsService.getTransactionsForAddresses(Set.of(ADDRESS, ADDRESS_2)))
+                .containsExactlyInAnyOrder(ADDRESS_TRANSACTIONS, ADDRESS_TRANSACTIONS_2);
+    }
+
     private void mockAddressTransactionsFromProvider(
             TransactionsRequestKey requestKey,
             RequestPriority priority,
@@ -59,7 +76,10 @@ class AddressTransactionsServiceTest {
     }
 
     private AddressTransactionsRequest argIsRequest(TransactionsRequestKey requestKey, RequestPriority priority) {
-        return argThat(request -> request.getKey().equals(requestKey) && request.getPriority().equals(priority));
+        return argThat(request -> request != null
+                                  && request.getKey().equals(requestKey)
+                                  && request.getPriority().equals(priority)
+        );
     }
 
     @Nested
