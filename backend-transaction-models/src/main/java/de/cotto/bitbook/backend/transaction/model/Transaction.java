@@ -37,7 +37,7 @@ public class Transaction {
     ) {
         this.hash = hash;
         this.blockHeight = blockHeight;
-        this.time = time;
+        this.time = time.withNano(0);
         this.fees = fees;
         this.inputs = inputs.stream().filter(input -> input.getValue().getSatoshis() > 0).collect(toList());
         this.outputs = outputs.stream().filter(output -> output.getValue().getSatoshis() > 0).collect(toList());

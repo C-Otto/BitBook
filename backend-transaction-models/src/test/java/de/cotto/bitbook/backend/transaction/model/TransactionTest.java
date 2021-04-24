@@ -212,6 +212,24 @@ class TransactionTest {
     }
 
     @Test
+    void getTime() {
+        assertThat(TRANSACTION.getTime()).isEqualTo(DATE_TIME);
+    }
+
+    @Test
+    void getTime_without_nanoseconds() {
+        Transaction transaction = new Transaction(
+                TRANSACTION_HASH,
+                BLOCK_HEIGHT,
+                DATE_TIME.withNano(789),
+                FEES,
+                List.of(INPUT_1, INPUT_2),
+                List.of(OUTPUT_1, OUTPUT_2)
+        );
+        assertThat(transaction.getTime()).isEqualTo(DATE_TIME);
+    }
+
+    @Test
     void getHash() {
         assertThat(TRANSACTION.getHash()).isEqualTo(TRANSACTION_HASH);
     }
