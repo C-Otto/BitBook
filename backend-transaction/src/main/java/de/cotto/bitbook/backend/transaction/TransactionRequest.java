@@ -6,7 +6,7 @@ import de.cotto.bitbook.backend.transaction.model.Transaction;
 
 public final class TransactionRequest extends PrioritizedRequest<String, Transaction> {
     public TransactionRequest(String transactionHash, RequestPriority priority) {
-        super(transactionHash, priority, result -> {});
+        super(transactionHash, priority);
     }
 
     public String getHash() {

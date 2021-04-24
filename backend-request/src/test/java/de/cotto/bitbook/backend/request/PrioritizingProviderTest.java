@@ -4,10 +4,8 @@ import de.cotto.bitbook.backend.Provider;
 import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -101,65 +99,6 @@ class PrioritizingProviderTest {
         assertThat(provider1.seenKeys).hasSize(3);
     }
 
-    @Nested
-    class WithConsumer {
-        private final List<Integer> results1 = new ArrayList<>();
-        private final List<Integer> results2 = new ArrayList<>();
-
-        @Test
-        void calls_duplicate_consumer_twice() {
-            prioritizingProvider.getForRequestBlocking(new PrioritizedRequest<>("a", LOWEST, this::consumer1));
-            prioritizingProvider.getForRequestBlocking(new PrioritizedRequest<>("a", LOWEST, this::consumer1));
-            prioritizingProvider.workOnRequests();
-
-            await().atMost(1, SECONDS).untilAsserted(() ->
-                assertThat(results1).hasSize(2)
-            );
-        }
-
-        @Test
-        void calls_different_consumers_for_merged_requests() {
-            prioritizingProvider.getForRequestBlocking(new PrioritizedRequest<>("a", LOWEST, this::consumer1));
-            prioritizingProvider.getForRequestBlocking(new PrioritizedRequest<>("a", LOWEST, this::consumer2));
-            prioritizingProvider.workOnRequests();
-
-            await().atMost(1, SECONDS).untilAsserted(() -> {
-                assertThat(results1).hasSize(1);
-                assertThat(results2).hasSize(1);
-            });
-        }
-
-        @Test
-        void calls_consumers_in_sequence() {
-            prioritizingProvider.getForRequestBlocking(
-                    new PrioritizedRequest<>("a", LOWEST, this::consumer1)
-            );
-            prioritizingProvider.getForRequestBlocking(
-                    new PrioritizedRequest<>("a", LOWEST, this::consumer1MustBeSecond)
-            );
-            prioritizingProvider.workOnRequests();
-
-            await().atMost(1, SECONDS).untilAsserted(() ->
-                assertThat(results1).hasSize(2)
-            );
-        }
-
-        private void consumer1(Integer result) {
-            results1.add(result);
-        }
-
-        private void consumer2(Integer result) {
-            results2.add(result);
-        }
-
-        private void consumer1MustBeSecond(Integer result) {
-            if (results1.isEmpty()) {
-                return;
-            }
-            consumer1(result);
-        }
-    }
-
     @Test
     void does_not_merge_requests_with_different_keys() {
         when(provider2.get(any())).thenThrow(mock(CallNotPermittedException.class));
@@ -213,7 +152,7 @@ class PrioritizingProviderTest {
 
     @Test
     void merges_with_already_running_request() {
-        prioritizingProvider.getForRequestBlocking(request("wait", LOWEST));
+        prioritizingProvider.getForRequest(request("wait", LOWEST));
         workOnExpectedRequests(1);
         await().atMost(1, SECONDS).until(() -> !prioritizingProvider.runningRequests.isEmpty());
         Optional<Integer> resultFromSecondRequest =

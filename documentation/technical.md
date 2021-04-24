@@ -66,7 +66,7 @@ The results are persisted in the database, so that future requests can be served
 As an example, when requesting details about a transaction, the price at the time of the transaction is requested in the
 background.
 
-The request classes make use of `CompletableFuture` and `Consumer<R>` to forward request results to the code that
+The request classes make use of `CompletableFuture`s to forward request results to the code that
 requested the information. This is necessary so that the results can be shown to the user, or so that follow-up
 operations (persisting to database, requesting more information) can be triggered.
 
