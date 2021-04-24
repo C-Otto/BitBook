@@ -3,6 +3,7 @@ package de.cotto.bitbook.ownership.cli;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.price.model.Price;
+import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.BalanceService;
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.cli.CliAddress;
@@ -22,11 +23,13 @@ import java.util.Map;
 import java.util.Set;
 
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_2;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_3;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -54,6 +57,9 @@ class OwnershipCommandsTest {
     @Mock
     private TransactionFormatter transactionFormatter;
 
+    @Mock
+    private AddressTransactionsService addressTransactionsService;
+
     @Test
     void getBalance() {
         Coins coins = Coins.ofSatoshis(123);
@@ -79,6 +85,21 @@ class OwnershipCommandsTest {
                 ".*" + address1 + ".*123.*\n" +
                 ".*" + address2 + ".*234.*"
         );
+    }
+
+    @Test
+    void listOwnedAddresses_preloads_address_transactions() {
+        when(balanceService.getBalance(any())).thenReturn(Coins.ofSatoshis(123));
+        when(addressOwnershipService.getOwnedAddressesWithDescription()).thenReturn(Set.of(
+                new AddressWithDescription(ADDRESS),
+                new AddressWithDescription(ADDRESS_2)
+        ));
+
+        ownershipCommands.listOwnedAddresses();
+
+        InOrder inOrder = inOrder(addressTransactionsService, balanceService);
+        inOrder.verify(addressTransactionsService).getTransactionsForAddresses(Set.of(ADDRESS, ADDRESS_2));
+        inOrder.verify(balanceService, atLeastOnce()).getBalance(any());
     }
 
     @Test

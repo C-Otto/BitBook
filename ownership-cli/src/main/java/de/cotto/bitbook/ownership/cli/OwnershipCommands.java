@@ -4,6 +4,7 @@ import com.google.common.base.Functions;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.price.model.Price;
+import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.BalanceService;
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
@@ -36,19 +37,22 @@ public class OwnershipCommands {
     private final PriceService priceService;
     private final PriceFormatter priceFormatter;
     private final TransactionFormatter transactionFormatter;
+    private final AddressTransactionsService addressTransactionsService;
 
     public OwnershipCommands(
             AddressOwnershipService addressOwnershipService,
             BalanceService balanceService,
             PriceService priceService,
             PriceFormatter priceFormatter,
-            TransactionFormatter transactionFormatter
+            TransactionFormatter transactionFormatter,
+            AddressTransactionsService addressTransactionsService
     ) {
         this.addressOwnershipService = addressOwnershipService;
         this.balanceService = balanceService;
         this.priceService = priceService;
         this.priceFormatter = priceFormatter;
         this.transactionFormatter = transactionFormatter;
+        this.addressTransactionsService = addressTransactionsService;
     }
 
     @ShellMethod("Get the total balance over all owned addresses")
@@ -62,7 +66,10 @@ public class OwnershipCommands {
     @ShellMethod("List all owned addresses")
     public String listOwnedAddresses() {
         Price currentPrice = priceService.getCurrentPrice();
-        return addressOwnershipService.getOwnedAddressesWithDescription().parallelStream()
+        Set<AddressWithDescription> ownedAddressesWithDescription =
+                addressOwnershipService.getOwnedAddressesWithDescription();
+        preloadAddressTransactions(ownedAddressesWithDescription);
+        return ownedAddressesWithDescription.parallelStream()
                 .collect(Collectors.toMap(
                         Functions.identity(),
                         addressWithDescription -> balanceService.getBalance(addressWithDescription.getAddress())
@@ -122,6 +129,13 @@ public class OwnershipCommands {
         }
         addressOwnershipService.resetOwnership(addressString);
         return "OK";
+    }
+
+    private void preloadAddressTransactions(Set<AddressWithDescription> addressesWithDescription) {
+        Set<String> ownedAddresses = addressesWithDescription.stream()
+                .map(AddressWithDescription::getAddress)
+                .collect(toSet());
+        addressTransactionsService.getTransactionsForAddresses(ownedAddresses);
     }
 
     private String formatAddressWithPrice(
