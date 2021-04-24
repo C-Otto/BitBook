@@ -27,6 +27,8 @@ import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixt
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_2;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_3;
+import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH_2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
@@ -72,7 +74,7 @@ class OwnershipCommandsTest {
     }
 
     @Test
-    void listOwnedAddresses_with_balance() {
+    void getOwnedAddresses_with_balance() {
         String address1 = "abc";
         String address2 = "def";
         when(balanceService.getBalance(address1)).thenReturn(Coins.ofSatoshis(123));
@@ -81,21 +83,21 @@ class OwnershipCommandsTest {
                 new AddressWithDescription(address1),
                 new AddressWithDescription(address2)
         ));
-        assertThat(ownershipCommands.listOwnedAddresses()).matches(
+        assertThat(ownershipCommands.getOwnedAddresses()).matches(
                 ".*" + address1 + ".*123.*\n" +
                 ".*" + address2 + ".*234.*"
         );
     }
 
     @Test
-    void listOwnedAddresses_preloads_address_transactions() {
+    void getOwnedAddresses_preloads_address_transactions() {
         when(balanceService.getBalance(any())).thenReturn(Coins.ofSatoshis(123));
         when(addressOwnershipService.getOwnedAddressesWithDescription()).thenReturn(Set.of(
                 new AddressWithDescription(ADDRESS),
                 new AddressWithDescription(ADDRESS_2)
         ));
 
-        ownershipCommands.listOwnedAddresses();
+        ownershipCommands.getOwnedAddresses();
 
         InOrder inOrder = inOrder(addressTransactionsService, balanceService);
         inOrder.verify(addressTransactionsService).getTransactionsForAddresses(Set.of(ADDRESS, ADDRESS_2));
@@ -103,7 +105,7 @@ class OwnershipCommandsTest {
     }
 
     @Test
-    void listOwnedAddresses_sorted_by_value() {
+    void getOwnedAddresses_sorted_by_value() {
         AddressWithDescription address1 = new AddressWithDescription("xxx", "b-DESCRIPTION");
         AddressWithDescription address2 = new AddressWithDescription("yyy", "a-DESCRIPTION");
         AddressWithDescription address3 = new AddressWithDescription("zzz", "c-DESCRIPTION");
@@ -112,8 +114,54 @@ class OwnershipCommandsTest {
         when(balanceService.getBalance(address3.getAddress())).thenReturn(Coins.ofSatoshis(1000));
         Set<AddressWithDescription> addresses = Set.of(address1, address2, address3);
         when(addressOwnershipService.getOwnedAddressesWithDescription()).thenReturn(addresses);
-        assertThat(ownershipCommands.listOwnedAddresses())
+        assertThat(ownershipCommands.getOwnedAddresses())
                 .matches(".*a-DESCRIPTION.*\n.*b-DESCRIPTION.*\n.*c-DESCRIPTION.*");
+    }
+
+    @Nested
+    class GetMyTransactions {
+        @BeforeEach
+        void setUp() {
+            when(transactionFormatter.formatSingleLineForValue(any(), any()))
+                    .then(invocation -> invocation.getArgument(0) + "/" + invocation.getArgument(1));
+        }
+
+        @Test
+        void formats_transactions_ordered_by_hash() {
+            when(addressOwnershipService.getMyTransactionsWithCoins()).thenReturn(
+                    Map.of(TRANSACTION, Coins.NONE, TRANSACTION_2, Coins.NONE)
+            );
+            assertThat(ownershipCommands.getMyTransactions()).matches(
+                    ".*" + TRANSACTION_HASH_2 + ".*\n"
+                    + ".*" + TRANSACTION_HASH + ".*"
+            );
+        }
+
+        @Test
+        void includes_value_and_orders_by_value() {
+            Coins value1 = Coins.ofSatoshis(1);
+            Coins value2 = Coins.ofSatoshis(2);
+            when(addressOwnershipService.getMyTransactionsWithCoins()).thenReturn(
+                    Map.of(TRANSACTION, value1, TRANSACTION_2, value2)
+            );
+            assertThat(ownershipCommands.getMyTransactions()).matches(
+                    ".*" + TRANSACTION_HASH + ".*" + value1 + ".*\n"
+                    + ".*" + TRANSACTION_HASH_2 + ".*" + value2
+            );
+        }
+
+        @Test
+        void includes_value_and_orders_by_absolute_value() {
+            Coins value1 = Coins.ofSatoshis(-100);
+            Coins value2 = Coins.ofSatoshis(2);
+            when(addressOwnershipService.getMyTransactionsWithCoins()).thenReturn(
+                    Map.of(TRANSACTION, value1, TRANSACTION_2, value2)
+            );
+            assertThat(ownershipCommands.getMyTransactions()).matches(
+                    ".*" + TRANSACTION_HASH_2 + ".*" + value2 + ".*\n"
+                    + ".*" + TRANSACTION_HASH + ".*" + value1
+            );
+        }
     }
 
     @Nested

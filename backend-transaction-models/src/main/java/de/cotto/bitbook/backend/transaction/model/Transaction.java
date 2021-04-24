@@ -88,8 +88,8 @@ public class Transaction {
         return getIncomingCoins(address).subtract(getOutgoingCoins(address));
     }
 
-    public Coins getDifferenceForAddresses(Set<String> ownedAddresses) {
-        return ownedAddresses.stream().map(this::getDifferenceForAddress).reduce(Coins.NONE, Coins::add);
+    public Coins getDifferenceForAddresses(Set<String> addresses) {
+        return addresses.stream().map(this::getDifferenceForAddress).reduce(Coins.NONE, Coins::add);
     }
 
     public String getHash() {

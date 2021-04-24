@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 
 @Component
@@ -50,15 +50,10 @@ public class AddressOwnershipService {
     public Map<Transaction, Coins> getNeighbourTransactions() {
         Set<String> ownedAddresses = getOwnedAddresses();
         Set<String> foreignAddresses = addressOwnershipDao.getForeignAddresses();
-        Set<String> transactionHashes = ownedAddresses.parallelStream()
-                .map(addressTransactionsService::getTransactions)
-                .map(AddressTransactions::getTransactionHashes)
-                .flatMap(Set::stream)
-                .collect(toSet());
-        Set<Transaction> transactionsFromToOwned = transactionService.getTransactionDetails(transactionHashes);
+        Set<Transaction> myTransactions = getMyTransactions();
 
-        Map<Transaction, Coins> differencesOwned = getDifferences(transactionsFromToOwned, ownedAddresses);
-        Map<Transaction, Coins> differencesForeign = getDifferences(transactionsFromToOwned, foreignAddresses);
+        Map<Transaction, Coins> differencesOwned = getDifferences(myTransactions, ownedAddresses);
+        Map<Transaction, Coins> differencesForeign = getDifferences(myTransactions, foreignAddresses);
         updateWithFeesAsForeign(differencesOwned);
         updateWithKnownForeignIgnoringForeignSurplus(differencesOwned, differencesForeign);
         return differencesOwned;
@@ -106,11 +101,23 @@ public class AddressOwnershipService {
         return addressOwnershipDao.getOwnershipStatus(address);
     }
 
+    public Map<Transaction, Coins> getMyTransactionsWithCoins() {
+        return getDifferences(getMyTransactions(), getOwnedAddresses());
+    }
+
+    private Set<Transaction> getMyTransactions() {
+        Set<String> hashes = addressTransactionsService.getTransactionsForAddresses(getOwnedAddresses()).stream()
+                .map(AddressTransactions::getTransactionHashes)
+                .flatMap(Set::stream)
+                .collect(toSet());
+        return transactionService.getTransactionDetails(hashes);
+    }
+
     private Map<Transaction, Coins> getDifferences(
             Set<Transaction> transactions,
             Set<String> addresses
     ) {
-        return transactions.stream().collect(Collectors.toMap(
+        return transactions.stream().collect(toMap(
                 Functions.identity(),
                 transaction -> transaction.getDifferenceForAddresses(addresses)
         ));

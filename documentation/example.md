@@ -133,10 +133,10 @@ As such, we are done and have complete ownership information about all owned add
 
 ## More Information
 
-Using `list-owned-addresses` you can get an overview of all owned addresses:
+Using `get-owned-addresses` you can get an overview of all owned addresses:
 
 ```
-BitBook$ list-owned-addresses 
+BitBook$ get-owned-addresses 
            35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS    0          [         0.00€]                     
            36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a    0.0238648  [     1,127.22€]     
 ```
