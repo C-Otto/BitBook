@@ -37,6 +37,11 @@ class WizardCommandsTest {
             assertThat(wizardCommands.exitWizardAvailability().isAvailable()).isEqualTo(false);
             assertThat(wizardCommands.exitWizardAvailability().getReason()).isEqualTo("wizard is not active");
         }
+
+        @Test
+        void wizard_command_initially_available() {
+            assertThat(wizardCommands.wizardAvailability().isAvailable()).isEqualTo(true);
+        }
     }
     
     @Nested
@@ -63,6 +68,13 @@ class WizardCommandsTest {
         void exit_wizard_notifies_service() {
             wizardCommands.exitWizard();
             verify(wizardService).disableWizard();
+        }
+
+        @Test
+        void start_wizard_command_not_available() {
+            when(wizardService.isEnabled()).thenReturn(true);
+            assertThat(wizardCommands.wizardAvailability().isAvailable()).isEqualTo(false);
+            assertThat(wizardCommands.wizardAvailability().getReason()).isEqualTo("wizard is active");
         }
     }
 }

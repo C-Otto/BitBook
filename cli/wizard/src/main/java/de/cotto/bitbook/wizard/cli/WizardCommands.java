@@ -28,6 +28,13 @@ public class WizardCommands {
         promptChangeListener.changePromptToDefault();
     }
 
+    public Availability wizardAvailability() {
+        if (wizardService.isEnabled()) {
+            return Availability.unavailable("wizard is active");
+        }
+        return Availability.available();
+    }
+
     public Availability exitWizardAvailability() {
         if (wizardService.isEnabled()) {
             return Availability.available();
