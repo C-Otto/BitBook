@@ -6,8 +6,11 @@ import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+
+import static java.util.stream.Collectors.toSet;
 
 @Component
 public class AddressTransactionsService {
@@ -33,6 +36,15 @@ public class AddressTransactionsService {
     @Async
     public void requestTransactionsInBackground(String address) {
         ResultFuture.getOrElse(getTransactions(address, RequestPriority.LOWEST), AddressTransactions.UNKNOWN);
+    }
+
+    public Set<AddressTransactions> getTransactionsForAddresses(Set<String> addresses) {
+        Set<Future<AddressTransactions>> futures = addresses.stream()
+                .map(address -> getTransactions(address, RequestPriority.STANDARD))
+                .collect(toSet());
+        return futures.stream()
+                .map(future -> ResultFuture.getOrElse(future, AddressTransactions.UNKNOWN))
+                .collect(toSet());
     }
 
     public AddressTransactions getTransactions(String address) {
