@@ -95,7 +95,9 @@ public class AddressOwnershipService {
     }
 
     public Coins getBalance() {
-        return getOwnedAddresses().parallelStream()
+        Set<String> ownedAddresses = getOwnedAddresses();
+        addressTransactionsService.getTransactionsForAddresses(ownedAddresses);
+        return ownedAddresses.parallelStream()
                 .map(balanceService::getBalance)
                 .reduce(Coins.NONE, Coins::add);
     }

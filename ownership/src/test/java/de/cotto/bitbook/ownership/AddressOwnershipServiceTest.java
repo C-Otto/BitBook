@@ -13,6 +13,7 @@ import de.cotto.bitbook.backend.transaction.model.Transaction;
 import de.cotto.bitbook.ownership.persistence.AddressOwnershipDaoImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -42,6 +43,9 @@ import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRA
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -311,6 +315,19 @@ class AddressOwnershipServiceTest {
         Coins balance = addressOwnershipService.getBalance();
 
         assertThat(balance).isEqualTo(Coins.ofSatoshis(123));
+    }
+
+    @Test
+    void getBalance_preloads_address_transactions() {
+        Set<String> addresses = Set.of(ADDRESS, ADDRESS_2);
+        when(ownedAddressesDao.getOwnedAddresses()).thenReturn(addresses);
+        when(balanceService.getBalance(any())).thenReturn(Coins.ofSatoshis(1));
+
+        addressOwnershipService.getBalance();
+
+        InOrder inOrder = inOrder(addressTransactionsService, balanceService);
+        inOrder.verify(addressTransactionsService).getTransactionsForAddresses(addresses);
+        inOrder.verify(balanceService, atLeastOnce()).getBalance(any());
     }
 
     @Test
