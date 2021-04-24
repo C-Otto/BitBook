@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -173,25 +172,18 @@ class PrioritizingProviderIT {
     class ReusesRequest {
         private static final String KEY = "sleep";
 
-        @Nullable
-        private Integer resultConsumerLowest;
-
-        @Nullable
-        private Integer resultConsumerStandard;
-
         private Optional<Integer> requestInParallel() throws InterruptedException {
             // Submit two requests. Make sure second request is added after first is started.
             AtomicBoolean standardRequestDone = new AtomicBoolean(false);
             AtomicReference<Optional<Integer>> resultStandardRequest = new AtomicReference<>();
             taskExecutor.execute(() -> {
-                PrioritizedRequest<String, Integer> requestStandard =
-                        new PrioritizedRequest<>(KEY, STANDARD, this::consumerStandard);
+                PrioritizedRequest<String, Integer> requestStandard = new PrioritizedRequest<>(KEY, STANDARD);
                 resultStandardRequest.set(prioritizingProvider.getForRequestBlocking(requestStandard));
                 standardRequestDone.set(true);
             });
             workOnScheduledTasks();
             await().until(() -> !provider1.seenKeys.isEmpty() || !provider2.seenKeys.isEmpty());
-            prioritizingProvider.getForRequestBlocking(new PrioritizedRequest<>(KEY, LOWEST, this::consumerLowest));
+            prioritizingProvider.getForRequestBlocking(new PrioritizedRequest<>(KEY, LOWEST));
 
             // Wait until both are done so that we can assert only one (the first) hits the network.
             await().until(standardRequestDone::get);
@@ -207,21 +199,6 @@ class PrioritizingProviderIT {
             seenKeys.addAll(provider2.seenKeys);
             assertThat(seenKeys).hasSize(1);
             assertThat(result).contains(KEY.length());
-        }
-
-        @Test
-        void reusing_request_also_delivers_result_to_result_consumers() throws Exception {
-            requestInParallel();
-            assertThat(resultConsumerLowest).isEqualTo(KEY.length());
-            assertThat(resultConsumerStandard).isEqualTo(KEY.length());
-        }
-
-        private void consumerLowest(Integer result) {
-            this.resultConsumerLowest = result;
-        }
-
-        private void consumerStandard(Integer result) {
-            this.resultConsumerStandard = result;
         }
 
         @SuppressWarnings("SameParameterValue")

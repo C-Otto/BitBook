@@ -9,7 +9,7 @@ import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
 
 public final class AddressTransactionsRequest extends PrioritizedRequest<TransactionsRequestKey, AddressTransactions> {
     private AddressTransactionsRequest(TransactionsRequestKey transactionsRequestKey, RequestPriority priority) {
-        super(transactionsRequestKey, priority, result -> {});
+        super(transactionsRequestKey, priority);
     }
 
     public static AddressTransactionsRequest forLowestPriority(TransactionsRequestKey transactionsRequestKey) {

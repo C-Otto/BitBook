@@ -3,7 +3,6 @@ package de.cotto.bitbook.backend.request;
 import javax.annotation.Nonnull;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 public class PrioritizedRequestWithResult<K, R> extends ResultFuture<R>
         implements Comparable<PrioritizedRequestWithResult<K, R>> {
@@ -13,12 +12,6 @@ public class PrioritizedRequestWithResult<K, R> extends ResultFuture<R>
 
     public PrioritizedRequestWithResult(K key, RequestPriority priority) {
         super();
-        this.key = key;
-        this.priority = priority;
-    }
-
-    public PrioritizedRequestWithResult(K key, RequestPriority priority, Consumer<R> resultConsumer) {
-        super(resultConsumer);
         this.key = key;
         this.priority = priority;
     }

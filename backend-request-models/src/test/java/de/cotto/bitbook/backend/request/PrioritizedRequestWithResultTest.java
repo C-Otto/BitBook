@@ -4,24 +4,11 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import javax.annotation.Nullable;
-
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 class PrioritizedRequestWithResultTest {
-
-    @Nullable
-    private String seen;
-
-    @Test
-    void default_result_consumer() {
-        assertThatCode(() ->
-            new PrioritizedRequestWithResult<>("a", LOWEST).provideResult("xxx")
-        ).doesNotThrowAnyException();
-    }
 
     @Test
     void compareTo_standard_before_low() {
@@ -66,44 +53,17 @@ class PrioritizedRequestWithResultTest {
         private static final String EXPECTED_RESULT = "expected result";
 
         private final PrioritizedRequestWithResult<String, Object> thisRequest =
-                new PrioritizedRequestWithResult<>(KEY, LOWEST, this::consumer1);
+                new PrioritizedRequestWithResult<>(KEY, LOWEST);
 
-        private final PrioritizedRequest<String, Object> otherRequest =
-                new PrioritizedRequest<>(KEY, STANDARD, this::consumer2);
+        private final PrioritizedRequest<String, Object> otherRequest = new PrioritizedRequest<>(KEY, STANDARD);
 
         private final PrioritizedRequestWithResult<String, Object> merged =
                 thisRequest.createMergedReplacement(otherRequest);
-
-        @Nullable
-        private Object consumer1Result;
-
-        @Nullable
-        private Object consumer2Result;
 
         @Test
         void has_same_key_and_higher_priority() {
             assertThat(merged.getKey()).isEqualTo(KEY);
             assertThat(merged.getPriority()).isEqualTo(STANDARD);
-        }
-
-        @Test
-        void forwards_result_to_existing_requests() {
-            merged.provideResult(EXPECTED_RESULT);
-
-            assertThat(consumer1Result).isEqualTo(EXPECTED_RESULT);
-            assertThat(consumer2Result).isEqualTo(EXPECTED_RESULT);
-        }
-
-        @Test
-        void forwards_result_to_existing_requests_in_order() {
-            PrioritizedRequest<String, Object> otherRequest =
-                    new PrioritizedRequest<>(KEY, STANDARD, this::consumer2MustBeCalledAfterFirst);
-
-            PrioritizedRequestWithResult<String, Object> merged = thisRequest.createMergedReplacement(otherRequest);
-            merged.provideResult(EXPECTED_RESULT);
-
-            assertThat(consumer1Result).isEqualTo(EXPECTED_RESULT);
-            assertThat(consumer2Result).isEqualTo(EXPECTED_RESULT);
         }
 
         @Test
@@ -119,30 +79,6 @@ class PrioritizedRequestWithResultTest {
 
             assertThat(thisRequest.getResult()).isEmpty();
         }
-
-        private void consumer1(Object result) {
-            consumer1Result = result;
-        }
-
-        private void consumer2(Object result) {
-            consumer2Result = result;
-        }
-
-        private void consumer2MustBeCalledAfterFirst(Object result) {
-            if (consumer1Result != null) {
-                consumer2Result = result;
-            }
-        }
-    }
-
-    @Test
-    void withResultConsumer() {
-        new PrioritizedRequestWithResult<>("a", LOWEST, this::resultConsumer).provideResult("xxx");
-        assertThat(seen).isEqualTo("xxx");
-    }
-
-    private void resultConsumer(String result) {
-        seen = result;
     }
 
     @Test

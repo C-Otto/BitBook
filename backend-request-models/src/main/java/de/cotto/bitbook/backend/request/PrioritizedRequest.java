@@ -1,22 +1,15 @@
 package de.cotto.bitbook.backend.request;
 
 import java.util.Objects;
-import java.util.function.Consumer;
 
 public class PrioritizedRequest<K, R> {
     private final K key;
     private final RequestPriority priority;
-    private final Consumer<R> resultConsumer;
 
     protected PrioritizedRequest(K key, RequestPriority priority) {
-        this(key, priority, result -> {});
-    }
-
-    protected PrioritizedRequest(K key, RequestPriority priority, Consumer<R> resultConsumer) {
         super();
         this.key = key;
         this.priority = priority;
-        this.resultConsumer = resultConsumer;
     }
 
     public RequestPriority getPriority() {
@@ -28,7 +21,7 @@ public class PrioritizedRequest<K, R> {
     }
 
     public PrioritizedRequestWithResult<K,R> getWithResultFuture() {
-        return new PrioritizedRequestWithResult<>(key, priority, resultConsumer);
+        return new PrioritizedRequestWithResult<>(key, priority);
     }
 
     @Override
@@ -49,12 +42,11 @@ public class PrioritizedRequest<K, R> {
         }
         PrioritizedRequest<?, ?> that = (PrioritizedRequest<?, ?>) other;
         return Objects.equals(key, that.key)
-               && priority == that.priority
-               && Objects.equals(resultConsumer, that.resultConsumer);
+               && priority == that.priority;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(key, priority, resultConsumer);
+        return Objects.hash(key, priority);
     }
 }

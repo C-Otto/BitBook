@@ -72,9 +72,8 @@ public class TransactionService {
     }
 
     private Future<Transaction> downloadAndPersist(String transactionHash, RequestPriority requestPriority) {
-        TransactionRequest requestWithResultConsumer =
-                new TransactionRequest(transactionHash, requestPriority);
-        return prioritizingTransactionProvider.getTransaction(requestWithResultConsumer).getFuture()
+        TransactionRequest request = new TransactionRequest(transactionHash, requestPriority);
+        return prioritizingTransactionProvider.getTransaction(request).getFuture()
                 .thenApply(transaction -> {
                     if (isInvalidOrTooRecent(transaction)) {
                         return Transaction.UNKNOWN;
