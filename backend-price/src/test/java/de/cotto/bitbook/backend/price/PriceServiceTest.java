@@ -154,7 +154,11 @@ public class PriceServiceTest {
 
     private Price mockPrice() {
         Price expectedPrice = Price.of(10);
-        mockResult(PriceRequest.forDateStandardPriority(DATE), Set.of(new PriceWithDate(expectedPrice, DATE)));
+        mockResult(PriceRequest.forDateStandardPriority(DATE), Set.of(
+                new PriceWithDate(expectedPrice.add(Price.of(1_000_000)), DATE.minusDays(1)),
+                new PriceWithDate(expectedPrice, DATE),
+                new PriceWithDate(expectedPrice.add(Price.of(1_000_000)), DATE.plusDays(1))
+        ));
         return expectedPrice;
     }
 
