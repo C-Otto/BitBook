@@ -64,18 +64,29 @@ class QueueStatusTest {
     }
 
     @Test
-    void logQueueStatus_includes_difference_to_previous_log() {
+    void logQueueStatus_includes_difference_to_previous_log_positive_and_zero() {
         provider1HasTwoStandardRequests();
         provider2HasOneStandardAndOneLowestRequest();
+        queueStatus.logQueueStatus();
+        queueStatus.reset();
+
+        provider1HasTwoStandardRequests();
+        provider2HasTwoStandardRequests();
+        queueStatus.logQueueStatus();
+        assertThat(queueStatus.formattedDifferences).containsExactly(" (+0)", " (+1)");
+    }
+
+    @Test
+    void logQueueStatus_includes_difference_to_previous_log_negative() {
+        provider1HasTwoStandardRequests();
         queueStatus.logQueueStatus();
         queueStatus.reset();
 
         when(provider1.getQueueByPriority()).thenReturn(Map.of(
                 STANDARD, List.of(new PrioritizedRequestWithResult<>("d", STANDARD))
         ));
-        provider2HasThreeStandardRequests();
         queueStatus.logQueueStatus();
-        assertThat(queueStatus.formattedDifferences).containsExactly(" (-1)", " (+2)");
+        assertThat(queueStatus.formattedDifferences).containsExactly(" (-1)");
     }
 
     private void provider1HasTwoStandardRequests() {
@@ -106,12 +117,11 @@ class QueueStatusTest {
         ));
     }
 
-    private void provider2HasThreeStandardRequests() {
+    private void provider2HasTwoStandardRequests() {
         when(provider2.getQueueByPriority()).thenReturn(Map.of(
                 STANDARD, List.of(
                         new PrioritizedRequestWithResult<>(1, STANDARD),
-                        new PrioritizedRequestWithResult<>(2, STANDARD),
-                        new PrioritizedRequestWithResult<>(3, STANDARD)
+                        new PrioritizedRequestWithResult<>(2, STANDARD)
                 )
         ));
     }
