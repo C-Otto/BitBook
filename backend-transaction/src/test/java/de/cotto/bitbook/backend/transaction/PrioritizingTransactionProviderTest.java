@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.request.ResultFuture;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
@@ -17,7 +18,6 @@ import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -79,11 +79,9 @@ class PrioritizingTransactionProviderTest {
     @Test
     void clears_lowest_priority_requests_if_all_providers_fail() {
         mockAllFail();
-        executor.execute(() -> prioritizingTransactionProvider.getTransaction(
-                new TransactionRequest(OTHER_HASH, LOWEST)
-        ));
+        prioritizingTransactionProvider.getTransaction(new TransactionRequest(OTHER_HASH, LOWEST));
 
-        get(1);
+        get();
 
         verify(transactionProvider1, never()).get(OTHER_HASH);
         verify(transactionProvider2, never()).get(OTHER_HASH);
@@ -92,13 +90,9 @@ class PrioritizingTransactionProviderTest {
     @Test
     void retains_all_but_lowest_priority_requests_if_all_providers_fail() {
         mockAllFail();
-        executor.execute(() -> prioritizingTransactionProvider.getTransaction(
-                new TransactionRequest(OTHER_HASH, STANDARD)
-        ));
-        executor.execute(() -> prioritizingTransactionProvider.getTransaction(
-                new TransactionRequest(TRANSACTION_HASH, STANDARD)
-        ));
-        workOnRequestsInBackground(2);
+        prioritizingTransactionProvider.getTransaction(new TransactionRequest(OTHER_HASH, STANDARD));
+        prioritizingTransactionProvider.getTransaction(new TransactionRequest(TRANSACTION_HASH, STANDARD));
+        workOnRequestsInBackground();
 
         verify(transactionProvider1, timeout(1_000)).get(TRANSACTION_HASH);
         verify(transactionProvider1, timeout(1_000)).get(OTHER_HASH);
@@ -112,22 +106,14 @@ class PrioritizingTransactionProviderTest {
     }
 
     private Transaction get() {
-        return get(0);
-    }
-
-    private Transaction get(int expectedSize) {
         TransactionRequest request = new TransactionRequest(TRANSACTION_HASH, STANDARD);
-        workOnRequestsInBackground(expectedSize + 1);
-        return prioritizingTransactionProvider.getTransaction(request).getResult().orElse(Transaction.UNKNOWN);
+        ResultFuture<Transaction> resultFuture = prioritizingTransactionProvider.getTransaction(request);
+        workOnRequestsInBackground();
+        return resultFuture.getResult().orElse(Transaction.UNKNOWN);
     }
 
-    private void workOnRequestsInBackground(int expectedSize) {
-        executor.execute(() -> {
-            await().until(
-                    () -> prioritizingTransactionProvider.getRequestQueue().size() == expectedSize
-            );
-            prioritizingTransactionProvider.workOnRequests();
-        });
+    private void workOnRequestsInBackground() {
+        executor.execute(() -> prioritizingTransactionProvider.workOnRequests());
     }
 
     private void mockAllFail() {

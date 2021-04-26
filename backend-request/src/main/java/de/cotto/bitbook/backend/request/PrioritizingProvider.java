@@ -1,6 +1,5 @@
 package de.cotto.bitbook.backend.request;
 
-import com.google.common.annotations.VisibleForTesting;
 import de.cotto.bitbook.backend.Provider;
 import org.apache.commons.collections4.QueueUtils;
 import org.slf4j.Logger;
@@ -125,11 +124,6 @@ public class PrioritizingProvider<K, R> {
                     requestQueue.add(replacingRequest);
                     return replacingRequest;
                 });
-    }
-
-    @VisibleForTesting
-    public Queue<PrioritizedRequestWithResult<K, R>> getRequestQueue() {
-        return requestQueue;
     }
 
     protected Map<RequestPriority, List<PrioritizedRequestWithResult<K, R>>> getQueueByPriority() {
