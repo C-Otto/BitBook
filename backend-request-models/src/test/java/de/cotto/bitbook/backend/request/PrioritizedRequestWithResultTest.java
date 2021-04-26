@@ -3,6 +3,7 @@ package de.cotto.bitbook.backend.request;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
@@ -67,6 +68,7 @@ class PrioritizedRequestWithResultTest {
         }
 
         @Test
+        @Timeout(1)
         void forwards_result_to_existing_futures() {
             merged.provideResult(EXPECTED_RESULT);
 
@@ -74,6 +76,7 @@ class PrioritizedRequestWithResultTest {
         }
 
         @Test
+        @Timeout(1)
         void forwards_cancellation_to_existing_futures() {
             merged.stopWithoutResult();
 
