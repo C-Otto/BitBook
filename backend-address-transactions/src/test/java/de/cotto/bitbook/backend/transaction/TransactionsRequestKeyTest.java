@@ -9,6 +9,7 @@ import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixt
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TransactionsRequestKeyTest {
 
@@ -24,6 +25,13 @@ class TransactionsRequestKeyTest {
     void without_known_address_transactions() {
         assertThat(TRANSACTIONS_REQUEST_KEY.getAddress()).isEqualTo(ADDRESS);
         assertThat(TRANSACTIONS_REQUEST_KEY.getBlockHeight()).isEqualTo(BLOCK_HEIGHT);
+    }
+
+    @Test
+    void without_known_address_transactions_does_not_allow_access_to_transactions() {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
+                TRANSACTIONS_REQUEST_KEY::getAddressTransactions
+        );
     }
 
     @Test
