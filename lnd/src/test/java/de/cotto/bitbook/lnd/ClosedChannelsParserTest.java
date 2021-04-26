@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.lnd.model.ClosedChannel;
+import de.cotto.bitbook.lnd.model.Resolution;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
@@ -113,12 +114,16 @@ class ClosedChannelsParserTest {
     void with_resolution() throws IOException {
         mockTransactionDetails();
 
-        assertThat(closedChannelsParser.parse(toJsonNode(
+        Set<ClosedChannel> closedChannels = closedChannelsParser.parse(toJsonNode(
                 getJsonArrayWithSingleChannel("{" +
                                               "\"sweep_txid\": \"" + SWEEP_TRANSACTION_HASH + "\"," +
                                               "\"amount_sat\": \"" + RESOLUTION_AMOUNT.getSatoshis() + "\"" +
                                               "}")
-        ))).hasSize(1);
+        ));
+        assertThat(closedChannels).hasSize(1)
+                .flatMap(ClosedChannel::getResolutions)
+                .map(Resolution::getSweepTransactionHash)
+                .contains(SWEEP_TRANSACTION_HASH);
     }
 
     private void mockTransactionDetails() {
