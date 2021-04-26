@@ -37,6 +37,11 @@ class KrakenPriceProviderTest {
     private KrakenClient krakenClient;
 
     @Test
+    void getName() {
+        assertThat(krakenPriceProvider.getName()).isEqualTo("KrakenPriceProvider");
+    }
+
+    @Test
     void current_price() {
         Price expectedPrice = Price.of(35_000);
         LocalDate today = now();
