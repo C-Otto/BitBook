@@ -51,13 +51,14 @@ public class SweepTransactionsServiceTest {
 
     @Test
     void unknown_transaction() {
-        when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(Transaction.UNKNOWN);
+        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH)))
+                .thenReturn(Set.of(Transaction.UNKNOWN));
         assertFailure(Set.of(TRANSACTION_HASH));
     }
 
     @Test
     void not_sweep_because_of_two_outputs() {
-        when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(TRANSACTION_2);
+        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH))).thenReturn(Set.of(TRANSACTION_2));
         assertFailure(Set.of(TRANSACTION_HASH));
     }
 
@@ -90,8 +91,8 @@ public class SweepTransactionsServiceTest {
 
         @BeforeEach
         void setUp() {
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(SWEEP_TRANSACTION);
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH_2)).thenReturn(SWEEP_TRANSACTION_2);
+            when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
+                    .thenReturn(Set.of(SWEEP_TRANSACTION, SWEEP_TRANSACTION_2));
         }
 
         @Test
@@ -102,7 +103,8 @@ public class SweepTransactionsServiceTest {
         @Test
         void accepts_two_inputs() {
             // this may happen for closed channels with unsettled HTLCs
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(TRANSACTION_4);
+            when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
+                    .thenReturn(Set.of(TRANSACTION_4, SWEEP_TRANSACTION_2));
             assertThat(sweepTransactionsService.addFromSweeps(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
                     .isEqualTo(2);
         }
