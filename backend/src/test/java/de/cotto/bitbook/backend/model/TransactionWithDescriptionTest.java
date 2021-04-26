@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("CPD-START")
-class TransationWithDescriptionTest {
+class TransactionWithDescriptionTest {
     private static final String TOO_LONG =
             "abcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaXIIIIIIIIIIIIIIIIIZ";
     private static final String SHORTENED_40 = "abcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaX…";
