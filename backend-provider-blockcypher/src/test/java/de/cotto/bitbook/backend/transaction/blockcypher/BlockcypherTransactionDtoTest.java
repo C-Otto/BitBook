@@ -220,6 +220,30 @@ class BlockcypherTransactionDtoTest {
     }
 
     @Test
+    void deserialization_coinbase_transaction_no_input() {
+        String json = """
+                {
+                  "block_height": 123,
+                  "hash": "abc",
+                  "fees": 0,
+                  "confirmed": "2019-10-26T20:06:35Z",
+                  "received": "2019-10-26T20:06:35Z",
+                  "inputs": [],
+                  "outputs": [
+                    {
+                      "value": 100,
+                      "addresses": [
+                        "abc"
+                      ]
+                    }
+                  ]
+                }""";
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+                objectMapper.readValue(json, BlockcypherTransactionDto.class).toModel()
+        );
+    }
+
+    @Test
     void deserialization_output_for_multisig_with_4_prefix() {
         // 4c1df235ffd7642008989422aee5255e6312b4172b55d94e328fa99e99d727c7
         String json = """
