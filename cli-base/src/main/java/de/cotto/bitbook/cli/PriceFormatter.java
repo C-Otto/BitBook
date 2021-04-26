@@ -28,7 +28,7 @@ public class PriceFormatter {
         }
         BigDecimal valueAtPrice = BigDecimal.valueOf(coins.getSatoshis())
                 .multiply(price.getAsBigDecimal())
-                .divide(BigDecimal.valueOf(Coins.SATOSHIS_IN_COIN), RoundingMode.HALF_UP)
+                .divide(Coins.SATOSHIS_IN_COIN, RoundingMode.HALF_UP)
                 .setScale(2, RoundingMode.HALF_UP);
         String formatted = decimalFormat.format(valueAtPrice);
         return StringUtils.leftPad(formatted, MINIMUM_LENGTH) + "€";

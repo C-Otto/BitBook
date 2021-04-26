@@ -3,11 +3,12 @@ package de.cotto.bitbook.backend.transaction.model;
 import org.springframework.boot.ansi.AnsiColor;
 import org.springframework.boot.ansi.AnsiOutput;
 
-import javax.annotation.Nonnull;
+import java.math.BigDecimal;
 import java.util.Locale;
 
 public class Coins implements Comparable<Coins> {
-    public static final int SATOSHIS_IN_COIN = 100_000_000;
+    private static final int COIN_SCALE = 8;
+    public static final BigDecimal SATOSHIS_IN_COIN = BigDecimal.valueOf(1, -COIN_SCALE);
     public static final Coins NONE = Coins.ofSatoshis(0);
 
     private final long satoshis;
@@ -72,9 +73,9 @@ public class Coins implements Comparable<Coins> {
         );
     }
 
-    @Nonnull
     private String getWithoutColor() {
-        String result = String.format(Locale.ENGLISH, "%13.8f", satoshis * 1.0 / Coins.SATOSHIS_IN_COIN);
+        double coins = BigDecimal.valueOf(satoshis, COIN_SCALE).doubleValue();
+        String result = String.format(Locale.ENGLISH, "%13.8f", coins);
         StringBuilder suffix = new StringBuilder();
         while (result.endsWith("0")) {
             result = withoutLastCharacter(result);
