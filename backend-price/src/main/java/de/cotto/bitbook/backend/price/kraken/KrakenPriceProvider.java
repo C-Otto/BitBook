@@ -74,16 +74,12 @@ public class KrakenPriceProvider implements Provider<LocalDate, Collection<Price
     private Optional<Price> getPriceAverage(long startEpochSeconds, KrakenTradesDto krakenPricesDto) {
         BigDecimal totalVolume = getValidTradesStream(krakenPricesDto, startEpochSeconds)
                 .map(Trade::getVolume)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return getValidTradesStream(krakenPricesDto, startEpochSeconds)
+                .map(trade -> trade.getPrice().getAsBigDecimal().multiply(trade.getVolume()))
                 .reduce(BigDecimal::add)
-                .orElse(BigDecimal.ZERO);
-        if (totalVolume.compareTo(BigDecimal.ZERO) > 0) {
-            return getValidTradesStream(krakenPricesDto, startEpochSeconds)
-                    .map(trade -> trade.getPrice().getAsBigDecimal().multiply(trade.getVolume()))
-                    .reduce(BigDecimal::add)
-                    .map(bigDecimal -> bigDecimal.divide(totalVolume, RoundingMode.HALF_UP))
-                    .map(Price::of);
-        }
-        return Optional.empty();
+                .map(bigDecimal -> bigDecimal.divide(totalVolume, RoundingMode.HALF_UP))
+                .map(Price::of);
     }
 
     private Stream<Trade> getValidTradesStream(KrakenTradesDto krakenPricesDto, long startEpochSeconds) {
