@@ -96,7 +96,7 @@ class RequestWorkerTest {
 
     @Test
     void prefers_second_provider_after_failure_of_first_provider() {
-        when(provider1.get(any())).thenThrow(mock(FeignException.class));
+        when(provider1.get(any())).thenThrow(mock(RequestNotPermitted.class));
         request(2);
 
         verifyNoInteractions(provider1);
