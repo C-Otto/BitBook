@@ -43,6 +43,9 @@ class MultiAddressInputOutputDtoDeserializerTest {
 
     @Nested
     class GetInputs {
+
+        private static final String WITH_ONE_INPUT = "{\"inputs\":[{\"inputValue\": 0}]}";
+
         @Test
         void empty_no_node() throws JsonProcessingException {
             assertThat(get("{}")).isEmpty();
@@ -54,17 +57,33 @@ class MultiAddressInputOutputDtoDeserializerTest {
         }
 
         @Test
+        void mismatched_expected_number_of_inputs_empty() {
+            deserializer.setExpectedNumberOfInputs(0);
+            assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> get(WITH_ONE_INPUT));
+        }
+
+        @Test
         void mismatched_expected_number_of_inputs() {
-            deserializer.setExpectedNumberOfInputs(1);
-            assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() ->
-                    get("{\"inputs\":[]}")
-            );
+            deserializer.setExpectedNumberOfInputs(2);
+            assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> get(WITH_ONE_INPUT));
+        }
+
+        @Test
+        void matches_expected_number_of_inputs_empty() throws JsonProcessingException {
+            deserializer.setExpectedNumberOfInputs(0);
+            assertThat(get("{\"inputs\":[]}")).isEmpty();
         }
 
         @Test
         void matches_expected_number_of_inputs() throws JsonProcessingException {
-            deserializer.setExpectedNumberOfInputs(0);
-            assertThat(get("{\"inputs\":[]}")).isEmpty();
+            deserializer.setExpectedNumberOfInputs(1);
+            assertThat(get(WITH_ONE_INPUT)).hasSize(1);
+        }
+
+        @Test
+        void number_of_inputs_is_not_checked() throws JsonProcessingException {
+            deserializer.setExpectedNumberOfInputs(-1);
+            assertThat(get(WITH_ONE_INPUT)).hasSize(1);
         }
 
         @Test
@@ -76,7 +95,7 @@ class MultiAddressInputOutputDtoDeserializerTest {
 
         @Test
         void no_value_and_no_addresses_property() throws JsonProcessingException {
-            assertThat(get("{\"inputs\":[{\"inputValue\": 0}]}"))
+            assertThat(get(WITH_ONE_INPUT))
                     .usingRecursiveFieldByFieldElementComparator()
                     .containsExactly(new InputDto(Coins.NONE, ""));
         }
@@ -151,6 +170,9 @@ class MultiAddressInputOutputDtoDeserializerTest {
 
     @Nested
     class GetOutputs {
+
+        private static final String WITH_ONE_OUTPUT = "{\"outputs\":[{\"outputValue\": 0}]}";
+
         @Test
         void empty_no_node() throws JsonProcessingException {
             assertThat(get("{}")).isEmpty();
@@ -162,17 +184,33 @@ class MultiAddressInputOutputDtoDeserializerTest {
         }
 
         @Test
+        void mismatched_expected_number_of_outputs_empty() {
+            deserializer.setExpectedNumberOfOutputs(0);
+            assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> get(WITH_ONE_OUTPUT));
+        }
+
+        @Test
         void mismatched_expected_number_of_outputs() {
-            deserializer.setExpectedNumberOfOutputs(1);
-            assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() ->
-                    get("{\"outputs\":[]}")
-            );
+            deserializer.setExpectedNumberOfOutputs(2);
+            assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> get(WITH_ONE_OUTPUT));
+        }
+
+        @Test
+        void matches_expected_number_of_outputs_empty() throws JsonProcessingException {
+            deserializer.setExpectedNumberOfOutputs(0);
+            assertThat(get("{\"outputs\":[]}")).isEmpty();
         }
 
         @Test
         void matches_expected_number_of_outputs() throws JsonProcessingException {
-            deserializer.setExpectedNumberOfOutputs(0);
-            assertThat(get("{\"outputs\":[]}")).isEmpty();
+            deserializer.setExpectedNumberOfOutputs(1);
+            assertThat(get(WITH_ONE_OUTPUT)).hasSize(1);
+        }
+
+        @Test
+        void number_of_outputs_is_not_checked() throws JsonProcessingException {
+            deserializer.setExpectedNumberOfOutputs(-1);
+            assertThat(get(WITH_ONE_OUTPUT)).hasSize(1);
         }
 
         @Test
@@ -184,7 +222,7 @@ class MultiAddressInputOutputDtoDeserializerTest {
 
         @Test
         void no_value_and_no_addresses_property() throws JsonProcessingException {
-            assertThat(get("{\"outputs\":[{\"outputValue\": 0}]}"))
+            assertThat(get(WITH_ONE_OUTPUT))
                     .usingRecursiveFieldByFieldElementComparator()
                     .containsExactly(new OutputDto(Coins.NONE, ""));
         }
