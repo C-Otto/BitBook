@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.request.ResultFuture;
 import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,9 +13,7 @@ import java.util.concurrent.Executors;
 import static de.cotto.bitbook.backend.transaction.TransactionsRequestKeyFixtures.ADDRESS_TRANSACTIONS_REQUEST;
 import static de.cotto.bitbook.backend.transaction.TransactionsRequestKeyFixtures.TRANSACTIONS_REQUEST_KEY;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,21 +32,23 @@ class PrioritizingAddressTransactionsProviderTest {
     @Test
     void getAddressTransactions() {
         when(addressTransactionsProvider.get(TRANSACTIONS_REQUEST_KEY)).thenReturn(Optional.of(ADDRESS_TRANSACTIONS));
+
+        ResultFuture<AddressTransactions> resultFuture =
+                prioritizingPriceProvider.getAddressTransactions(ADDRESS_TRANSACTIONS_REQUEST);
         workOnRequestsInBackground();
 
-        Optional<AddressTransactions> result =
-                prioritizingPriceProvider.getAddressTransactions(ADDRESS_TRANSACTIONS_REQUEST).getResult();
-        assertThat(result).contains(ADDRESS_TRANSACTIONS);
+        assertThat(resultFuture.getResult()).contains(ADDRESS_TRANSACTIONS);
     }
 
     @Test
     void getAddressTransactions_failure() {
         when(addressTransactionsProvider.get(TRANSACTIONS_REQUEST_KEY)).thenReturn(Optional.empty());
+
+        ResultFuture<AddressTransactions> resultFuture =
+                prioritizingPriceProvider.getAddressTransactions(ADDRESS_TRANSACTIONS_REQUEST);
         workOnRequestsInBackground();
 
-        Optional<AddressTransactions> result =
-                prioritizingPriceProvider.getAddressTransactions(ADDRESS_TRANSACTIONS_REQUEST).getResult();
-        assertThat(result).isEmpty();
+        assertThat(resultFuture.getResult()).isEmpty();
     }
 
     @Test
@@ -56,10 +57,6 @@ class PrioritizingAddressTransactionsProviderTest {
     }
 
     private void workOnRequestsInBackground() {
-        executor.execute(() -> {
-            await().atMost(1, SECONDS)
-                    .until(() -> !prioritizingPriceProvider.getRequestQueue().isEmpty());
-            prioritizingPriceProvider.workOnRequests();
-        });
+        executor.execute(() -> prioritizingPriceProvider.workOnRequests());
     }
 }
