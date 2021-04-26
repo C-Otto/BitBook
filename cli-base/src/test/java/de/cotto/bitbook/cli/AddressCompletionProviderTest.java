@@ -70,6 +70,16 @@ class AddressCompletionProviderTest {
     }
 
     @Test
+    void complete_bc1_address() {
+        input = "bc1xxx";
+        when(context.currentWordUpToCursor()).thenReturn(input);
+        when(addressDescriptionService.get(ADDRESS)).thenReturn(addressWithDescription);
+        when(addressCompletionDao.completeFromAddressTransactions(input)).thenReturn(Set.of(ADDRESS));
+
+        assertThat(completionProvider.complete(methodParameter, context, hints)).isNotEmpty();
+    }
+
+    @Test
     void complete_address_from_input_output() {
         AddressWithDescription addressWithDescription = new AddressWithDescription(INPUT_ADDRESS_1, description);
         when(addressDescriptionService.get(INPUT_ADDRESS_1)).thenReturn(addressWithDescription);
