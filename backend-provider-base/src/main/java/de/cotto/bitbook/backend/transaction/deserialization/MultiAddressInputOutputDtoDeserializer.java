@@ -71,11 +71,11 @@ public class MultiAddressInputOutputDtoDeserializer implements InputOutputDtoDes
             int expected,
             BiFunction<Coins, String, T> inputOutputCreator
     ) {
-        List<T> result = new ArrayList<>();
         JsonNode inputsOrOutputs = transactionNode.get(inputOutputProperty);
         if (inputsOrOutputs == null) {
-            return result;
+            return List.of();
         }
+        List<T> result = new ArrayList<>();
         for (JsonNode inputOutputNode : inputsOrOutputs) {
             result.add(getInputOutputDto(inputOutputNode, valueProperty, addressesProperty, inputOutputCreator));
         }
