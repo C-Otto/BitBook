@@ -44,7 +44,7 @@ public class ClosedChannelsParser {
         for (JsonNode channelNode : channels) {
             allTransactionHashes.addAll(getValidTransactionHashes(channelNode));
         }
-        allTransactionHashes.parallelStream().forEach(transactionService::getTransactionDetails);
+        transactionService.getTransactionDetails(allTransactionHashes);
     }
 
     private ClosedChannel parseClosedChannel(JsonNode channelNode) {
