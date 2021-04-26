@@ -39,6 +39,11 @@ class BlockcypherAddressTransactionsProviderTest {
     private BlockcypherClient blockcypherClient;
 
     @Test
+    void getName() {
+        assertThat(provider.getName()).isEqualTo("BlockcypherAddressTransactionsProvider");
+    }
+
+    @Test
     void getAddressDetails() {
         when(blockcypherClient.getAllAddressDetails(ADDRESS))
                 .thenReturn(Optional.of(BLOCKCYPHER_ADDRESS_DETAILS));
