@@ -4,6 +4,7 @@ plugins {
     id 'bitbook.errorprone'
     id 'bitbook.checkstyle'
     id 'bitbook.tests'
+    id 'bitbook.mutationtests'
     id 'bitbook.integration-tests'
     id 'bitbook.spotbugs'
     id 'bitbook.pmd'

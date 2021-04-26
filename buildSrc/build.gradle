@@ -13,4 +13,5 @@ dependencies {
     implementation 'gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.7.0'
     implementation 'org.springframework.boot:spring-boot-gradle-plugin:2.4.5'
     implementation 'com.adarshr:gradle-test-logger-plugin:3.0.0'
+    implementation 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.6.0'
 }
