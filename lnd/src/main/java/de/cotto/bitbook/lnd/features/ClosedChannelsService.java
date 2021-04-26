@@ -36,13 +36,14 @@ public class ClosedChannelsService {
     }
 
     public long addFromClosedChannels(Set<ClosedChannel> closedChannels) {
-        return closedChannels.parallelStream()
+        Set<ClosedChannel> validClosedChannels = closedChannels.stream()
                 .filter(ClosedChannel::isValid)
-                .map(this::addFromClosedChannel)
-                .count();
+                .collect(Collectors.toSet());
+        validClosedChannels.forEach(this::addFromClosedChannel);
+        return validClosedChannels.size();
     }
 
-    private ClosedChannel addFromClosedChannel(ClosedChannel closedChannel) {
+    private void addFromClosedChannel(ClosedChannel closedChannel) {
         String channelAddress = closedChannel.getChannelAddress();
         String remotePubkey = closedChannel.getRemotePubkey();
 
@@ -51,7 +52,6 @@ public class ClosedChannelsService {
         setOtherOutputAsForeignForCooperativeClose(closedChannel);
         setChannelAddressOwnershipAndDescription(channelAddress, closedChannel.getOpenInitiator(), remotePubkey);
         addFromHtlcSweepTransactions(closedChannel);
-        return closedChannel;
     }
 
     private void setTransactionDescriptions(ClosedChannel closedChannel) {
