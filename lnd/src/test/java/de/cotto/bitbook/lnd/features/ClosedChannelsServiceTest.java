@@ -21,6 +21,7 @@ import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.AMBIGUOUS_SETTLEM
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.CLOSED_CHANNEL;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.SWEEP_TRANSACTION_HASH;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.WITH_RESOLUTION;
+import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.WITH_RESOLUTION_BLANK_HASH;
 import static de.cotto.bitbook.lnd.model.Initiator.LOCAL;
 import static de.cotto.bitbook.lnd.model.Initiator.REMOTE;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
@@ -185,6 +186,12 @@ public class ClosedChannelsServiceTest {
     void adds_from_sweep_transactions_in_htlc_resolutions() {
         load(WITH_RESOLUTION);
         verify(sweepTransactionsService).addFromSweeps(Set.of(SWEEP_TRANSACTION_HASH));
+    }
+
+    @Test
+    void ignores_blank_sweep_transaction_in_htlc_resolutions() {
+        load(WITH_RESOLUTION_BLANK_HASH);
+        verify(sweepTransactionsService).addFromSweeps(Set.of());
     }
 
     private void load(ClosedChannel closedChannel) {
