@@ -44,11 +44,23 @@ class AddressTransactionsTest {
     @Test
     void testToString_many_transactions() {
         AddressTransactions addressTransactions =
-                new AddressTransactions(ADDRESS, oneThousandStrings(), LAST_CHECKED_AT_BLOCK_HEIGHT);
+                new AddressTransactions(ADDRESS, manyStrings(10), LAST_CHECKED_AT_BLOCK_HEIGHT);
         assertThat(addressTransactions).hasToString(
                 "AddressTransactions{" +
                 "address='" + ADDRESS + "'" +
-                ", transactionHashes='(1000 transactions)'" +
+                ", transactionHashes='" + addressTransactions.getTransactionHashes() + "'" +
+                ", lastCheckedAtBlockHeight='678123'" +
+                "}");
+    }
+
+    @Test
+    void testToString_too_many_transactions() {
+        AddressTransactions addressTransactions =
+                new AddressTransactions(ADDRESS, manyStrings(11), LAST_CHECKED_AT_BLOCK_HEIGHT);
+        assertThat(addressTransactions).hasToString(
+                "AddressTransactions{" +
+                "address='" + ADDRESS + "'" +
+                ", transactionHashes='(11 transactions)'" +
                 ", lastCheckedAtBlockHeight='678123'" +
                 "}");
     }
@@ -111,9 +123,9 @@ class AddressTransactionsTest {
         assertThat(ADDRESS_TRANSACTIONS.getCombined(update)).isEqualTo(ADDRESS_TRANSACTIONS);
     }
 
-    private Set<String> oneThousandStrings() {
+    private Set<String> manyStrings(int howMany) {
         Set<String> result = new LinkedHashSet<>();
-        for (int i = 0; i < 1_000; i++) {
+        for (int i = 0; i < howMany; i++) {
             result.add(String.valueOf(i));
         }
         return result;
