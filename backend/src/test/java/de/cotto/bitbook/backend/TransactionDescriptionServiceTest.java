@@ -75,7 +75,7 @@ class TransactionDescriptionServiceTest {
 
     @Test
     void getWithDescriptionInfix() {
-        String infix = "infix";
+        String infix = "abc";
         TransactionWithDescription expected = new TransactionWithDescription("x", "y");
         when(dao.findWithDescriptionInfix(infix)).thenReturn(Set.of(expected));
         assertThat(service.getWithDescriptionInfix(infix)).containsExactly(expected);
