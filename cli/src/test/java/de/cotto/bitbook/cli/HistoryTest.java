@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,6 +24,11 @@ class HistoryTest {
     @BeforeEach
     void setUp() {
         historyPath = new History(lineReader, "historyPath");
+    }
+
+    @Test
+    void setsHistoryFile() {
+        verify(lineReader).setVariable("history-file", Paths.get("historyPath"));
     }
 
     @Test
