@@ -5,8 +5,6 @@ import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -16,7 +14,6 @@ public class SweepTransactionsService {
     private static final String SWEEP_TRANSACTION_DESCRIPTION = "lnd sweep transaction";
     private static final String DEFAULT_ADDRESS_DESCRIPTION = "lnd";
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final TransactionService transactionService;
     private final AddressDescriptionService addressDescriptionService;
     private final AddressOwnershipService addressOwnershipService;
@@ -35,21 +32,12 @@ public class SweepTransactionsService {
     }
 
     public long addFromSweeps(Set<String> hashes) {
-        return hashes.stream()
-                .map(this::getGetTransactionDetails)
+        return transactionService.getTransactionDetails(hashes).stream()
                 .filter(this::isSweepTransaction)
                 .map(this::addTransactionDescription)
                 .map(this::addAddressDescriptions)
                 .map(this::setAddressesAsOwned)
                 .count();
-    }
-
-    private Transaction getGetTransactionDetails(String transactionHash) {
-        Transaction transactionDetails = transactionService.getTransactionDetails(transactionHash);
-        if (transactionDetails.isInvalid()) {
-            logger.warn("Unable to find transaction {}", transactionHash);
-        }
-        return transactionDetails;
     }
 
     private boolean isSweepTransaction(Transaction transaction) {
