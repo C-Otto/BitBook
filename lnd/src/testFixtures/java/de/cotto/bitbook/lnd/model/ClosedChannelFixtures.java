@@ -6,6 +6,7 @@ import de.cotto.bitbook.backend.transaction.model.Output;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 
 import java.util.List;
+import java.util.Set;
 
 import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_2;
@@ -81,6 +82,6 @@ public class ClosedChannelFixtures {
             .withSettledBalance(SETTLED_BALANCE)
             .withOpenInitiator(OPEN_INITIATOR)
             .withCloseType(CloseType.COOPERATIVE_REMOTE)
-            .withResolution(new Resolution(SWEEP_TRANSACTION_HASH))
+            .withResolutions(Set.of(new Resolution(SWEEP_TRANSACTION_HASH)))
             .build();
 }
