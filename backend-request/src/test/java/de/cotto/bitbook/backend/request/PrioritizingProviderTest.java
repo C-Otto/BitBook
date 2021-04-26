@@ -153,13 +153,28 @@ class PrioritizingProviderTest {
     }
 
     @Test
-    void merges_with_already_running_request() {
-        prioritizingProvider.getForRequest(request("wait", LOWEST));
+    void merges_with_already_running_request_with_same_key() {
+        String key = "wait";
+        ResultFuture<Integer> result1 = prioritizingProvider.getForRequest(request(key, LOWEST));
         workOnExpectedRequests(1);
         await().atMost(1, SECONDS).until(() -> !prioritizingProvider.runningRequests.isEmpty());
-        Optional<Integer> resultFromSecondRequest =
-                prioritizingProvider.getForRequestBlocking(request("wait", STANDARD));
-        assertThat(resultFromSecondRequest).contains(4);
+        ResultFuture<Integer> result2 =
+                prioritizingProvider.getForRequest(request(key, STANDARD));
+        assertThat(result1.getResult()).contains(4);
+        assertThat(result2.getResult()).contains(4);
+    }
+
+    @Test
+    void does_not_merge_with_already_running_request_with_different_key() throws Exception {
+        ResultFuture<Integer> result1 = prioritizingProvider.getForRequest(request("wait", LOWEST));
+        workOnExpectedRequests(1);
+        await().atMost(1, SECONDS).until(() -> !prioritizingProvider.runningRequests.isEmpty());
+
+        ResultFuture<Integer> result2 =
+                prioritizingProvider.getForRequest(request("something-else", LOWEST));
+
+        assertThat(result1.getFuture().get(1, SECONDS)).isEqualTo(4);
+        assertThat(result2.getFuture().get(1, SECONDS)).isNotEqualTo(4);
     }
 
     @Test
