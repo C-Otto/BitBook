@@ -35,7 +35,7 @@ public class ChannelsParser {
         for (JsonNode channelNode : channels) {
             hashes.add(getOpeningTransactionHash(channelNode));
         }
-        hashes.parallelStream().forEach(transactionService::getTransactionDetails);
+        transactionService.getTransactionDetails(hashes);
     }
 
     private Channel parseChannel(JsonNode channelNode) {
