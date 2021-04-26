@@ -156,6 +156,31 @@ class BlockcypherAddressTransactionsDtoTest {
     }
 
     @Test
+    void deserialization_has_more_false() throws Exception {
+        String json = """
+                {
+                   "address": "%s",
+                   "txrefs": [],
+                   "hasMore": false
+                }""".formatted(ADDRESS);
+        BlockcypherAddressTransactionsDto blockcypherTransactionDto =
+                objectMapper.readValue(json, BlockcypherAddressTransactionsDto.class);
+        assertThat(blockcypherTransactionDto.isIncomplete()).isFalse();
+    }
+
+    @Test
+    void deserialization_has_more_field_not_set() throws Exception {
+        String json = """
+                {
+                   "address": "%s",
+                   "txrefs": []
+                }""".formatted(ADDRESS);
+        BlockcypherAddressTransactionsDto blockcypherTransactionDto =
+                objectMapper.readValue(json, BlockcypherAddressTransactionsDto.class);
+        assertThat(blockcypherTransactionDto.isIncomplete()).isFalse();
+    }
+
+    @Test
     void deserialization_lowest_completed_block_height_no_transaction() throws Exception {
         String json = """
                 {
