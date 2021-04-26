@@ -13,6 +13,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class DefaultInputOutputDtoDeserializerTest {
+    private static final String ERROR_EXPECTED_ADDRESS = "expected address";
+    private static final String ERROR_EXPECTED_VALUE = "expected input/output value";
+    private static final String ERROR_UNKNOWN_ADDRESS_FORMAT = "unknown address format";
+
     private final TestableDeserializer deserializer = new TestableDeserializer();
 
     @Test
@@ -95,7 +99,7 @@ class DefaultInputOutputDtoDeserializerTest {
         void value_but_no_address() {
             assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() ->
                     get("{\"inputs\":[{\"inputValue\": 1}]}")
-            );
+            ).withMessage(ERROR_EXPECTED_ADDRESS);
         }
 
         @Test
@@ -109,14 +113,14 @@ class DefaultInputOutputDtoDeserializerTest {
         void no_value_and_address_is_something_else() {
             assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() ->
                     get("{\"inputs\":[{\"inputValue\": 1, \"addr\": 5}]}")
-            );
+            ).withMessage(ERROR_EXPECTED_ADDRESS);
         }
 
         @Test
         void no_value_and_address_is_array() {
             assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() ->
                     get("{\"inputs\":[{\"inputValue\": 1, \"addr\": [\"x\"]}]}")
-            );
+            ).withMessage(ERROR_EXPECTED_ADDRESS);
         }
 
         @Test
@@ -144,14 +148,14 @@ class DefaultInputOutputDtoDeserializerTest {
         void unsupported() {
             assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() ->
                     get("{\"inputs\":[{\"inputValue\": 1, \"addr\": \"m-123\"}]}")
-            );
+            ).withMessage(ERROR_UNKNOWN_ADDRESS_FORMAT);
         }
 
         @Test
         void address_but_no_value() {
             assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() ->
                     get("{\"inputs\":[{\"addr\": \"xxx\"}]}")
-            );
+            ).withMessage(ERROR_EXPECTED_VALUE);
         }
 
         @Test
@@ -189,7 +193,7 @@ class DefaultInputOutputDtoDeserializerTest {
         void value_but_no_address() {
             assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() ->
                     get("{\"outputs\":[{\"outputValue\": 1}]}")
-            );
+            ).withMessage(ERROR_EXPECTED_ADDRESS);
         }
 
         @Test
@@ -203,14 +207,14 @@ class DefaultInputOutputDtoDeserializerTest {
         void no_value_and_address_is_something_else() {
             assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() ->
                     get("{\"outputs\":[{\"outputValue\": 1, \"addr\": 5}]}")
-            );
+            ).withMessage(ERROR_EXPECTED_ADDRESS);
         }
 
         @Test
         void no_value_and_address_is_array() {
             assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() ->
                     get("{\"outputs\":[{\"outputValue\": 1, \"addr\": [\"x\"]}]}")
-            );
+            ).withMessage(ERROR_EXPECTED_ADDRESS);
         }
 
         @Test
@@ -238,14 +242,14 @@ class DefaultInputOutputDtoDeserializerTest {
         void unsupported() {
             assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() ->
                     get("{\"outputs\":[{\"outputValue\": 1, \"addr\": \"m-123\"}]}")
-            );
+            ).withMessage(ERROR_UNKNOWN_ADDRESS_FORMAT);
         }
 
         @Test
         void address_but_no_value() {
             assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() ->
                     get("{\"outputs\":[{\"addr\": \"xxx\"}]}")
-            );
+            ).withMessage(ERROR_EXPECTED_VALUE);
         }
 
         @Test
