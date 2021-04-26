@@ -1,8 +1,5 @@
 plugins {
     id 'java'
-}
-
-plugins {
     id 'com.adarshr.test-logger'
 }
 
