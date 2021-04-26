@@ -199,11 +199,6 @@ public class ClosedChannel {
             return this;
         }
 
-        public ClosedChannelBuilder withResolution(Resolution resolution) {
-            this.resolutions.add(resolution);
-            return this;
-        }
-
         public ClosedChannelBuilder withResolutions(Set<Resolution> resolutions) {
             this.resolutions = resolutions;
             return this;
