@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -23,21 +22,10 @@ public class PrioritizingProvider<K, R> {
     protected final Queue<PrioritizedRequestWithResult<K, R>> requestQueue;
     protected final List<PrioritizedRequestWithResult<K, R>> runningRequests;
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final AtomicBoolean workOnRequestsIsDisabled;
     private final String providedResultName;
     private final RequestWorker<K, R> requestWorker;
 
     protected PrioritizingProvider(List<? extends Provider<K, R>> providers, String providedResultName) {
-        this(new AtomicBoolean(false), providers, providedResultName);
-    }
-
-    @VisibleForTesting
-    PrioritizingProvider(
-            AtomicBoolean workOnRequestsIsDisabled,
-            List<? extends Provider<K, R>> providers,
-            String providedResultName
-    ) {
-        this.workOnRequestsIsDisabled = workOnRequestsIsDisabled;
         requestQueue = QueueUtils.synchronizedQueue(new PriorityQueue<>());
         runningRequests = Collections.synchronizedList(new ArrayList<>());
         this.providedResultName = providedResultName;
@@ -63,13 +51,10 @@ public class PrioritizingProvider<K, R> {
 
     @Scheduled(fixedDelay = 100)
     public void workOnRequests() {
-        if (workOnRequestsIsDisabled.get()) {
-            return;
-        }
-        PrioritizedRequestWithResult<K, R> prioritizedRequestWithResult;
         if (logger.isDebugEnabled() && !requestQueue.isEmpty()) {
             logger.debug("Queue size: {}", requestQueue.size());
         }
+        PrioritizedRequestWithResult<K, R> prioritizedRequestWithResult;
         do {
             prioritizedRequestWithResult = requestQueue.poll();
             if (prioritizedRequestWithResult != null) {

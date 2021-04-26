@@ -2,7 +2,6 @@ package de.cotto.bitbook.backend.request;
 
 import de.cotto.bitbook.backend.Provider;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,17 +9,12 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
@@ -42,33 +36,26 @@ class PrioritizingProviderIT {
     @Autowired
     private List<RequestWorker<?, ?>> requestWorkers;
 
-    @Autowired
-    private ThreadPoolTaskExecutor taskExecutor;
-
     private ProviderForTest provider1;
     private ProviderForTest provider2;
 
     @BeforeEach
     void setUp() {
-        PrioritizingProviderForTest.WORK_ON_REQUESTS_IS_DISABLED.set(true);
         prioritizingProvider.requestQueue.clear();
         requestWorkers.forEach(RequestWorker::resetScores);
         providers.forEach(provider -> provider.seenKeys.clear());
         provider1 = providers.get(0);
         provider2 = providers.get(1);
+        provider2.disabled = true;
     }
 
     @Test
     void requests_are_ordered_by_priority() {
-        provider2.disabled = true;
-        executor.execute(
-                () -> {
-                    prioritizingProvider.getForRequestBlocking(new PrioritizedRequest<>("lowest", LOWEST));
-                    prioritizingProvider.getForRequestBlocking(new PrioritizedRequest<>("standard", STANDARD));
-                }
-        );
-        await().atMost(1, SECONDS).until(() -> prioritizingProvider.requestQueue.size() == 2);
-        workOnScheduledTasks();
+        synchronized (prioritizingProvider.requestQueue) {
+            addToQueue(new PrioritizedRequest<>("lowest", LOWEST));
+            addToQueue(new PrioritizedRequest<>("standard", STANDARD));
+        }
+        assertThat(prioritizingProvider.requestQueue).hasSize(2);
         await().atMost(2, SECONDS).untilAsserted(
                 () -> assertThat(provider1.seenKeys).containsExactly("standard", "lowest")
         );
@@ -76,10 +63,10 @@ class PrioritizingProviderIT {
 
     @Test
     void providers_are_used_in_order() {
+        provider2.disabled = false;
         executor.execute(
                 () -> prioritizingProvider.getForRequestBlocking(new PrioritizedRequest<>("xxx", STANDARD))
         );
-        workOnScheduledTasks();
         await().atMost(1, SECONDS).untilAsserted(
                 () -> {
                     assertThat(provider1.seenKeys).containsExactly("xxx");
@@ -138,10 +125,6 @@ class PrioritizingProviderIT {
         }
     }
 
-    private void workOnScheduledTasks() {
-        PrioritizingProviderForTest.WORK_ON_REQUESTS_IS_DISABLED.set(false);
-    }
-
     @TestConfiguration
     static class TestConfig {
         @Bean
@@ -161,50 +144,30 @@ class PrioritizingProviderIT {
     }
 
     private static class PrioritizingProviderForTest extends PrioritizingProvider<String, Integer> {
-        private static final AtomicBoolean WORK_ON_REQUESTS_IS_DISABLED = new AtomicBoolean(true);
-
         private PrioritizingProviderForTest(List<ProviderForTest> providers) {
-            super(WORK_ON_REQUESTS_IS_DISABLED, providers, "");
+            super(providers, "");
         }
     }
 
-    @Nested
-    class ReusesRequest {
-        private static final String KEY = "sleep";
+    @Test
+    void reuses_already_running_request() throws Exception {
+        String key = "sleep";
+        // Submit two requests. Make sure second request is added after first is started.
+        PrioritizedRequest<String, Integer> firstRequest = new PrioritizedRequest<>(key, STANDARD);
+        PrioritizedRequest<String, Integer> secondRequest = new PrioritizedRequest<>(key, LOWEST);
+        ResultFuture<Integer> future1 = prioritizingProvider.getForRequest(firstRequest);
+        ResultFuture<Integer> future2 = prioritizingProvider.getForRequest(secondRequest);
+        await().until(() -> !provider1.seenKeys.isEmpty());
 
-        private Optional<Integer> requestInParallel() throws InterruptedException {
-            // Submit two requests. Make sure second request is added after first is started.
-            AtomicBoolean standardRequestDone = new AtomicBoolean(false);
-            AtomicReference<Optional<Integer>> resultStandardRequest = new AtomicReference<>();
-            taskExecutor.execute(() -> {
-                PrioritizedRequest<String, Integer> requestStandard = new PrioritizedRequest<>(KEY, STANDARD);
-                resultStandardRequest.set(prioritizingProvider.getForRequestBlocking(requestStandard));
-                standardRequestDone.set(true);
-            });
-            workOnScheduledTasks();
-            await().until(() -> !provider1.seenKeys.isEmpty() || !provider2.seenKeys.isEmpty());
-            prioritizingProvider.getForRequestBlocking(new PrioritizedRequest<>(KEY, LOWEST));
+        // Wait until both are done so that we can assert only one (the first) hits the provider.
+        Integer result1 = future1.getFuture().get(1, SECONDS);
+        Integer result2 = future2.getFuture().get(1, SECONDS);
 
-            // Wait until both are done so that we can assert only one (the first) hits the network.
-            await().until(standardRequestDone::get);
-            waitForExecutorToFinish(500);
+        assertThat(provider1.seenKeys).hasSize(1);
+        assertThat(result1).isEqualTo(result2).isEqualTo(key.length());
+    }
 
-            return Objects.requireNonNull(resultStandardRequest.get());
-        }
-
-        @Test
-        void reuses_already_running_request() throws Exception {
-            Optional<Integer> result = requestInParallel();
-            List<String> seenKeys = new ArrayList<>(provider1.seenKeys);
-            seenKeys.addAll(provider2.seenKeys);
-            assertThat(seenKeys).hasSize(1);
-            assertThat(result).contains(KEY.length());
-        }
-
-        @SuppressWarnings("SameParameterValue")
-        private void waitForExecutorToFinish(int milliseconds) throws InterruptedException {
-            //noinspection ResultOfMethodCallIgnored
-            taskExecutor.getThreadPoolExecutor().awaitTermination(milliseconds, TimeUnit.MILLISECONDS);
-        }
+    private void addToQueue(PrioritizedRequest<String, Integer> request) {
+        prioritizingProvider.requestQueue.offer(request.getWithResultFuture());
     }
 }
