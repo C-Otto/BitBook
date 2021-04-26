@@ -2,7 +2,6 @@ package de.cotto.bitbook.backend.request;
 
 import de.cotto.bitbook.backend.Provider;
 import feign.FeignException;
-import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -28,15 +27,13 @@ import static org.mockito.Mockito.when;
 class PrioritizingProviderTest {
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
 
-    private TestableProvider provider1;
-    private TestableProvider provider2;
+    private TestableProvider provider;
     private TestablePrioritizingProvider prioritizingProvider;
 
     @BeforeEach
     void setUp() {
-        provider1 = spy(new TestableProvider());
-        provider2 = spy(new TestableProvider());
-        prioritizingProvider = new TestablePrioritizingProvider(List.of(provider1, provider2));
+        provider = spy(new TestableProvider());
+        prioritizingProvider = new TestablePrioritizingProvider(List.of(provider));
     }
 
     @Test
@@ -49,8 +46,7 @@ class PrioritizingProviderTest {
     @Test
     void all_providers_fail() {
         workOnExpectedRequests(1);
-        when(provider1.get(any())).thenThrow(mock(FeignException.class));
-        when(provider2.get(any())).thenThrow(mock(CallNotPermittedException.class));
+        when(provider.get(any())).thenThrow(mock(FeignException.class));
         Optional<Integer> result = prioritizingProvider.getForRequestBlocking(request("xyz", STANDARD));
         assertThat(result).isEmpty();
     }
@@ -58,8 +54,7 @@ class PrioritizingProviderTest {
     @Test
     void all_providers_fail_removes_low_priority_requests_from_queue() {
         workOnExpectedRequests(2);
-        when(provider1.get(any())).thenThrow(mock(FeignException.class));
-        when(provider2.get(any())).thenThrow(mock(CallNotPermittedException.class));
+        when(provider.get(any())).thenThrow(mock(FeignException.class));
         prioritizingProvider.getForRequestBlocking(request("yyy", LOWEST));
 
         Optional<Integer> result = prioritizingProvider.getForRequestBlocking(request("...", STANDARD));
@@ -71,8 +66,7 @@ class PrioritizingProviderTest {
     @Test
     void all_providers_fail_retains_standard_priority_request() {
         workOnExpectedRequests(2);
-        when(provider1.get(any())).thenThrow(mock(FeignException.class));
-        when(provider2.get(any())).thenThrow(mock(CallNotPermittedException.class));
+        when(provider.get(any())).thenThrow(mock(FeignException.class));
         executor.execute(() -> {
             await().atMost(1, SECONDS).until(() -> prioritizingProvider.requestQueue.size() == 1);
             prioritizingProvider.getForRequestBlocking(request("anotherRequest", STANDARD));
@@ -82,15 +76,14 @@ class PrioritizingProviderTest {
         assertThat(result).isEmpty();
 
         await().atMost(1, SECONDS).untilAsserted(() -> {
-                verify(provider1).get("request");
-                verify(provider1).get("anotherRequest");
+                verify(provider).get("request");
+                verify(provider).get("anotherRequest");
             }
         );
     }
 
     @Test
     void merges_requests_with_same_key_and_priority() {
-        when(provider2.get(any())).thenThrow(mock(CallNotPermittedException.class));
         prioritizingProvider.getForRequestBlocking(request("a", LOWEST));
         prioritizingProvider.getForRequestBlocking(request("bb", LOWEST));
         prioritizingProvider.getForRequestBlocking(request("ccc", LOWEST));
@@ -98,18 +91,17 @@ class PrioritizingProviderTest {
         prioritizingProvider.workOnRequests();
 
         await().atMost(1, SECONDS).until(prioritizingProvider.requestQueue::isEmpty);
-        assertThat(provider1.seenKeys).hasSize(3);
+        assertThat(provider.seenKeys).hasSize(3);
     }
 
     @Test
     void does_not_merge_requests_with_different_keys() {
-        when(provider2.get(any())).thenThrow(mock(CallNotPermittedException.class));
         workOnExpectedRequests(2);
         executor.execute(() -> prioritizingProvider.getForRequestBlocking(request("a", STANDARD)));
         executor.execute(() -> prioritizingProvider.getForRequestBlocking(request("bb", STANDARD)));
         await().atMost(1, SECONDS).untilAsserted(() -> {
-                synchronized (provider1.seenKeys) {
-                    assertThat(provider1.seenKeys).hasSize(2);
+                synchronized (provider.seenKeys) {
+                    assertThat(provider.seenKeys).hasSize(2);
                 }
             }
         );
@@ -117,7 +109,6 @@ class PrioritizingProviderTest {
 
     @Test
     void merges_low_priority_requests_into_standard_priority_request() {
-        when(provider2.get(any())).thenThrow(mock(CallNotPermittedException.class));
         executor.execute(() -> prioritizingProvider.getForRequestBlocking(request("a", STANDARD)));
         executor.execute(() -> {
             await().until(() -> prioritizingProvider.requestQueue.size() > 0);
@@ -125,13 +116,12 @@ class PrioritizingProviderTest {
             prioritizingProvider.workOnRequests();
         });
         await().atMost(1, SECONDS).untilAsserted(() ->
-            assertThat(provider1.seenKeys).hasSize(1)
+            assertThat(provider.seenKeys).hasSize(1)
         );
     }
 
     @Test
     void replaces_low_priority_requests_with_standard_priority_request() {
-        when(provider2.get(any())).thenThrow(mock(CallNotPermittedException.class));
         executor.execute(() -> {
             await().until(() -> prioritizingProvider.requestQueue.stream()
                     .anyMatch(request -> request.getPriority() == STANDARD));
@@ -145,10 +135,10 @@ class PrioritizingProviderTest {
             prioritizingProvider.getForRequestBlocking(request("a", STANDARD));
         });
         await().atMost(1, SECONDS).untilAsserted(() ->
-                assertThat(provider1.seenKeys).startsWith("a")
+                assertThat(provider.seenKeys).startsWith("a")
         );
         await().pollDelay(200, MILLISECONDS).atMost(1, SECONDS).untilAsserted(() ->
-                assertThat(provider1.seenKeys).hasSize(3)
+                assertThat(provider.seenKeys).hasSize(3)
         );
     }
 
@@ -160,8 +150,8 @@ class PrioritizingProviderTest {
         await().atMost(1, SECONDS).until(() -> !prioritizingProvider.runningRequests.isEmpty());
         ResultFuture<Integer> result2 =
                 prioritizingProvider.getForRequest(request(key, STANDARD));
-        assertThat(result1.getResult()).contains(4);
-        assertThat(result2.getResult()).contains(4);
+        assertThat(result1.getResult()).isEqualTo(result2.getResult()).contains(4);
+        assertThat(provider.seenKeys).hasSize(1);
     }
 
     @Test
@@ -179,14 +169,13 @@ class PrioritizingProviderTest {
 
     @Test
     void worksOnQueue() {
-        when(provider2.get(any())).thenThrow(mock(CallNotPermittedException.class));
         prioritizingProvider.getForRequestBlocking(request("lowest", LOWEST));
         executor.execute(() -> prioritizingProvider.getForRequestBlocking(request("standard", STANDARD)));
 
         workOnExpectedRequests(2);
         await().atMost(1, SECONDS).untilAsserted(() -> {
-                synchronized (provider1.seenKeys) {
-                    assertThat(provider1.seenKeys).containsExactly("standard", "lowest");
+                synchronized (provider.seenKeys) {
+                    assertThat(provider.seenKeys).containsExactly("standard", "lowest");
                 }
             }
         );

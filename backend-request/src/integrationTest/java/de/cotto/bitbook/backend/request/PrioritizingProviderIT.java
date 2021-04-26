@@ -149,24 +149,6 @@ class PrioritizingProviderIT {
         }
     }
 
-    @Test
-    void reuses_already_running_request() throws Exception {
-        String key = "sleep";
-        // Submit two requests. Make sure second request is added after first is started.
-        PrioritizedRequest<String, Integer> firstRequest = new PrioritizedRequest<>(key, STANDARD);
-        PrioritizedRequest<String, Integer> secondRequest = new PrioritizedRequest<>(key, LOWEST);
-        ResultFuture<Integer> future1 = prioritizingProvider.getForRequest(firstRequest);
-        ResultFuture<Integer> future2 = prioritizingProvider.getForRequest(secondRequest);
-        await().until(() -> !provider1.seenKeys.isEmpty());
-
-        // Wait until both are done so that we can assert only one (the first) hits the provider.
-        Integer result1 = future1.getFuture().get(1, SECONDS);
-        Integer result2 = future2.getFuture().get(1, SECONDS);
-
-        assertThat(provider1.seenKeys).hasSize(1);
-        assertThat(result1).isEqualTo(result2).isEqualTo(key.length());
-    }
-
     private void addToQueue(PrioritizedRequest<String, Integer> request) {
         prioritizingProvider.requestQueue.offer(request.getWithResultFuture());
     }
