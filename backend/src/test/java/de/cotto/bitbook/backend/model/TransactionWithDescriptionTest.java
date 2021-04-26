@@ -74,6 +74,19 @@ class TransactionWithDescriptionTest {
     }
 
     @Test
+    void testToString_max_length() {
+        TransactionWithDescription transactionWithDescription = new TransactionWithDescription(
+                TRANSACTION_WITH_DESCRIPTION.getTransactionHash(),
+                "abcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaXZ"
+        );
+        assertThat(transactionWithDescription).hasToString(
+                transactionWithDescription.getTransactionHash() +
+                " " +
+                "abcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaXZ"
+        );
+    }
+
+    @Test
     void testToString_without_description() {
         assertThat(new TransactionWithDescription("x"))
                 .hasToString("x ");

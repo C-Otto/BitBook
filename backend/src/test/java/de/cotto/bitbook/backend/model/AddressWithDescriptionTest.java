@@ -75,6 +75,19 @@ class AddressWithDescriptionTest {
     }
 
     @Test
+    void testToString_max_length() {
+        AddressWithDescription addressWithDescription = new AddressWithDescription(
+                "abcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaXaaaaXZ",
+                ADDRESS_WITH_DESCRIPTION.getDescription()
+        );
+        assertThat(addressWithDescription).hasToString(
+                "abcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaXaaaaXZ" +
+                " " +
+                addressWithDescription.getDescription()
+        );
+    }
+
+    @Test
     void testToString_long_description() {
         AddressWithDescription addressWithDescription = new AddressWithDescription(
                 ADDRESS_WITH_DESCRIPTION.getAddress(),
