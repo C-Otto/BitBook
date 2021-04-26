@@ -28,7 +28,6 @@ public class PrioritizedRequestWithResult<K, R> extends ResultFuture<R>
         PrioritizedRequestWithResult<K, R> replacementRequest =
                 new PrioritizedRequestWithResult<>(key, priority.getHighestPriority(newRequest.getPriority()));
         replacementRequest.addResultListener(this);
-        replacementRequest.addResultListener(newRequest.getWithResultFuture());
         return replacementRequest;
     }
 
