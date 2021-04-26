@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.price;
 
 import de.cotto.bitbook.backend.price.model.Price;
 import de.cotto.bitbook.backend.price.model.PriceWithDate;
+import de.cotto.bitbook.backend.request.ResultFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,9 +14,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,21 +35,23 @@ class PrioritizingPriceProviderTest {
     void getPrices() {
         PriceWithDate expected = new PriceWithDate(Price.of(2), DATE);
         when(priceProvider.get(DATE)).thenReturn(Optional.of(Set.of(expected)));
-        workOnRequestsInBackground();
 
         PriceRequest request = PriceRequest.forDateStandardPriority(DATE);
-        Collection<PriceWithDate> result = prioritizingPriceProvider.getPrices(request).getResult().orElseThrow();
-        assertThat(result).contains(expected);
+        ResultFuture<Collection<PriceWithDate>> resultFuture = prioritizingPriceProvider.getPrices(request);
+        workOnRequestsInBackground();
+
+        assertThat(resultFuture.getResult().orElseThrow()).contains(expected);
     }
 
     @Test
     void getPrices_failure() {
         when(priceProvider.get(DATE)).thenReturn(Optional.empty());
-        workOnRequestsInBackground();
 
         PriceRequest request = PriceRequest.forDateStandardPriority(DATE);
-        Optional<Collection<PriceWithDate>> result = prioritizingPriceProvider.getPrices(request).getResult();
-        assertThat(result).isEmpty();
+        ResultFuture<Collection<PriceWithDate>> resultFuture = prioritizingPriceProvider.getPrices(request);
+        workOnRequestsInBackground();
+
+        assertThat(resultFuture.getResult()).isEmpty();
     }
 
     @Test
@@ -59,10 +60,6 @@ class PrioritizingPriceProviderTest {
     }
 
     private void workOnRequestsInBackground() {
-        executor.execute(() -> {
-            await().atMost(2, SECONDS)
-                    .until(() -> !prioritizingPriceProvider.getRequestQueue().isEmpty());
-            prioritizingPriceProvider.workOnRequests();
-        });
+        executor.execute(() -> prioritizingPriceProvider.workOnRequests());
     }
 }
