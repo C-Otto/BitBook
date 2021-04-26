@@ -113,6 +113,17 @@ class KrakenPriceProviderTest {
     }
 
     @Test
+    void getPriceTwoYearsAgo_only_zero_volume_trade() {
+        LocalDate twoYearsAgo = now().minusYears(2);
+        long expectedSinceEpochSeconds = twoYearsAgo.atStartOfDay().toEpochSecond(ZoneOffset.UTC);
+        Optional<KrakenTradesDto> mockedTrades = mockTradesWithZeroVolume(expectedSinceEpochSeconds);
+        when(krakenClient.getTrades(anyLong())).thenReturn(mockedTrades);
+
+        Optional<Collection<PriceWithDate>> prices = krakenPriceProvider.get(twoYearsAgo);
+        assertThat(prices).contains(Set.of());
+    }
+
+    @Test
     void getPriceUnknown() {
         LocalDate wayTooEarly = now().minusYears(20);
 
@@ -126,14 +137,21 @@ class KrakenPriceProviderTest {
         KrakenTradesDto krakenTradesDto = mock(KrakenTradesDto.class);
         Price oneMillion = Price.of(1_000_000);
         KrakenTradesDto.Trade earlyTrade = mockTrade(oneMillion, BigDecimal.valueOf(100.0), start - 1);
-        KrakenTradesDto.Trade trade1 = mockTrade(averagePrice, BigDecimal.TEN, start + 1);
-        KrakenTradesDto.Trade trade2 = mockTrade(averagePrice.add(Price.of(10)), BigDecimal.ONE, start + 1);
-        KrakenTradesDto.Trade tradeZeroVolume = mockTrade(averagePrice.add(Price.of(10)), BigDecimal.ZERO, start + 1);
+        KrakenTradesDto.Trade trade1 = mockTrade(averagePrice.add(Price.of(10)), BigDecimal.ONE, start);
+        KrakenTradesDto.Trade trade2 = mockTrade(averagePrice, BigDecimal.TEN, start + 1);
+        KrakenTradesDto.Trade tradeZeroVolume = mockTrade(oneMillion, BigDecimal.ZERO, start + 1);
         KrakenTradesDto.Trade trade3 =
-                mockTrade(averagePrice.subtract(Price.of(5)), BigDecimal.valueOf(2), start + 1);
+                mockTrade(averagePrice.subtract(Price.of(5)), BigDecimal.valueOf(2), start + 2);
         KrakenTradesDto.Trade lateTrade = mockTrade(oneMillion, BigDecimal.TEN, start + ONE_DAY_IN_SECONDS);
         when(krakenTradesDto.getTrades())
                 .thenReturn(List.of(earlyTrade, trade1, trade2, trade3, tradeZeroVolume, lateTrade));
+        return Optional.of(krakenTradesDto);
+    }
+
+    private Optional<KrakenTradesDto> mockTradesWithZeroVolume(long start) {
+        KrakenTradesDto krakenTradesDto = mock(KrakenTradesDto.class);
+        KrakenTradesDto.Trade tradeZeroVolume = mockTrade(Price.of(1), BigDecimal.ZERO, start);
+        when(krakenTradesDto.getTrades()).thenReturn(List.of(tradeZeroVolume));
         return Optional.of(krakenTradesDto);
     }
 
