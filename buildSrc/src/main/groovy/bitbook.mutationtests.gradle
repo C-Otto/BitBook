@@ -1,0 +1,18 @@
+plugins {
+    id 'bitbook.tests'
+    id 'info.solidsoft.pitest'
+}
+
+pitest {
+    targetClasses = ['de.cotto.*']
+    pitestVersion = '1.6.5'
+    junit5PluginVersion = '0.14'
+    outputFormats = ['XML', 'HTML']
+    timestampedReports = false
+    failWhenNoMutations = false
+    excludedMethods = ['hashCode']
+}
+
+tasks.withType(info.solidsoft.gradle.pitest.PitestTask).configureEach {
+    dependsOn test
+}
