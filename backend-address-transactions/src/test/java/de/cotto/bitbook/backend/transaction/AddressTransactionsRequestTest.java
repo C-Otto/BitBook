@@ -33,7 +33,7 @@ class AddressTransactionsRequestTest {
 
     @Test
     void testEquals() {
-        AddressTransactionsRequest request = AddressTransactionsRequest.forStandardPriority(TRANSACTIONS_REQUEST_KEY);
+        AddressTransactionsRequest request = AddressTransactionsRequest.create(TRANSACTIONS_REQUEST_KEY, STANDARD);
         assertThat(ADDRESS_TRANSACTIONS_REQUEST).isEqualTo(request);
     }
 
@@ -45,7 +45,7 @@ class AddressTransactionsRequestTest {
     @Test
     void testEquals_different_address() {
         assertThat(ADDRESS_TRANSACTIONS_REQUEST).isNotEqualTo(
-                AddressTransactionsRequest.forStandardPriority(new TransactionsRequestKey("xxx", BLOCK_HEIGHT))
+                AddressTransactionsRequest.create(new TransactionsRequestKey("xxx", BLOCK_HEIGHT), STANDARD)
         );
     }
 
