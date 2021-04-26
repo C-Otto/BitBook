@@ -65,8 +65,8 @@ public class KrakenPriceProvider implements Provider<LocalDate, Collection<Price
                 .collect(Collectors.toList());
     }
 
-    private Optional<Price> getAveragePriceForFirstTrades(LocalDate startOfDate) {
-        long startEpochSeconds = startOfDate.atStartOfDay().toEpochSecond(ZoneOffset.UTC);
+    private Optional<Price> getAveragePriceForFirstTrades(LocalDate date) {
+        long startEpochSeconds = date.atStartOfDay().toEpochSecond(ZoneOffset.UTC);
         Optional<KrakenTradesDto> prices = getWithFeignClient(() -> krakenClient.getTrades(startEpochSeconds));
         return prices.flatMap(krakenPricesDto -> getPriceAverage(startEpochSeconds, krakenPricesDto));
     }
@@ -93,10 +93,10 @@ public class KrakenPriceProvider implements Provider<LocalDate, Collection<Price
         return date.isBefore(NO_PRICE_BEFORE);
     }
 
-    private boolean isRecentEnoughForOhlcData(LocalDate startOfDate) {
+    private boolean isRecentEnoughForOhlcData(LocalDate date) {
         // Kraken provides 720 days of daily OHLC data
         LocalDate sevenHundredDaysAgo = now().minusDays(700);
-        return startOfDate.isAfter(sevenHundredDaysAgo);
+        return date.isAfter(sevenHundredDaysAgo);
     }
 
     private LocalDate now() {
