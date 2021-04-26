@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
+import static java.util.stream.Collectors.toSet;
+
 @Component
 public class SweepTransactionsService {
     private static final String SWEEP_TRANSACTION_DESCRIPTION = "lnd sweep transaction";
@@ -32,34 +34,33 @@ public class SweepTransactionsService {
     }
 
     public long addFromSweeps(Set<String> hashes) {
-        return transactionService.getTransactionDetails(hashes).stream()
+        Set<Transaction> sweepTransactions = transactionService.getTransactionDetails(hashes).stream()
                 .filter(this::isSweepTransaction)
-                .map(this::addTransactionDescription)
-                .map(this::addAddressDescriptions)
-                .map(this::setAddressesAsOwned)
-                .count();
+                .collect(toSet());
+        sweepTransactions.forEach(transaction -> {
+            addTransactionDescription(transaction);
+            addAddressDescriptions(transaction);
+            setAddressesAsOwned(transaction);
+        });
+        return sweepTransactions.size();
     }
 
     private boolean isSweepTransaction(Transaction transaction) {
         return transaction.getOutputs().size() == 1;
     }
 
-    private Transaction addAddressDescriptions(Transaction transaction) {
+    private void addAddressDescriptions(Transaction transaction) {
         addressDescriptionService.set(getInputAddress(transaction), DEFAULT_ADDRESS_DESCRIPTION);
         addressDescriptionService.set(getOutputAddress(transaction), DEFAULT_ADDRESS_DESCRIPTION);
-        return transaction;
     }
 
-    @SuppressWarnings("PMD.LinguisticNaming")
-    private Transaction setAddressesAsOwned(Transaction transaction) {
+    private void setAddressesAsOwned(Transaction transaction) {
         addressOwnershipService.setAddressAsOwned(getInputAddress(transaction));
         addressOwnershipService.setAddressAsOwned(getOutputAddress(transaction));
-        return transaction;
     }
 
-    private Transaction addTransactionDescription(Transaction transaction) {
+    private void addTransactionDescription(Transaction transaction) {
         transactionDescriptionService.set(transaction.getHash(), SWEEP_TRANSACTION_DESCRIPTION);
-        return transaction;
     }
 
     private String getOutputAddress(Transaction transaction) {
