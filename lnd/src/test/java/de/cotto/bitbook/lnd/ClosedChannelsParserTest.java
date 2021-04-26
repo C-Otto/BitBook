@@ -8,11 +8,14 @@ import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.lnd.model.ClosedChannel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
+import java.util.Set;
 
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
@@ -23,7 +26,11 @@ import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.OPENING_TRANSACTI
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.RESOLUTION_AMOUNT;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.SWEEP_TRANSACTION_HASH;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,7 +66,7 @@ class ClosedChannelsParserTest {
         );
 
         assertThat(closedChannelsParser.parse(toJsonNode(json))).isEmpty();
-        verifyNoInteractions(transactionService);
+        verify(transactionService, never()).getTransactionDetails(anyString());
     }
 
     @Test
@@ -68,13 +75,12 @@ class ClosedChannelsParserTest {
         String json = getJsonArrayWithSingleChannel("").replace(TRANSACTION_HASH_2, closingTransactionHash);
 
         assertThat(closedChannelsParser.parse(toJsonNode(json))).isEmpty();
-        verifyNoInteractions(transactionService);
+        verify(transactionService, never()).getTransactionDetails(anyString());
     }
 
     @Test
     void success() throws IOException {
-        when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(OPENING_TRANSACTION);
-        when(transactionService.getTransactionDetails(TRANSACTION_HASH_2)).thenReturn(CLOSING_TRANSACTION);
+        mockTransactionDetails();
         ClosedChannel closedChannel2 = CLOSED_CHANNEL.toBuilder().withSettledBalance(Coins.ofSatoshis(500)).build();
 
         assertThat(closedChannelsParser.parse(toJsonNode(
@@ -87,9 +93,25 @@ class ClosedChannelsParserTest {
     }
 
     @Test
+    void preloads_transaction_details() throws IOException {
+        mockTransactionDetails();
+        ClosedChannel closedChannel2 = CLOSED_CHANNEL.toBuilder().withSettledBalance(Coins.ofSatoshis(500)).build();
+
+        closedChannelsParser.parse(toJsonNode(
+                "{\"channels\": [" +
+                getJsonSingleClosedChannel(CLOSED_CHANNEL.getSettledBalance(), "") +
+                "," +
+                getJsonSingleClosedChannel(closedChannel2.getSettledBalance(), "") +
+                "]}"
+        ));
+        InOrder inOrder = Mockito.inOrder(transactionService);
+        inOrder.verify(transactionService).getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2));
+        inOrder.verify(transactionService, atLeastOnce()).getTransactionDetails(anyString());
+    }
+
+    @Test
     void with_resolution() throws IOException {
-        when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(OPENING_TRANSACTION);
-        when(transactionService.getTransactionDetails(TRANSACTION_HASH_2)).thenReturn(CLOSING_TRANSACTION);
+        mockTransactionDetails();
 
         assertThat(closedChannelsParser.parse(toJsonNode(
                 getJsonArrayWithSingleChannel("{" +
@@ -97,6 +119,12 @@ class ClosedChannelsParserTest {
                                               "\"amount_sat\": \"" + RESOLUTION_AMOUNT.getSatoshis() + "\"" +
                                               "}")
         ))).hasSize(1);
+    }
+
+    private void mockTransactionDetails() {
+        when(transactionService.getTransactionDetails(anySet())).thenReturn(Set.of());
+        when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(OPENING_TRANSACTION);
+        when(transactionService.getTransactionDetails(TRANSACTION_HASH_2)).thenReturn(CLOSING_TRANSACTION);
     }
 
     private String getJsonArrayWithSingleChannel(String resolutions) {
