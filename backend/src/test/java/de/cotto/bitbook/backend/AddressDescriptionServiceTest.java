@@ -75,7 +75,7 @@ class AddressDescriptionServiceTest {
 
     @Test
     void getWithDescriptionInfix() {
-        String infix = "infix";
+        String infix = "abc";
         AddressWithDescription expected = new AddressWithDescription("x", "y");
         when(addressWithDescriptionDao.findWithDescriptionInfix(infix)).thenReturn(Set.of(expected));
         assertThat(service.getWithDescriptionInfix(infix)).containsExactly(expected);
