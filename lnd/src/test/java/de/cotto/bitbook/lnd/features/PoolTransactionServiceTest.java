@@ -84,6 +84,7 @@ class PoolTransactionServiceTest {
         void sets_description_for_pool_address() {
             poolTransactionService.addFromOnchainTransaction(POOL_ACCOUNT_CREATION);
             verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_2, "pool account " + POOL_ACCOUNT_ID);
+            verify(addressDescriptionService, never()).set(OUTPUT_ADDRESS_1, "pool account " + POOL_ACCOUNT_ID);
         }
 
         @Test
@@ -96,6 +97,7 @@ class PoolTransactionServiceTest {
         void sets_description_for_other_outputs() {
             poolTransactionService.addFromOnchainTransaction(POOL_ACCOUNT_CREATION);
             verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_1, DEFAULT_DESCRIPTION);
+            verify(addressDescriptionService, never()).set(OUTPUT_ADDRESS_2, DEFAULT_DESCRIPTION);
         }
 
         @Test
@@ -300,6 +302,7 @@ class PoolTransactionServiceTest {
         void sets_description_for_pool_addresses() {
             poolTransactionService.addFromOnchainTransaction(POOL_ACCOUNT_DEPOSIT);
             verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_1, "pool account " + POOL_ACCOUNT_ID);
+            verify(addressDescriptionService, never()).set(OUTPUT_ADDRESS_2, "pool account " + POOL_ACCOUNT_ID);
         }
 
         @Test
@@ -312,6 +315,7 @@ class PoolTransactionServiceTest {
         void sets_description_for_other_output() {
             poolTransactionService.addFromOnchainTransaction(POOL_ACCOUNT_DEPOSIT);
             verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_2, DEFAULT_DESCRIPTION);
+            verify(addressDescriptionService, never()).set(OUTPUT_ADDRESS_1, DEFAULT_DESCRIPTION);
         }
 
         @Test
