@@ -15,14 +15,15 @@ import java.util.Set;
 
 import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_2;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_1;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_2;
+import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.lnd.model.PoolLeaseFixtures.POOL_LEASE;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 import static de.cotto.bitbook.ownership.OwnershipStatus.UNKNOWN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -54,8 +55,8 @@ class PoolLeasesServiceTest {
         when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_1)).thenReturn(UNKNOWN);
         when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_2)).thenReturn(OWNED);
         when(addressDescriptionService.getDescription(any())).thenReturn("");
-        channelAddress = OUTPUT_1.getAddress();
-        changeAddress = OUTPUT_2.getAddress();
+        channelAddress = OUTPUT_ADDRESS_1;
+        changeAddress = OUTPUT_ADDRESS_2;
     }
 
     @Test
@@ -76,10 +77,9 @@ class PoolLeasesServiceTest {
     void sets_channel_address_description() {
         poolLeasesService.addFromLeases(Set.of(POOL_LEASE));
 
-        verify(addressDescriptionService).set(
-                channelAddress,
-                "Lightning Channel with " + POOL_LEASE.getPubKey()
-        );
+        String channelDescription = "Lightning Channel with " + POOL_LEASE.getPubKey();
+        verify(addressDescriptionService).set(channelAddress, channelDescription);
+        verify(addressDescriptionService, never()).set(changeAddress, channelDescription);
     }
 
     @Test
@@ -92,6 +92,7 @@ class PoolLeasesServiceTest {
     void sets_description_for_change_address() {
         poolLeasesService.addFromLeases(Set.of(POOL_LEASE));
         verify(addressDescriptionService).set(changeAddress, DEFAULT_DESCRIPTION);
+        verify(addressDescriptionService, never()).set(channelAddress, DEFAULT_DESCRIPTION);
     }
 
     @Test
