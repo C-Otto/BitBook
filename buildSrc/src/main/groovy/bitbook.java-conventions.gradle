@@ -24,9 +24,6 @@ repositories {
     mavenCentral()
 }
 
-group = 'de.cotto'
-version = '0.0.1-SNAPSHOT'
-
 tasks.withType(JavaCompile).configureEach {
     options.compilerArgs << '-Werror'
 }
