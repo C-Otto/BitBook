@@ -261,7 +261,7 @@ class OnchainTransactionsServiceTest {
 
         @Test
         void transaction_with_unowned_input() {
-            when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_1)).thenReturn(OWNED);
+            setupInputMocksForOpeningTransaction();
             when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_2)).thenReturn(UNKNOWN);
             assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION))).isEqualTo(0);
             verify(addressOwnershipService, never()).setAddressAsOwned(any());
@@ -468,8 +468,8 @@ class OnchainTransactionsServiceTest {
     private void setupInputMocksForOpeningTransaction() {
         when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_1)).thenReturn(OWNED);
         when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_2)).thenReturn(OWNED);
-        when(addressDescriptionService.getDescription(INPUT_ADDRESS_1)).thenReturn(DEFAULT_DESCRIPTION);
-        when(addressDescriptionService.getDescription(INPUT_ADDRESS_2)).thenReturn(DEFAULT_DESCRIPTION);
+        lenient().when(addressDescriptionService.getDescription(INPUT_ADDRESS_1)).thenReturn(DEFAULT_DESCRIPTION);
+        lenient().when(addressDescriptionService.getDescription(INPUT_ADDRESS_2)).thenReturn(DEFAULT_DESCRIPTION);
     }
 
     private void assertFailure(OnchainTransaction transaction) {
