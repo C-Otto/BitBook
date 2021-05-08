@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
-import static java.util.stream.Collectors.toSet;
 
 @Component
 public class PoolLeasesService {
@@ -39,32 +38,28 @@ public class PoolLeasesService {
     }
 
     public long addFromLeases(Set<PoolLease> leases) {
-        return leases.stream()
-                .map(this::setTransactionDescription)
-                .map(this::setChannelAddressDescriptionAndOwnership)
-                .map(this::setChangeAddressDescriptionAndOwnership)
-                .collect(toSet()).size();
+        leases.forEach(lease -> {
+            setTransactionDescription(lease);
+            setChangeAddressDescriptionAndOwnership(lease);
+            setChannelAddressDescriptionAndOwnership(lease);
+        });
+        return leases.size();
     }
 
-    @SuppressWarnings("PMD.LinguisticNaming")
-    private PoolLease setTransactionDescription(PoolLease poolLease) {
+    private void setTransactionDescription(PoolLease poolLease) {
         transactionDescriptionService.set(
                 poolLease.getTransactionHash(),
                 "Opening Channel with " + poolLease.getPubKey()
         );
-        return poolLease;
     }
 
-    @SuppressWarnings("PMD.LinguisticNaming")
-    private PoolLease setChannelAddressDescriptionAndOwnership(PoolLease poolLease) {
+    private void setChannelAddressDescriptionAndOwnership(PoolLease poolLease) {
         String channelAddress = getChannelAddress(poolLease);
         addressDescriptionService.set(channelAddress, "Lightning Channel with " + poolLease.getPubKey());
         addressOwnershipService.setAddressAsOwned(channelAddress);
-        return poolLease;
     }
 
-    @SuppressWarnings("PMD.LinguisticNaming")
-    private PoolLease setChangeAddressDescriptionAndOwnership(PoolLease poolLease) {
+    private void setChangeAddressDescriptionAndOwnership(PoolLease poolLease) {
         getChangeAddress(poolLease).ifPresent(changeAddress -> {
             Transaction transaction = transactionService.getTransactionDetails(poolLease.getTransactionHash());
             String description = transaction.getInputAddresses().stream()
@@ -76,7 +71,6 @@ public class PoolLeasesService {
             addressDescriptionService.set(changeAddress, description);
             addressOwnershipService.setAddressAsOwned(changeAddress);
         });
-        return poolLease;
     }
 
     private String getChannelAddress(PoolLease poolLease) {

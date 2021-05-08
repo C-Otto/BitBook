@@ -96,7 +96,7 @@ class PoolLeasesServiceTest {
     }
 
     @Test
-    void sets_description_for_change_address_description_from_input() {
+    void sets_description_for_change_address_description_from_owned_input() {
         String description = "pool account 123";
         when(addressDescriptionService.getDescription(INPUT_ADDRESS_2)).thenReturn(description);
         poolLeasesService.addFromLeases(Set.of(POOL_LEASE));
