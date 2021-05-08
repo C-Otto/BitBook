@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -51,12 +52,12 @@ class TransactionServiceTest {
     @BeforeEach
     void setUp() {
         when(transactionDao.getTransaction(any())).thenReturn(Transaction.UNKNOWN);
+        lenient().when(blockHeightService.getBlockHeight()).thenReturn(BLOCK_COUNT_IN_CHAIN);
     }
 
     @Test
     void downloads_transaction_details_with_standard_priority() {
         mockResult(TRANSACTION_HASH, TRANSACTION);
-        when(blockHeightService.getBlockHeight()).thenReturn(BLOCK_COUNT_IN_CHAIN);
 
         Transaction transaction = transactionService.getTransactionDetails(TRANSACTION_HASH);
 
@@ -67,7 +68,6 @@ class TransactionServiceTest {
     void downloads_transaction_details_with_standard_priority_by_hashes() {
         mockResult(TRANSACTION_HASH, TRANSACTION);
         mockResult(TRANSACTION_HASH_2, TRANSACTION_2);
-        when(blockHeightService.getBlockHeight()).thenReturn(BLOCK_COUNT_IN_CHAIN);
 
         Set<Transaction> transactions =
                 transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2));
@@ -78,7 +78,6 @@ class TransactionServiceTest {
     @Test
     void requests_price_for_transaction_timestamp() {
         mockResult(TRANSACTION_HASH, TRANSACTION);
-        when(blockHeightService.getBlockHeight()).thenReturn(BLOCK_COUNT_IN_CHAIN);
 
         Transaction transaction = transactionService.getTransactionDetails(TRANSACTION_HASH);
 
@@ -104,7 +103,6 @@ class TransactionServiceTest {
     @Test
     void persists_download_for_confirmed_transaction() {
         mockResult(TRANSACTION_HASH, TRANSACTION);
-        when(blockHeightService.getBlockHeight()).thenReturn(BLOCK_COUNT_IN_CHAIN);
 
         transactionService.getTransactionDetails(TRANSACTION_HASH);
 
@@ -130,8 +128,18 @@ class TransactionServiceTest {
     }
 
     @Test
+    void get_details_for_transaction_in_first_block() {
+        Transaction downloadedTransaction = new Transaction(TRANSACTION_HASH, 1);
+        mockResult(TRANSACTION_HASH, downloadedTransaction);
+
+        Transaction transaction = transactionService.getTransactionDetails(TRANSACTION_HASH);
+
+        assertThat(transaction).isEqualTo(downloadedTransaction);
+    }
+
+    @Test
     void does_not_persist_download_for_unconfirmed_transaction() {
-        Transaction downloadedTransaction = new Transaction(TRANSACTION_HASH, -1);
+        Transaction downloadedTransaction = new Transaction(TRANSACTION_HASH, 0);
         mockResult(TRANSACTION_HASH, downloadedTransaction);
 
         transactionService.getTransactionDetails(TRANSACTION_HASH);
@@ -141,7 +149,7 @@ class TransactionServiceTest {
 
     @Test
     void unconfirmed_transaction_is_treated_as_unknown() {
-        Transaction downloadedTransaction = new Transaction(TRANSACTION_HASH, -1);
+        Transaction downloadedTransaction = new Transaction(TRANSACTION_HASH, 0);
         mockResult(TRANSACTION_HASH, downloadedTransaction);
 
         Transaction transaction = transactionService.getTransactionDetails(TRANSACTION_HASH);
@@ -168,6 +176,17 @@ class TransactionServiceTest {
         Transaction transaction = transactionService.getTransactionDetails(TRANSACTION_HASH);
 
         assertThat(transaction).isEqualTo(Transaction.UNKNOWN);
+    }
+
+    @Test
+    void six_confirmations_are_not_too_recent() {
+        int confirmationHeight = BLOCK_COUNT_IN_CHAIN - 6;
+        Transaction downloadedTransaction = new Transaction(TRANSACTION_HASH, confirmationHeight);
+        mockResult(TRANSACTION_HASH, downloadedTransaction);
+
+        Transaction transaction = transactionService.getTransactionDetails(TRANSACTION_HASH);
+
+        assertThat(transaction).isEqualTo(downloadedTransaction);
     }
 
     @Test
