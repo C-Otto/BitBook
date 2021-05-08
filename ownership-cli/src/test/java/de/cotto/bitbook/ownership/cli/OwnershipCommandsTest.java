@@ -24,6 +24,7 @@ import java.util.Set;
 
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_2;
+import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.TRANSACTION_HASH_3;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_2;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_3;
@@ -40,6 +41,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class OwnershipCommandsTest {
     private static final String INVALID_ADDRESS = "-";
+    private static final String ANYTHING = ".*";
 
     @InjectMocks
     private OwnershipCommands ownershipCommands;
@@ -84,8 +86,8 @@ class OwnershipCommandsTest {
                 new AddressWithDescription(address2)
         ));
         assertThat(ownershipCommands.getOwnedAddresses()).matches(
-                ".*" + address1 + ".*123.*\n" +
-                ".*" + address2 + ".*234.*"
+                ANYTHING + address1 + ANYTHING + 123 + ANYTHING + "\n" +
+                ANYTHING + address2 + ANYTHING + 234 + ANYTHING
         );
     }
 
@@ -115,7 +117,9 @@ class OwnershipCommandsTest {
         Set<AddressWithDescription> addresses = Set.of(address1, address2, address3);
         when(addressOwnershipService.getOwnedAddressesWithDescription()).thenReturn(addresses);
         assertThat(ownershipCommands.getOwnedAddresses())
-                .matches(".*a-DESCRIPTION.*\n.*b-DESCRIPTION.*\n.*c-DESCRIPTION.*");
+                .matches(".*a-DESCRIPTION" + ANYTHING + "\n" +
+                         ANYTHING + "b-DESCRIPTION" + ANYTHING + "\n" +
+                         ANYTHING + "c-DESCRIPTION" + ANYTHING);
     }
 
     @Nested
@@ -129,11 +133,12 @@ class OwnershipCommandsTest {
         @Test
         void formats_transactions_ordered_by_hash() {
             when(addressOwnershipService.getMyTransactionsWithCoins()).thenReturn(
-                    Map.of(TRANSACTION, Coins.NONE, TRANSACTION_2, Coins.NONE)
+                    Map.of(TRANSACTION, Coins.NONE, TRANSACTION_2, Coins.NONE, TRANSACTION_3, Coins.NONE)
             );
             assertThat(ownershipCommands.getMyTransactions()).matches(
-                    ".*" + TRANSACTION_HASH_2 + ".*\n"
-                    + ".*" + TRANSACTION_HASH + ".*"
+                    ANYTHING + TRANSACTION_HASH_3 + ANYTHING + "\n"
+                    + ANYTHING + TRANSACTION_HASH_2 + ANYTHING + "\n"
+                    + ANYTHING + TRANSACTION_HASH + ANYTHING
             );
         }
 
@@ -145,8 +150,8 @@ class OwnershipCommandsTest {
                     Map.of(TRANSACTION, value1, TRANSACTION_2, value2)
             );
             assertThat(ownershipCommands.getMyTransactions()).matches(
-                    ".*" + TRANSACTION_HASH + ".*" + value1 + ".*\n"
-                    + ".*" + TRANSACTION_HASH_2 + ".*" + value2
+                    ANYTHING + TRANSACTION_HASH + ANYTHING + value1 + ANYTHING + "\n"
+                    + ANYTHING + TRANSACTION_HASH_2 + ANYTHING + value2
             );
         }
 
@@ -158,8 +163,8 @@ class OwnershipCommandsTest {
                     Map.of(TRANSACTION, value1, TRANSACTION_2, value2)
             );
             assertThat(ownershipCommands.getMyTransactions()).matches(
-                    ".*" + TRANSACTION_HASH_2 + ".*" + value2 + ".*\n"
-                    + ".*" + TRANSACTION_HASH + ".*" + value1
+                    ANYTHING + TRANSACTION_HASH_2 + ANYTHING + value2 + ANYTHING + "\n"
+                    + ANYTHING + TRANSACTION_HASH + ANYTHING + value1
             );
         }
     }
