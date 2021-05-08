@@ -15,6 +15,7 @@ import static de.cotto.bitbook.lnd.model.ChannelFixtures.CHANNEL;
 import static de.cotto.bitbook.lnd.model.ChannelFixtures.CHANNEL_ADDRESS;
 import static de.cotto.bitbook.lnd.model.ChannelFixtures.CHANNEL_LOCAL;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,6 +33,11 @@ public class ChannelsServiceTest {
 
     @Mock
     private AddressOwnershipService addressOwnershipService;
+
+    @Test
+    void returns_number_of_channels() {
+        assertThat(channelsService.addFromChannels(Set.of(CHANNEL))).isEqualTo(1);
+    }
 
     @Test
     void sets_opening_transaction_description() {
