@@ -59,6 +59,8 @@ class PoolTransactionServiceTest {
 
     @Nested
     class PoolAccountCreationSuccess {
+        private static final String PREFIX = "pool account ";
+
         @BeforeEach
         void setUp() {
             when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash()))
@@ -83,8 +85,8 @@ class PoolTransactionServiceTest {
         @Test
         void sets_description_for_pool_address() {
             poolTransactionService.addFromOnchainTransaction(POOL_ACCOUNT_CREATION);
-            verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_2, "pool account " + POOL_ACCOUNT_ID);
-            verify(addressDescriptionService, never()).set(OUTPUT_ADDRESS_1, "pool account " + POOL_ACCOUNT_ID);
+            verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_2, PREFIX + POOL_ACCOUNT_ID);
+            verify(addressDescriptionService, never()).set(OUTPUT_ADDRESS_1, PREFIX + POOL_ACCOUNT_ID);
         }
 
         @Test
@@ -161,6 +163,8 @@ class PoolTransactionServiceTest {
 
     @Nested
     class PoolAccountCloseSuccess {
+        private static final String PREFIX = "pool account ";
+
         @BeforeEach
         void setUp() {
             when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash()))
@@ -191,7 +195,7 @@ class PoolTransactionServiceTest {
         @Test
         void sets_description_for_pool_addresses() {
             poolTransactionService.addFromOnchainTransaction(POOL_ACCOUNT_CLOSE);
-            verify(addressDescriptionService, atLeastOnce()).set(INPUT_ADDRESS_1, "pool account " + POOL_ACCOUNT_ID);
+            verify(addressDescriptionService, atLeastOnce()).set(INPUT_ADDRESS_1, PREFIX + POOL_ACCOUNT_ID);
         }
 
         @Test
@@ -269,6 +273,8 @@ class PoolTransactionServiceTest {
 
     @Nested
     class PoolAccountDepositSuccess {
+        private static final String PREFIX = "pool account ";
+
         @BeforeEach
         void setUp() {
             when(addressDescriptionService.getDescription(INPUT_ADDRESS_1)).thenReturn("");
@@ -301,8 +307,8 @@ class PoolTransactionServiceTest {
         @Test
         void sets_description_for_pool_addresses() {
             poolTransactionService.addFromOnchainTransaction(POOL_ACCOUNT_DEPOSIT);
-            verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_1, "pool account " + POOL_ACCOUNT_ID);
-            verify(addressDescriptionService, never()).set(OUTPUT_ADDRESS_2, "pool account " + POOL_ACCOUNT_ID);
+            verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_1, PREFIX + POOL_ACCOUNT_ID);
+            verify(addressDescriptionService, never()).set(OUTPUT_ADDRESS_2, PREFIX + POOL_ACCOUNT_ID);
         }
 
         @Test
