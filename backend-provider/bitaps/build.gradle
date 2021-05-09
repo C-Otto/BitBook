@@ -6,6 +6,6 @@ plugins {
 dependencies {
     implementation project(':backend-provider:base')
     implementation project(':backend:blockheight')
-    implementation project(':backend-address-transactions')
+    implementation project(':backend:address-transactions')
     testFixturesApi testFixtures(project(':backend-provider:base'))
 }
