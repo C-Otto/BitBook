@@ -35,7 +35,7 @@ public abstract class AbstractCompletionProvider<T extends StringWithDescription
             CompletionContext completionContext,
             String[] hints
     ) {
-        String input = getInputToComplete(completionContext);
+        String input = getStringToComplete(completionContext.currentWordUpToCursor());
         if (isTooShort(input, MINIMUM_LENGTH_FOR_COMPLETION)) {
             return List.of();
         }
@@ -55,16 +55,18 @@ public abstract class AbstractCompletionProvider<T extends StringWithDescription
 
     protected abstract Set<Function<String, Set<String>>> getStringCompleters();
 
-    private String getInputToComplete(CompletionContext completionContext) {
-        return completionContext.currentWordUpToCursor().trim().replaceAll("…", "");
+    protected String getStringToComplete(String string) {
+        return string.trim().replaceAll("…", "");
     }
 
     private Stream<CompletionProposal> getCompletionProposals(String input) {
-        Stream<CompletionProposal> completedInput = getStringCompleters().stream()
-                .map(completer -> completer.apply(input))
-                .flatMap(this::toProposals);
+        Stream<CompletionProposal> completedInput = completeUsingStringCompleters(input).flatMap(this::toProposals);
         Stream<CompletionProposal> completedDescription = completeDescription(input);
         return Streams.concat(completedInput, completedDescription);
+    }
+
+    protected Stream<Set<String>> completeUsingStringCompleters(String input) {
+        return getStringCompleters().stream().map(completer -> completer.apply(input));
     }
 
     protected Stream<CompletionProposal> toProposals(Set<String> strings) {

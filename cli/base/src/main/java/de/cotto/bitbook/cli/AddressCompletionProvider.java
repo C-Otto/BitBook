@@ -5,6 +5,10 @@ import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.transaction.AddressCompletionDao;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Component
 public class AddressCompletionProvider extends AbstractAddressCompletionProvider {
 
@@ -20,4 +24,14 @@ public class AddressCompletionProvider extends AbstractAddressCompletionProvider
         return true;
     }
 
+    @SuppressWarnings("PMD.AvoidLiteralsInIfCondition")
+    public Optional<String> completeIfUnique(String addressPrefix) {
+        Set<String> proposals = completeUsingStringCompleters(getStringToComplete(addressPrefix))
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+        if (proposals.size() == 1) {
+            return proposals.stream().findFirst();
+        }
+        return Optional.empty();
+    }
 }
