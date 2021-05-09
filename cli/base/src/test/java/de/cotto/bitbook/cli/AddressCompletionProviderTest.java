@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AddressCompletionProviderTest {
+    private static final String BC1_ADDRESS = "bc1xxx";
     @InjectMocks
     private AddressCompletionProvider completionProvider;
 
@@ -71,10 +72,26 @@ class AddressCompletionProviderTest {
 
     @Test
     void complete_bc1_address() {
-        input = "bc1xxx";
+        input = BC1_ADDRESS;
+        assertCompletion(input);
+    }
+
+    @Test
+    void complete_bc1_address_with_whitespace() {
+        input = "      " + BC1_ADDRESS + "        ";
+        assertCompletion(BC1_ADDRESS);
+    }
+
+    @Test
+    void complete_bc1_address_with_ellipsis() {
+        input = BC1_ADDRESS + "…";
+        assertCompletion(BC1_ADDRESS);
+    }
+
+    private void assertCompletion(String expectedInput) {
         when(context.currentWordUpToCursor()).thenReturn(input);
         when(addressDescriptionService.get(ADDRESS)).thenReturn(addressWithDescription);
-        when(addressCompletionDao.completeFromAddressTransactions(input)).thenReturn(Set.of(ADDRESS));
+        when(addressCompletionDao.completeFromAddressTransactions(expectedInput)).thenReturn(Set.of(ADDRESS));
 
         assertThat(completionProvider.complete(methodParameter, context, hints)).isNotEmpty();
     }
@@ -138,6 +155,13 @@ class AddressCompletionProviderTest {
     @Test
     void does_not_complete_short_address() {
         when(context.currentWordUpToCursor()).thenReturn("xx");
+        assertThat(completionProvider.complete(methodParameter, context, hints)).isEmpty();
+        verifyNoInteractions(addressCompletionDao);
+    }
+
+    @Test
+    void ignores_whitespace_when_checking_length() {
+        when(context.currentWordUpToCursor()).thenReturn("xx             ");
         assertThat(completionProvider.complete(methodParameter, context, hints)).isEmpty();
         verifyNoInteractions(addressCompletionDao);
     }
