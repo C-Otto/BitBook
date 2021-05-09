@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static de.cotto.bitbook.backend.transaction.deserialization.OutputDtoFixtures.OUTPUT_DTO_1;
 import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_1;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class OutputDtoTest {
     @Test
