@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     implementation project(':backend-provider:bitaps')
-    implementation project(':backend-provider-blockchaininfo')
+    implementation project(':backend-provider:blockchaininfo')
     implementation project(':backend-provider-blockchair')
     implementation project(':backend-provider-blockcypher')
     implementation project(':backend-provider-blockstreaminfo')
