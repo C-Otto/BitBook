@@ -7,3 +7,7 @@ dependencies {
     api project(':backend-transaction-models')
     testFixturesApi testFixtures(project(':backend-transaction-models'))
 }
+
+jar {
+    archivesBaseName = 'backend-provider-base'
+}
