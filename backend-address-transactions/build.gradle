@@ -4,8 +4,8 @@ plugins {
 }
 
 dependencies {
-    implementation project(':backend-request:models')
+    implementation project(':backend:request:models')
     implementation project(':backend:transaction:models')
     testFixturesApi testFixtures(project(':backend:transaction:models'))
-    testFixturesImplementation project(':backend-request:models')
+    testFixturesImplementation project(':backend:request:models')
 }
