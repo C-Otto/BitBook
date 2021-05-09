@@ -18,12 +18,12 @@ public class AbstractJsonService {
     protected <T> Set<T> parse(String json, Function<JsonNode, Set<T>> parseFunction) {
         try (JsonParser parser = objectMapper.createParser(json)) {
             JsonNode rootNode = parser.getCodec().readTree(parser);
-            if (rootNode == null) {
-                return Set.of();
+            if (rootNode != null) {
+                return parseFunction.apply(rootNode);
             }
-            return parseFunction.apply(rootNode);
         } catch (IOException e) {
             return Set.of();
         }
+        return Set.of();
     }
 }
