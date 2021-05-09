@@ -9,7 +9,7 @@ dependencies {
     implementation project(':backend-price')
     implementation project(':ownership')
     testImplementation testFixtures(project(':backend-transaction'))
-    testImplementation testFixtures(project(':backend-transaction-models'))
+    testImplementation testFixtures(project(':backend-transaction:models'))
 }
 
 jacocoTestCoverageVerification {

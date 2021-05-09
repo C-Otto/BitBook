@@ -12,7 +12,7 @@ dependencies {
     implementation project(':cli:base')
     implementation 'org.flywaydb:flyway-core'
     testImplementation testFixtures(project(':backend-transaction'))
-    testImplementation testFixtures(project(':backend-transaction-models'))
+    testImplementation testFixtures(project(':backend-transaction:models'))
 }
 
 bootJar {
