@@ -1,6 +1,6 @@
 rootProject.name = 'bitbook'
-include 'cli-base'
 include 'cli'
+include 'cli:base'
 include 'backend'
 include 'backend-price'
 include 'backend-address-transactions'

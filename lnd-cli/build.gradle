@@ -3,6 +3,6 @@ plugins {
 }
 
 dependencies {
-    implementation project(':cli-base')
+    implementation project(':cli:base')
     implementation project(':lnd')
 }
