@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation project(':backend-price')
+    implementation project(':backend:price')
     implementation project(':ownership')
     implementation project(':cli:base')
     testImplementation testFixtures(project(':backend-transaction'))
