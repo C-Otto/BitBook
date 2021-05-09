@@ -9,7 +9,20 @@ class CustomPromptProviderTest {
     private final CustomPromptProvider customPromptProvider = new CustomPromptProvider();
 
     @Test
-    void customPrompt_text() {
+    void default_prompt() {
+        assertThat(customPromptProvider.getPrompt()).hasToString("BitBook$ ");
+    }
+
+    @Test
+    void changePrompt() {
+        customPromptProvider.changePrompt("foo");
+        assertThat(customPromptProvider.getPrompt()).hasToString("foo");
+    }
+
+    @Test
+    void changePromptToDefault() {
+        customPromptProvider.changePrompt("foo");
+        customPromptProvider.changePromptToDefault();
         assertThat(customPromptProvider.getPrompt()).hasToString("BitBook$ ");
     }
 }
