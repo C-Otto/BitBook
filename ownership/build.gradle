@@ -4,9 +4,9 @@ plugins {
 }
 
 dependencies {
-    api project(':backend-transaction')
+    api project(':backend:transaction')
     api project(':backend')
     testFixturesImplementation 'javax.persistence:javax.persistence-api'
-    testImplementation testFixtures(project(':backend-transaction'))
-    testImplementation testFixtures(project(':backend-transaction:models'))
+    testImplementation testFixtures(project(':backend:transaction'))
+    testImplementation testFixtures(project(':backend:transaction:models'))
 }

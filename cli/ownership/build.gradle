@@ -6,8 +6,8 @@ dependencies {
     implementation project(':backend:price')
     implementation project(':ownership')
     implementation project(':cli:base')
-    testImplementation testFixtures(project(':backend-transaction'))
-    testImplementation testFixtures(project(':backend-transaction:models'))
+    testImplementation testFixtures(project(':backend:transaction'))
+    testImplementation testFixtures(project(':backend:transaction:models'))
 }
 
 jar {

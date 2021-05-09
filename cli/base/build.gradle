@@ -5,11 +5,11 @@ plugins {
 dependencies {
     api 'org.springframework.shell:spring-shell-starter:2.0.0.RELEASE'
     implementation project(':backend')
-    implementation project(':backend-transaction')
+    implementation project(':backend:transaction')
     implementation project(':backend:price')
     implementation project(':ownership')
-    testImplementation testFixtures(project(':backend-transaction'))
-    testImplementation testFixtures(project(':backend-transaction:models'))
+    testImplementation testFixtures(project(':backend:transaction'))
+    testImplementation testFixtures(project(':backend:transaction:models'))
 }
 
 jacocoTestCoverageVerification {
