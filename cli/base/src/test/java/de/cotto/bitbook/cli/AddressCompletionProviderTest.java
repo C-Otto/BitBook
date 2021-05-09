@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AddressCompletionProviderTest {
     private static final String BC1_ADDRESS = "bc1xxx";
+    private static final String PREFIX = "bc1xx";
     @InjectMocks
     private AddressCompletionProvider completionProvider;
 
@@ -53,11 +54,11 @@ class AddressCompletionProviderTest {
         input = "abc";
         description = "my foo bar";
         addressWithDescription = new AddressWithDescription(ADDRESS, description);
-        when(context.currentWordUpToCursor()).thenReturn(input);
     }
 
     @Test
     void complete_address() {
+        when(context.currentWordUpToCursor()).thenReturn(input);
         when(addressDescriptionService.get(ADDRESS)).thenReturn(addressWithDescription);
         when(addressDescriptionService.get(ADDRESS_2)).thenReturn(new AddressWithDescription(ADDRESS_2));
         when(addressCompletionDao.completeFromAddressTransactions(input)).thenReturn(Set.of(ADDRESS, ADDRESS_2));
@@ -99,6 +100,7 @@ class AddressCompletionProviderTest {
     @Test
     void complete_address_from_input_output() {
         AddressWithDescription addressWithDescription = new AddressWithDescription(INPUT_ADDRESS_1, description);
+        when(context.currentWordUpToCursor()).thenReturn(input);
         when(addressDescriptionService.get(INPUT_ADDRESS_1)).thenReturn(addressWithDescription);
         when(addressCompletionDao.completeFromInputsAndOutputs(input)).thenReturn(Set.of(INPUT_ADDRESS_1));
 
@@ -112,6 +114,7 @@ class AddressCompletionProviderTest {
     @Test
     void complete_no_duplicates() {
         AddressWithDescription addressWithDescription = new AddressWithDescription(ADDRESS);
+        when(context.currentWordUpToCursor()).thenReturn(input);
         when(addressDescriptionService.get(ADDRESS)).thenReturn(addressWithDescription);
         when(addressCompletionDao.completeFromAddressTransactions(input)).thenReturn(Set.of(ADDRESS));
         when(addressCompletionDao.completeFromInputsAndOutputs(input)).thenReturn(Set.of(ADDRESS));
@@ -125,6 +128,7 @@ class AddressCompletionProviderTest {
 
     @Test
     void complete_description() {
+        when(context.currentWordUpToCursor()).thenReturn(input);
         when(addressDescriptionService.getWithDescriptionInfix(input))
                 .thenReturn(Set.of(addressWithDescription));
 
@@ -138,6 +142,7 @@ class AddressCompletionProviderTest {
     @Test
     void complete_sorted_by_address() {
         AddressWithDescription addressWithDescription = new AddressWithDescription(ADDRESS, description);
+        when(context.currentWordUpToCursor()).thenReturn(input);
         when(addressDescriptionService.getWithDescriptionInfix(input))
                 .thenReturn(Set.of(addressWithDescription));
 
@@ -171,6 +176,30 @@ class AddressCompletionProviderTest {
         when(context.currentWordUpToCursor()).thenReturn("bc1xx");
         assertThat(completionProvider.complete(methodParameter, context, hints)).isEmpty();
         verifyNoInteractions(addressCompletionDao);
+    }
+
+    @Test
+    void complete_single_string_not_unique() {
+        when(addressCompletionDao.completeFromAddressTransactions(PREFIX)).thenReturn(Set.of(BC1_ADDRESS));
+        when(addressCompletionDao.completeFromInputsAndOutputs(PREFIX)).thenReturn(Set.of("bc1xxy"));
+        assertThat(completionProvider.completeIfUnique(PREFIX)).isEmpty();
+    }
+
+    @Test
+    void complete_single_string_not_found() {
+        assertThat(completionProvider.completeIfUnique(PREFIX)).isEmpty();
+    }
+
+    @Test
+    void complete_single_string_unique() {
+        when(addressCompletionDao.completeFromInputsAndOutputs(PREFIX)).thenReturn(Set.of(BC1_ADDRESS));
+        assertThat(completionProvider.completeIfUnique(PREFIX)).contains(BC1_ADDRESS);
+    }
+
+    @Test
+    void complete_after_trim_and_removing_ellipsis() {
+        when(addressCompletionDao.completeFromInputsAndOutputs(PREFIX)).thenReturn(Set.of(BC1_ADDRESS));
+        assertThat(completionProvider.completeIfUnique("   " + PREFIX + "…")).contains(BC1_ADDRESS);
     }
 
     private String addressWithAnsiDescription() {
