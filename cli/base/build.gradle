@@ -23,3 +23,7 @@ jacocoTestCoverageVerification {
         }
     }
 }
+
+jar {
+    archivesBaseName = 'cli-base'
+}
