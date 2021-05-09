@@ -1,0 +1,10 @@
+plugins {
+    id 'bitbook.java-library-conventions'
+    id 'java-test-fixtures'
+}
+
+dependencies {
+    implementation project(':backend:provider:base')
+    implementation project(':backend:address-transactions')
+    testFixturesApi testFixtures(project(':backend:provider:base'))
+}
