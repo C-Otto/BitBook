@@ -8,7 +8,7 @@ dependencies {
     api project(':backend-transaction:models')
     implementation project(':backend-address-transactions')
     implementation project(':backend-blockheight')
-    implementation project(':backend-price')
+    implementation project(':backend:price')
     implementation project(':backend-request')
     testImplementation testFixtures(project(':backend-transaction:models'))
     testImplementation testFixtures(project(':backend-address-transactions'))
