@@ -6,3 +6,7 @@ dependencies {
     implementation project(':cli:base')
     implementation project(':lnd')
 }
+
+jar {
+    archivesBaseName = 'lnd-cli'
+}
