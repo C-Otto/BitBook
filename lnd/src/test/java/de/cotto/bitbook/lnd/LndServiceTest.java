@@ -204,6 +204,13 @@ class LndServiceTest {
             lndService.addFromChannels("{}");
             verify(channelsService).addFromChannels(Set.of(CHANNEL));
         }
+
+        @Test
+        void returns_number_of_channels() {
+            when(channelsParser.parse(any())).thenReturn(Set.of(CHANNEL));
+            when(channelsService.addFromChannels(Set.of(CHANNEL))).thenReturn(1L);
+            assertThat(lndService.addFromChannels("{}")).isEqualTo(1);
+        }
     }
 
     @Nested
@@ -232,6 +239,13 @@ class LndServiceTest {
             lndService.addFromClosedChannels("{}");
             verify(closedChannelsService).addFromClosedChannels(Set.of(CLOSED_CHANNEL));
         }
+
+        @Test
+        void returns_number_of_channels() {
+            when(closedChannelsParser.parse(any())).thenReturn(Set.of(CLOSED_CHANNEL));
+            when(closedChannelsService.addFromClosedChannels(Set.of(CLOSED_CHANNEL))).thenReturn(1L);
+            assertThat(lndService.addFromClosedChannels("{}")).isEqualTo(1);
+        }
     }
 
     @Nested
@@ -258,6 +272,13 @@ class LndServiceTest {
             when(onchainTransactionsParser.parse(any())).thenReturn(onchainTransactions);
             lndService.addFromOnchainTransactions("{}");
             verify(onchainTransactionsService).addFromOnchainTransactions(onchainTransactions);
+        }
+
+        @Test
+        void returns_number_of_transactions() {
+            when(onchainTransactionsParser.parse(any())).thenReturn(Set.of(ONCHAIN_TRANSACTION));
+            when(onchainTransactionsService.addFromOnchainTransactions(Set.of(ONCHAIN_TRANSACTION))).thenReturn(1L);
+            assertThat(lndService.addFromOnchainTransactions("{}")).isEqualTo(1);
         }
     }
 }
