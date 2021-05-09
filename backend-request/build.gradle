@@ -4,6 +4,10 @@ plugins {
 
 dependencies {
     implementation project(':backend')
-    api project(':backend-request-models')
+    api project(':backend-request:models')
     implementation 'org.apache.commons:commons-collections4:4.4'
+}
+
+jar {
+    archivesBaseName = 'backend-request-models'
 }

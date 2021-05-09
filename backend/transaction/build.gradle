@@ -16,5 +16,5 @@ dependencies {
     testFixturesImplementation testFixtures(project(':backend-address-transactions'))
     testFixturesImplementation 'javax.persistence:javax.persistence-api'
     testFixturesImplementation project(':backend')
-    testFixturesImplementation project(':backend-request-models')
+    testFixturesImplementation project(':backend-request:models')
 }
