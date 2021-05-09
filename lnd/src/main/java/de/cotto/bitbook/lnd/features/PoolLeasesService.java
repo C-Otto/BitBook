@@ -63,7 +63,6 @@ public class PoolLeasesService {
         getChangeAddress(poolLease).ifPresent(changeAddress -> {
             Transaction transaction = transactionService.getTransactionDetails(poolLease.getTransactionHash());
             String description = transaction.getInputAddresses().stream()
-                    .filter(address -> OWNED.equals(addressOwnershipService.getOwnershipStatus(address)))
                     .map(addressDescriptionService::getDescription)
                     .filter(inputDescription -> inputDescription.startsWith(DEFAULT_DESCRIPTION))
                     .findFirst()
