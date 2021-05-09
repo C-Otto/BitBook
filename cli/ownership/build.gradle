@@ -9,3 +9,7 @@ dependencies {
     testImplementation testFixtures(project(':backend-transaction'))
     testImplementation testFixtures(project(':backend-transaction-models'))
 }
+
+jar {
+    archivesBaseName = 'ownership-cli'
+}
