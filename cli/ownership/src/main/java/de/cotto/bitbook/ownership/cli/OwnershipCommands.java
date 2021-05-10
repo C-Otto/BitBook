@@ -81,7 +81,9 @@ public class OwnershipCommands {
 
     @ShellMethod("Get all transactions that touch at least one owned address")
     public String getMyTransactions() {
-        return addressOwnershipService.getMyTransactionsWithCoins().entrySet().stream()
+        Map<Transaction, Coins> transactionsWithCoins = addressOwnershipService.getMyTransactionsWithCoins();
+        preloadPrices(transactionsWithCoins.keySet());
+        return transactionsWithCoins.entrySet().stream()
                 .sorted(transactionSorter.getComparator())
                 .map(entry -> transactionFormatter.formatSingleLineForValue(entry.getKey(), entry.getValue()))
                 .collect(Collectors.joining("\n"));
