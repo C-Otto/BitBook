@@ -220,6 +220,12 @@ class TransactionsCommandsTest {
         verifyNoInteractions(transactionDescriptionService);
     }
 
+    @Test
+    void setTransactionSortOrder() {
+        assertThat(transactionsCommands.setTransactionSortOrder(TransactionSortOrder.BY_HASH)).isEqualTo("OK");
+        verify(transactionSorter).setOrder(TransactionSortOrder.BY_HASH);
+    }
+
     private void prepareMocks() {
         mockSortByHash();
         when(addressDescriptionService.getDescription(any())).thenReturn("");
