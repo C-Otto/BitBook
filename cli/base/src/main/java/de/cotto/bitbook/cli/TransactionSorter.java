@@ -13,17 +13,73 @@ public class TransactionSorter {
     private static final Comparator<Map.Entry<Transaction, Coins>> BY_HASH =
             Comparator.comparing(entry -> entry.getKey().getHash());
 
-    private static final Comparator<Map.Entry<Transaction, Coins>> BY_ABSOLUTE_COINS =
+    private static final Comparator<Map.Entry<Transaction, Coins>> BY_DATE =
+            Comparator.comparing(entry -> entry.getKey().getTime());
+
+    private static final Comparator<Map.Entry<Transaction, Coins>> BY_COINS =
+            Map.Entry.comparingByValue();
+
+    private static final Comparator<Map.Entry<Transaction, Coins>> BY_COINS_ABSOLUTE =
             Comparator.comparing(entry -> entry.getValue().absolute());
 
-    private static final Comparator<Map.Entry<Transaction, Coins>> BY_ABSOLUTE_COINS_THEN_HASH =
-            BY_ABSOLUTE_COINS.thenComparing(BY_HASH);
+    private static final Comparator<Map.Entry<Transaction, Coins>> BY_COINS_ABSOLUTE_THEN_HASH =
+            BY_COINS_ABSOLUTE.thenComparing(BY_HASH);
+
+    private static final Comparator<Map.Entry<Transaction, Coins>> BY_COINS_THEN_HASH =
+            BY_COINS.thenComparing(BY_HASH);
+
+    private static final Comparator<Map.Entry<Transaction, Coins>> BY_DATE_THEN_COINS_HASH =
+            BY_DATE.thenComparing(BY_COINS_THEN_HASH);
+
+    private static final Comparator<Map.Entry<Transaction, Coins>> BY_DATE_THEN_COINS_ABSOLUTE_HASH =
+            BY_DATE.thenComparing(BY_COINS_ABSOLUTE_THEN_HASH);
+
+    private static final Comparator<Map.Entry<Transaction, Coins>> BY_DATE_THEN_HASH =
+            BY_DATE.thenComparing(BY_HASH);
+
+    private static final Comparator<Map.Entry<Transaction, Coins>> BY_COINS_ABSOLUTE_THEN_DATE_HASH =
+            BY_COINS_ABSOLUTE.thenComparing(BY_DATE_THEN_HASH);
+
+    private static final Comparator<Map.Entry<Transaction, Coins>> BY_COINS_THEN_DATE_HASH =
+            BY_COINS.thenComparing(BY_DATE_THEN_HASH);
+
+    private Comparator<Map.Entry<Transaction, Coins>> comparator;
 
     public TransactionSorter() {
-        // default constructor
+        this.comparator = BY_COINS_ABSOLUTE_THEN_HASH;
+    }
+
+    public void setOrder(TransactionSortOrder transactionSortOrder) {
+        //noinspection EnhancedSwitchMigration
+        switch (transactionSortOrder) {
+            case BY_HASH:
+                comparator = BY_HASH;
+                break;
+            case BY_DATE_THEN_COINS_THEN_HASH:
+                comparator = BY_DATE_THEN_COINS_HASH;
+                break;
+            case BY_DATE_THEN_COINS_ABSOLUTE_THEN_HASH:
+                comparator = BY_DATE_THEN_COINS_ABSOLUTE_HASH;
+                break;
+            case BY_COINS_THEN_HASH:
+                comparator = BY_COINS_THEN_HASH;
+                break;
+            case BY_COINS_THEN_DATE_THEN_HASH:
+                comparator = BY_COINS_THEN_DATE_HASH;
+                break;
+            case BY_COINS_ABSOLUTE_THEN_DATE_THEN_HASH:
+                comparator = BY_COINS_ABSOLUTE_THEN_DATE_HASH;
+                break;
+            case BY_DATE_THEN_HASH:
+                comparator = BY_DATE_THEN_HASH;
+                break;
+            default:
+                comparator = BY_COINS_ABSOLUTE_THEN_HASH;
+                break;
+        }
     }
 
     public Comparator<Map.Entry<Transaction, Coins>> getComparator() {
-        return BY_ABSOLUTE_COINS_THEN_HASH;
+        return comparator;
     }
 }
