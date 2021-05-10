@@ -13,7 +13,6 @@ import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,6 +29,7 @@ public class TransactionsCommands {
     private final TransactionFormatter transactionFormatter;
     private final AddressFormatter addressFormatter;
     private final PriceService priceService;
+    private final TransactionSorter transactionSorter;
 
     public TransactionsCommands(
             TransactionService transactionService,
@@ -38,7 +38,8 @@ public class TransactionsCommands {
             TransactionDescriptionService transactionDescriptionService,
             TransactionFormatter transactionFormatter,
             AddressFormatter addressFormatter,
-            PriceService priceService
+            PriceService priceService,
+            TransactionSorter transactionSorter
     ) {
         this.transactionService = transactionService;
         this.addressTransactionsService = addressTransactionsService;
@@ -47,6 +48,7 @@ public class TransactionsCommands {
         this.transactionFormatter = transactionFormatter;
         this.addressFormatter = addressFormatter;
         this.priceService = priceService;
+        this.transactionSorter = transactionSorter;
     }
 
     @ShellMethod("Get data for a given transaction")
@@ -79,7 +81,7 @@ public class TransactionsCommands {
                 addressFormatter.getFormattedOwnershipStatus(addressString),
                 description,
                 hashes.size(),
-                formattedHashesSortedByDifferenceForAddress(hashes, addressString)
+                formattedAndSortedHashes(hashes, addressString)
         );
         return StringUtils.stripEnd(result, "\n");
     }
@@ -109,7 +111,7 @@ public class TransactionsCommands {
         return "OK";
     }
 
-    private String formattedHashesSortedByDifferenceForAddress(Set<String> hashes, String addressString) {
+    private String formattedAndSortedHashes(Set<String> hashes, String addressString) {
         Set<Transaction> transactions = transactionService.getTransactionDetails(hashes);
         preloadPrices(transactions);
         String details = transactions.parallelStream()
@@ -118,7 +120,7 @@ public class TransactionsCommands {
                         Functions.identity(),
                         transaction -> transaction.getDifferenceForAddress(addressString).absolute()))
                 .entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
+                .sorted(transactionSorter.getComparator())
                 .map(entry -> transactionFormatter.formatSingleLineForAddress(entry.getKey(), addressString))
                 .collect(Collectors.joining("\n"));
         if (transactions.size() != hashes.size() || transactions.contains(Transaction.UNKNOWN)) {
