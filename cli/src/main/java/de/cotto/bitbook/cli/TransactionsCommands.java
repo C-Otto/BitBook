@@ -111,6 +111,13 @@ public class TransactionsCommands {
         return "OK";
     }
 
+    @SuppressWarnings("PMD.LinguisticNaming")
+    @ShellMethod("Sets the order used to sort transactions")
+    public String setTransactionSortOrder(@ShellOption TransactionSortOrder transactionSortOrder) {
+        transactionSorter.setOrder(transactionSortOrder);
+        return "OK";
+    }
+
     private String formattedAndSortedHashes(Set<String> hashes, String addressString) {
         Set<Transaction> transactions = transactionService.getTransactionDetails(hashes);
         preloadPrices(transactions);
