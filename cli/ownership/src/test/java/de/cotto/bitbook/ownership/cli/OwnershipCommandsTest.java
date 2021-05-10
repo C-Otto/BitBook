@@ -28,6 +28,7 @@ import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixt
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_2;
+import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_3;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH_2;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -126,16 +127,16 @@ class OwnershipCommandsTest {
     }
 
     @Nested
-    class GetMyTransactions {
+    class GetTransactions {
         @BeforeEach
         void setUp() {
+            mockSortByHash();
             when(transactionFormatter.formatSingleLineForValue(any(), any()))
                     .then(invocation -> invocation.getArgument(0) + "/" + invocation.getArgument(1));
         }
 
         @Test
-        void includes_value_and_orders_transaction_sorter() {
-            mockSortByHash();
+        void getMyTransactions_includes_value_and_orders_transaction_sorter() {
             Coins value1 = Coins.ofSatoshis(1);
             Coins value2 = Coins.ofSatoshis(2);
             when(addressOwnershipService.getMyTransactionsWithCoins()).thenReturn(
@@ -146,19 +147,21 @@ class OwnershipCommandsTest {
                     + ANYTHING + TRANSACTION_HASH + ANYTHING + value1
             );
         }
-    }
 
-    @Nested
-    class GetNeighbourTransactions {
-        @BeforeEach
-        void setUp() {
-            mockSortByHash();
-            when(transactionFormatter.formatSingleLineForValue(any(), any()))
-                    .then(invocation -> invocation.getArgument(0) + "/" + invocation.getArgument(1));
+        @Test
+        void getMyTransactions_preloads_prices() {
+            when(addressOwnershipService.getMyTransactionsWithCoins()).thenReturn(
+                    Map.of(TRANSACTION_2, Coins.NONE, TRANSACTION_3, Coins.NONE)
+            );
+            ownershipCommands.getMyTransactions();
+
+            InOrder inOrder = inOrder(priceService, transactionFormatter);
+            inOrder.verify(priceService).getPrices(Set.of(TRANSACTION_2.getTime(), TRANSACTION_3.getTime()));
+            inOrder.verify(transactionFormatter, atLeastOnce()).formatSingleLineForValue(any(), any());
         }
 
         @Test
-        void uses_formatter_and_transaction_sorter() {
+        void getNeighbourTransactions_uses_formatter_and_transaction_sorter() {
             Coins coins1 = Coins.ofSatoshis(1);
             Coins coins2 = Coins.ofSatoshis(2);
 
@@ -171,7 +174,7 @@ class OwnershipCommandsTest {
         }
 
         @Test
-        void does_not_show_zero_values() {
+        void getNeighbourTransactions_does_not_show_zero_values() {
             when(addressOwnershipService.getNeighbourTransactions()).thenReturn(Map.of(
                     TRANSACTION, Coins.NONE,
                     TRANSACTION_2, Coins.ofSatoshis(1)
@@ -181,7 +184,7 @@ class OwnershipCommandsTest {
         }
 
         @Test
-        void preloads_prices() {
+        void getNeighbourTransactions_preloads_prices() {
             when(addressOwnershipService.getNeighbourTransactions()).thenReturn(Map.of(
                     TRANSACTION, Coins.NONE,
                     TRANSACTION_2, Coins.ofSatoshis(1)
