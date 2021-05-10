@@ -9,6 +9,7 @@ import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.cli.CliAddress;
 import de.cotto.bitbook.cli.PriceFormatter;
 import de.cotto.bitbook.cli.TransactionFormatter;
+import de.cotto.bitbook.cli.TransactionSorter;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -19,12 +20,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_2;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.TRANSACTION_HASH_3;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_2;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_3;
@@ -63,6 +64,9 @@ class OwnershipCommandsTest {
 
     @Mock
     private AddressTransactionsService addressTransactionsService;
+
+    @Mock
+    private TransactionSorter transactionSorter;
 
     @Test
     void getBalance() {
@@ -131,33 +135,9 @@ class OwnershipCommandsTest {
         }
 
         @Test
-        void formats_transactions_ordered_by_hash() {
-            when(addressOwnershipService.getMyTransactionsWithCoins()).thenReturn(
-                    Map.of(TRANSACTION, Coins.NONE, TRANSACTION_2, Coins.NONE, TRANSACTION_3, Coins.NONE)
-            );
-            assertThat(ownershipCommands.getMyTransactions()).matches(
-                    ANYTHING + TRANSACTION_HASH_3 + ANYTHING + "\n"
-                    + ANYTHING + TRANSACTION_HASH_2 + ANYTHING + "\n"
-                    + ANYTHING + TRANSACTION_HASH + ANYTHING
-            );
-        }
-
-        @Test
-        void includes_value_and_orders_by_value() {
+        void includes_value_and_orders_transaction_sorter() {
+            mockSortByHash();
             Coins value1 = Coins.ofSatoshis(1);
-            Coins value2 = Coins.ofSatoshis(2);
-            when(addressOwnershipService.getMyTransactionsWithCoins()).thenReturn(
-                    Map.of(TRANSACTION, value1, TRANSACTION_2, value2)
-            );
-            assertThat(ownershipCommands.getMyTransactions()).matches(
-                    ANYTHING + TRANSACTION_HASH + ANYTHING + value1 + ANYTHING + "\n"
-                    + ANYTHING + TRANSACTION_HASH_2 + ANYTHING + value2
-            );
-        }
-
-        @Test
-        void includes_value_and_orders_by_absolute_value() {
-            Coins value1 = Coins.ofSatoshis(-100);
             Coins value2 = Coins.ofSatoshis(2);
             when(addressOwnershipService.getMyTransactionsWithCoins()).thenReturn(
                     Map.of(TRANSACTION, value1, TRANSACTION_2, value2)
@@ -268,5 +248,10 @@ class OwnershipCommandsTest {
         assertThat(ownershipCommands.resetOwnership(new CliAddress(INVALID_ADDRESS)))
                 .isEqualTo(CliAddress.ERROR_MESSAGE);
         verifyNoInteractions(addressOwnershipService);
+    }
+
+    private void mockSortByHash() {
+        when(transactionSorter.getComparator())
+                .thenReturn(Comparator.comparing(entry -> entry.getKey().getHash()));
     }
 }
