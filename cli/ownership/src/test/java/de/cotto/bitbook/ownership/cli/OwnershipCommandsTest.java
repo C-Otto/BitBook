@@ -28,7 +28,6 @@ import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixt
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_2;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_3;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH_2;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -153,12 +152,13 @@ class OwnershipCommandsTest {
     class GetNeighbourTransactions {
         @BeforeEach
         void setUp() {
+            mockSortByHash();
             when(transactionFormatter.formatSingleLineForValue(any(), any()))
                     .then(invocation -> invocation.getArgument(0) + "/" + invocation.getArgument(1));
         }
 
         @Test
-        void uses_formatter() {
+        void uses_formatter_and_transaction_sorter() {
             Coins coins1 = Coins.ofSatoshis(1);
             Coins coins2 = Coins.ofSatoshis(2);
 
@@ -167,22 +167,7 @@ class OwnershipCommandsTest {
                     TRANSACTION_2, coins2
             ));
             assertThat(ownershipCommands.getNeighbourTransactions())
-                    .isEqualTo(TRANSACTION + "/" + coins1 + "\n" + TRANSACTION_2 + "/" + coins2);
-        }
-
-        @Test
-        void sorted_by_hash() {
-            Coins coins = Coins.ofSatoshis(1);
-            when(addressOwnershipService.getNeighbourTransactions()).thenReturn(Map.of(
-                    TRANSACTION, coins,
-                    TRANSACTION_2, coins,
-                    TRANSACTION_3, coins
-            ));
-            assertThat(ownershipCommands.getNeighbourTransactions()).isEqualTo(
-                    TRANSACTION_3 + "/" + coins + "\n"
-                    + TRANSACTION_2 + "/" + coins + "\n"
-                    + TRANSACTION + "/" + coins
-            );
+                    .isEqualTo(TRANSACTION_2 + "/" + coins2 + "\n" + TRANSACTION + "/" + coins1);
         }
 
         @Test

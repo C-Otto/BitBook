@@ -19,16 +19,11 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
-import java.util.AbstractMap.SimpleEntry;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.util.Map.Entry.comparingByKey;
 import static java.util.Map.Entry.comparingByValue;
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toSet;
 
 @ShellComponent
@@ -94,15 +89,12 @@ public class OwnershipCommands {
 
     @ShellMethod("Get transactions connected to own addresses where source/target has unknown ownership")
     public String getNeighbourTransactions() {
-        Map<Transaction, Coins> map = addressOwnershipService.getNeighbourTransactions();
-        preloadPrices(map.keySet());
-        Map<Coins, List<Map.Entry<Transaction, Coins>>> byCoins = map.entrySet().stream()
-                .collect(groupingBy(Map.Entry::getValue));
-        return byCoins.entrySet().stream()
-                .map(entry -> new SimpleEntry<>(entry.getKey().absolute(), entry.getValue()))
-                .sorted(comparingByKey())
-                .filter(coins -> coins.getKey().absolute().isPositive())
-                .map(coinsEntry -> appendTransactions(coinsEntry.getValue()))
+        Map<Transaction, Coins> transactionsWithCoins = addressOwnershipService.getNeighbourTransactions();
+        preloadPrices(transactionsWithCoins.keySet());
+        return transactionsWithCoins.entrySet().stream()
+                .filter(entry -> entry.getValue().absolute().isPositive())
+                .sorted(transactionSorter.getComparator())
+                .map(entry -> transactionFormatter.formatSingleLineForValue(entry.getKey(), entry.getValue()))
                 .collect(Collectors.joining("\n"));
     }
 
@@ -159,18 +151,6 @@ public class OwnershipCommands {
         String formattedPrice = priceFormatter.format(value, currentPrice);
         String coinsWithPrice = "%s [%s]".formatted(value, formattedPrice);
         return addressWithDescription.getFormattedWithInfix(coinsWithPrice);
-    }
-
-    private String appendTransactions(List<Map.Entry<Transaction, Coins>> entries) {
-        Comparator<Map.Entry<Transaction, Coins>> compareByTransactionHash =
-                Comparator.comparing(entry -> entry.getKey().getHash());
-        return entries.stream()
-                .sorted(compareByTransactionHash)
-                .map(transactionWithCoins -> transactionFormatter.formatSingleLineForValue(
-                        transactionWithCoins.getKey(),
-                        transactionWithCoins.getValue()
-                ))
-                .collect(Collectors.joining("\n"));
     }
 
     private void preloadPrices(Set<Transaction> transactions) {
