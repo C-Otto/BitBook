@@ -43,10 +43,13 @@ public class TransactionSorter {
     private static final Comparator<Map.Entry<Transaction, Coins>> BY_COINS_THEN_DATE_HASH =
             BY_COINS.thenComparing(BY_DATE_THEN_HASH);
 
+    private static final Comparator<Map.Entry<Transaction, Coins>> DEFAULT_COMPARATOR =
+            BY_COINS_ABSOLUTE_THEN_DATE_HASH;
+
     private Comparator<Map.Entry<Transaction, Coins>> comparator;
 
     public TransactionSorter() {
-        this.comparator = BY_COINS_ABSOLUTE_THEN_HASH;
+        this.comparator = DEFAULT_COMPARATOR;
     }
 
     public void setOrder(TransactionSortOrder transactionSortOrder) {
@@ -73,8 +76,11 @@ public class TransactionSorter {
             case BY_DATE_THEN_HASH:
                 comparator = BY_DATE_THEN_HASH;
                 break;
-            default:
+            case BY_COINS_ABSOLUTE_THEN_HASH:
                 comparator = BY_COINS_ABSOLUTE_THEN_HASH;
+                break;
+            default:
+                comparator = DEFAULT_COMPARATOR;
                 break;
         }
     }
