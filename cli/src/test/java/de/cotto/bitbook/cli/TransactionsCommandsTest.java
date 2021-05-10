@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -71,6 +72,9 @@ class TransactionsCommandsTest {
     @Mock
     private PriceService priceService;
 
+    @Mock
+    private TransactionSorter transactionSorter;
+
     @Test
     void getTransactionDetails() {
         when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(TRANSACTION);
@@ -123,7 +127,8 @@ class TransactionsCommandsTest {
     }
 
     @Test
-    void getAddressTransactions_sorted_by_absolute_difference_for_transaction() {
+    void getAddressTransactions_sorted_using_transaction_sorter() {
+        mockSortByHash();
         String address = INPUT_ADDRESS_1;
         Transaction transaction3 = new Transaction(
                 TRANSACTION_HASH_3,
@@ -135,12 +140,12 @@ class TransactionsCommandsTest {
         );
         when(addressDescriptionService.getDescription(address)).thenReturn("");
         when(addressFormatter.getFormattedOwnershipStatus(address)).thenReturn("?");
-        AddressTransactions addressTransactions1 = new AddressTransactions(
+        AddressTransactions addressTransactions = new AddressTransactions(
                 ADDRESS,
                 Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2, TRANSACTION_HASH_3),
                 LAST_CHECKED_AT_BLOCK_HEIGHT
         );
-        when(addressTransactionsService.getTransactions(address)).thenReturn(addressTransactions1);
+        when(addressTransactionsService.getTransactions(address)).thenReturn(addressTransactions);
         when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2, TRANSACTION_HASH_3)))
                 .thenReturn(Set.of(TRANSACTION, TRANSACTION_2, transaction3));
 
@@ -148,20 +153,19 @@ class TransactionsCommandsTest {
         when(transactionFormatter.formatSingleLineForAddress(TRANSACTION_2, address)).thenReturn("f2");
         when(transactionFormatter.formatSingleLineForAddress(transaction3, address)).thenReturn("f3");
 
-        String addressTransactions = transactionsCommands.getAddressTransactions(new CliAddress(address));
-
-        assertThat(addressTransactions).isEqualTo("""
+        assertThat(transactionsCommands.getAddressTransactions(new CliAddress(address))).isEqualTo("""
                 Address: bc1xxxn59nfqcw2la4ms7zsphqllm5789syhrgcupw ?
                 Description:\040
                 Transaction hashes (3):
+                f3
                 f2
-                f1
-                f3"""
+                f1"""
         );
     }
 
     @Test
     void getAddressTransactions_with_description() {
+        mockSortByHash();
         when(addressFormatter.getFormattedOwnershipStatus(ADDRESS)).thenReturn("?");
         when(addressDescriptionService.getDescription(ADDRESS)).thenReturn("description");
         when(addressTransactionsService.getTransactions(ADDRESS)).thenReturn(ADDRESS_TRANSACTIONS);
@@ -176,6 +180,7 @@ class TransactionsCommandsTest {
 
     @Test
     void getAddressTransactions_requests_all_prices_before_formatting_details() {
+        mockSortByHash();
         when(addressTransactionsService.getTransactions(ADDRESS))
                 .thenReturn(new AddressTransactions(ADDRESS, Set.of(TRANSACTION_HASH), LAST_CHECKED_AT_BLOCK_HEIGHT));
         when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH))).thenReturn(Set.of(TRANSACTION));
@@ -216,9 +221,15 @@ class TransactionsCommandsTest {
     }
 
     private void prepareMocks() {
+        mockSortByHash();
         when(addressDescriptionService.getDescription(any())).thenReturn("");
         when(addressFormatter.getFormattedOwnershipStatus(ADDRESS)).thenReturn("?");
         when(transactionFormatter.formatSingleLineForAddress(any(), any()))
                 .then(invocation -> invocation.getArgument(0) + "/" + invocation.getArgument(1));
+    }
+
+    private void mockSortByHash() {
+        when(transactionSorter.getComparator())
+                .thenReturn(Comparator.comparing(entry -> entry.getKey().getHash()));
     }
 }
