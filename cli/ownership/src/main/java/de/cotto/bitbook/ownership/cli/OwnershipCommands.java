@@ -13,6 +13,7 @@ import de.cotto.bitbook.cli.AddressWithOwnershipCompletionProvider;
 import de.cotto.bitbook.cli.CliAddress;
 import de.cotto.bitbook.cli.PriceFormatter;
 import de.cotto.bitbook.cli.TransactionFormatter;
+import de.cotto.bitbook.cli.TransactionSorter;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -39,6 +40,7 @@ public class OwnershipCommands {
     private final PriceFormatter priceFormatter;
     private final TransactionFormatter transactionFormatter;
     private final AddressTransactionsService addressTransactionsService;
+    private final TransactionSorter transactionSorter;
 
     public OwnershipCommands(
             AddressOwnershipService addressOwnershipService,
@@ -46,7 +48,8 @@ public class OwnershipCommands {
             PriceService priceService,
             PriceFormatter priceFormatter,
             TransactionFormatter transactionFormatter,
-            AddressTransactionsService addressTransactionsService
+            AddressTransactionsService addressTransactionsService,
+            TransactionSorter transactionSorter
     ) {
         this.addressOwnershipService = addressOwnershipService;
         this.balanceService = balanceService;
@@ -54,6 +57,7 @@ public class OwnershipCommands {
         this.priceFormatter = priceFormatter;
         this.transactionFormatter = transactionFormatter;
         this.addressTransactionsService = addressTransactionsService;
+        this.transactionSorter = transactionSorter;
     }
 
     @ShellMethod("Get the total balance over all owned addresses")
@@ -83,7 +87,7 @@ public class OwnershipCommands {
     @ShellMethod("Get all transactions that touch at least one owned address")
     public String getMyTransactions() {
         return addressOwnershipService.getMyTransactionsWithCoins().entrySet().stream()
-                .sorted(byAbsoluteValueThenHash())
+                .sorted(transactionSorter.getComparator())
                 .map(entry -> transactionFormatter.formatSingleLineForValue(entry.getKey(), entry.getValue()))
                 .collect(Collectors.joining("\n"));
     }
@@ -171,10 +175,5 @@ public class OwnershipCommands {
 
     private void preloadPrices(Set<Transaction> transactions) {
         priceService.getPrices(transactions.stream().map(Transaction::getTime).collect(toSet()));
-    }
-
-    private Comparator<Map.Entry<Transaction, Coins>> byAbsoluteValueThenHash() {
-        return Comparator.comparing((Map.Entry<Transaction, Coins> entry) -> entry.getValue().absolute())
-                .thenComparing(entry -> entry.getKey().getHash());
     }
 }
