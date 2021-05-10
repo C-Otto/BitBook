@@ -60,8 +60,8 @@ out again, the fiat value shown for these two transactions may vary a lot if the
 The block height and timestamp shown for each transaction is identical to the information in
 [get-transaction-details](#get-transaction-details).
 
-The transactions are sorted by the absolute amount, so that transactions having the most impact on the address are shown
-at the bottom.
+By default, the transactions are sorted by the absolute amount, so that transactions having the most impact on the
+address are shown at the bottom (see [Sort Order](#sort-order) if you want to change the sort order).
 
 Note that the underlying network requests may be slow for addresses with many transactions.
 The list of associated transactions is persisted, so it will not be downloaded more than once.
@@ -102,8 +102,8 @@ You can reset ownership information for an address using `reset-ownership <addre
 ### Get Owned Addresses
 The command `get-owned-addresses` can be used to list the addresses you marked as `owned`.
 The output includes the current balance with the current fiat value, and the addresses' descriptions (if set).
-The output is sorted by value, so that the addresses with the highest number of coins are shown at the bottom of the
-list.
+By default, the output is sorted by value, so that the addresses with the highest number of coins are shown at the
+bottom of the list (see [Sort Order](#sort-order) if you want to change the sort order).
 
 ```
 BitBook$ get-owned-addresses
@@ -136,8 +136,9 @@ In addition to the transaction details, the output shows the contribution of eac
 As such, transactions from one of your owned addresses to another (or the same) owned address have a negative
 contribution, which is the transaction fee.
 
-The output is sorted by the absolute value of the contribution, so that the transactions having the most impact on your
-balance are shown at the bottom of the list.
+By default, the output is sorted by the absolute value of the contribution, so that the transactions having the most
+impact on your balance are shown at the bottom of the list (see [Sort Order](#sort-order) if you want to change the
+sort order).
 
 ```
 BitBook$ get-my-transactions
@@ -204,8 +205,8 @@ a value of zero are not included in the output.
 This information is aggregated over all of your owned addresses, so that transactions between your owned addresses do
 not show up (fees are considered to be sent to a foreign address).
 
-The list is sorted by absolute values, so that the transactions that have the most impact in your owned addresses
-are shown at the bottom.
+By default, the list is sorted by absolute values, so that the transactions that have the most impact in your owned
+addresses are shown at the bottom (see [Sort Order](#sort-order) if you want to change the sort order).
 
 **As described in the [example](example.md), you could go through the list of
 transactions (using [Get Transaction Details](#get-transaction-details)) and add ownership information until the
@@ -263,3 +264,12 @@ description is known.
 
 ## lnd Support
 Please have a look at [lnd.md](lnd.md).
+
+## Sort Order
+Using the command `set-transaction-sort-order` you can influence how lists of transactions are ordered.
+By default, transactions are sorted by their absolute coin value (i.e., -2 coins and 2 coins are treated as identical),
+followed by the date, followed by the transaction hash.
+As an example, you can use `set-transaction-sort-order BY_DATE_THEN_COINS_ABSOLUTE_THEN_HASH` to sort by date
+(and then by absolute coin value if two transactions have the same date).
+Please use [tab completion](#tab-completion) (type `set-transaction-sort-order` and press TAB twice) to see all
+available sort orders.
