@@ -1,0 +1,12 @@
+plugins {
+    id 'bitbook.java-library-conventions'
+    id 'java-test-fixtures'
+}
+
+dependencies {
+    implementation project(':backend:transaction')
+    implementation project(':ownership')
+    implementation 'commons-codec:commons-codec:1.15'
+    testImplementation testFixtures(project(':backend:transaction:models'))
+    testFixturesImplementation testFixtures(project(':backend:transaction:models'))
+}
