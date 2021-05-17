@@ -14,23 +14,24 @@ import static java.util.stream.Collectors.toSet;
 
 @Component
 public class AddressTransactionsService {
-    private static final int BLOCKS_CONSIDERED_RECENT = 48;
-
     private final PrioritizingAddressTransactionsProvider addressTransactionsProvider;
     private final TransactionService transactionService;
     private final AddressTransactionsDao addressTransactionsDao;
     private final BlockHeightService blockHeightService;
+    private final TransactionUpdateHeuristics transactionUpdateHeuristics;
 
     public AddressTransactionsService(
             PrioritizingAddressTransactionsProvider addressTransactionsProvider,
             TransactionService transactionService,
             AddressTransactionsDao addressTransactionsDao,
-            BlockHeightService blockHeightService
+            BlockHeightService blockHeightService,
+            TransactionUpdateHeuristics transactionUpdateHeuristics
     ) {
         this.addressTransactionsProvider = addressTransactionsProvider;
         this.transactionService = transactionService;
         this.addressTransactionsDao = addressTransactionsDao;
         this.blockHeightService = blockHeightService;
+        this.transactionUpdateHeuristics = transactionUpdateHeuristics;
     }
 
     @Async
@@ -66,7 +67,7 @@ public class AddressTransactionsService {
             int currentBlockHeight,
             RequestPriority requestPriority
     ) {
-        if (isRecentEnough(addressTransactions, currentBlockHeight)) {
+        if (transactionUpdateHeuristics.isRecentEnough(addressTransactions)) {
             return CompletableFuture.completedFuture(addressTransactions);
         }
         TransactionsRequestKey transactionsRequestKey =
@@ -89,10 +90,6 @@ public class AddressTransactionsService {
 
     private boolean isValid(AddressTransactions persistedAddressTransactions) {
         return persistedAddressTransactions.isValid();
-    }
-
-    private boolean isRecentEnough(AddressTransactions addressTransactions, int currentBlockHeight) {
-        return addressTransactions.getLastCheckedAtBlockHeight() + BLOCKS_CONSIDERED_RECENT >= currentBlockHeight;
     }
 
     private void requestTransactionDetailsAndPersist(AddressTransactions addressTransactions) {

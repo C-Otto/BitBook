@@ -47,6 +47,9 @@ class AddressTransactionsServiceTest {
     @Mock
     private BlockHeightService blockHeightService;
 
+    @Mock
+    private TransactionUpdateHeuristics transactionUpdateHeuristics;
+
     @Test
     void getTransactionsForAddresses() {
         when(blockHeightService.getBlockHeight()).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
@@ -148,7 +151,8 @@ class AddressTransactionsServiceTest {
         }
 
         @Test
-        void downloads_transactions_from_higher_block_heights() {
+        void downloads_transactions() {
+            when(transactionUpdateHeuristics.isRecentEnough(any())).thenReturn(false);
             mockAddressTransactionsFromProvider(requestKey, STANDARD, ADDRESS_TRANSACTIONS_UPDATED);
             addressTransactionsService.getTransactions(ADDRESS);
             verify(addressTransactionsProvider).getAddressTransactions(argIsRequest(requestKey, STANDARD));
@@ -156,7 +160,7 @@ class AddressTransactionsServiceTest {
 
         @Test
         void does_not_update_if_recently_updated() {
-            when(blockHeightService.getBlockHeight()).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT + 48);
+            when(transactionUpdateHeuristics.isRecentEnough(any())).thenReturn(true);
             addressTransactionsService.getTransactions(ADDRESS);
             verifyNoInteractions(addressTransactionsProvider);
         }
