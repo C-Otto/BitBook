@@ -23,11 +23,7 @@ public class BalanceService {
         AddressTransactions transactions = addressTransactionsService.getTransactions(address);
         Set<String> transactionHashes = transactions.getTransactionHashes();
         return transactionService.getTransactionDetails(transactionHashes).stream()
-                .map(transactionDetails -> {
-                    Coins incoming = transactionDetails.getIncomingCoins(address);
-                    Coins outgoing = transactionDetails.getOutgoingCoins(address);
-                    return Coins.NONE.add(incoming).subtract(outgoing);
-                })
+                .map(transactionDetails -> transactionDetails.getDifferenceForAddress(address))
                 .reduce(Coins.NONE, Coins::add);
     }
 
