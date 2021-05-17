@@ -14,7 +14,8 @@ public class TransactionSorter {
             Comparator.comparing(entry -> entry.getKey().getHash());
 
     private static final Comparator<Map.Entry<Transaction, Coins>> BY_DATE =
-            Comparator.comparing(entry -> entry.getKey().getTime());
+            Comparator.comparing((Map.Entry<Transaction, Coins> entry) -> entry.getKey().getBlockHeight())
+                    .thenComparing((Map.Entry<Transaction, Coins> entry) -> entry.getKey().getTime());
 
     private static final Comparator<Map.Entry<Transaction, Coins>> BY_COINS =
             Map.Entry.comparingByValue();

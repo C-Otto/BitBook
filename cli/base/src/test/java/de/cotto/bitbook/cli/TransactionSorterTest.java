@@ -2,6 +2,7 @@ package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
+import de.cotto.bitbook.backend.transaction.model.TransactionFixtures;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Nested;
@@ -111,6 +112,24 @@ class TransactionSorterTest {
         void sortsByDate() {
             for (TransactionSortOrder order : sortByDate) {
                 assertOrder(entries, order, date1hash2, date2hash1);
+            }
+            softly.assertAll();
+        }
+
+        @Test
+        void sortsByBlockThenDate() {
+            Transaction earlierBlockTransaction = new Transaction(
+                    TransactionFixtures.TRANSACTION_HASH_2,
+                    TransactionFixtures.BLOCK_HEIGHT - 1,
+                    TransactionFixtures.DATE_TIME.plusDays(1),
+                    Coins.NONE,
+                    List.of(),
+                    List.of()
+            );
+            Map.Entry<Transaction, Coins> block1date2 = entry(earlierBlockTransaction, COINS);
+            Map.Entry<Transaction, Coins> block2date1 = entry(TRANSACTION, COINS);
+            for (TransactionSortOrder order : sortByDate) {
+                assertOrder(Lists.newArrayList(block2date1, block1date2), order, block1date2, block2date1);
             }
             softly.assertAll();
         }
