@@ -1,1 +1,1 @@
-./gradlew cli:bootJar && clear && java -jar cli/build/libs/*-boot.jar
+./gradlew cli:bootJar && clear && java -jar cli/build/libs/cli-boot.jar
