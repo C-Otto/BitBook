@@ -26,7 +26,7 @@ check.dependsOn integrationTest
 
 dependencies {
     testImplementation 'com.tngtech.archunit:archunit:0.18.0'
-    testImplementation 'org.awaitility:awaitility:4.0.3'
+    testImplementation 'org.awaitility:awaitility:4.1.0'
 
 }
 

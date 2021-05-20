@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.5.5'
+    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.6'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
