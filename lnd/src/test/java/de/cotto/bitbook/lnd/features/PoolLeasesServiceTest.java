@@ -3,6 +3,7 @@ package de.cotto.bitbook.lnd.features;
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
+import de.cotto.bitbook.backend.transaction.model.Transaction;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 import static de.cotto.bitbook.ownership.OwnershipStatus.UNKNOWN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -52,9 +54,9 @@ class PoolLeasesServiceTest {
     @BeforeEach
     void setUp() {
         when(transactionService.getTransactionDetails(POOL_LEASE.getTransactionHash())).thenReturn(TRANSACTION);
-        when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_1)).thenReturn(UNKNOWN);
-        when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_2)).thenReturn(OWNED);
-        when(addressDescriptionService.getDescription(any())).thenReturn("");
+        lenient().when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_1)).thenReturn(UNKNOWN);
+        lenient().when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_2)).thenReturn(OWNED);
+        lenient().when(addressDescriptionService.getDescription(any())).thenReturn("");
         channelAddress = OUTPUT_ADDRESS_1;
         changeAddress = OUTPUT_ADDRESS_2;
     }
@@ -107,5 +109,11 @@ class PoolLeasesServiceTest {
     void marks_change_address_as_owned() {
         poolLeasesService.addFromLeases(Set.of(POOL_LEASE));
         verify(addressOwnershipService).setAddressAsOwned(changeAddress);
+    }
+
+    @Test
+    void unknown_transaction_details() {
+        when(transactionService.getTransactionDetails(POOL_LEASE.getTransactionHash())).thenReturn(Transaction.UNKNOWN);
+        assertThat(poolLeasesService.addFromLeases(Set.of(POOL_LEASE))).isEqualTo(0);
     }
 }

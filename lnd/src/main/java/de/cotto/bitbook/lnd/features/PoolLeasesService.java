@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 
@@ -38,12 +39,15 @@ public class PoolLeasesService {
     }
 
     public long addFromLeases(Set<PoolLease> leases) {
-        leases.forEach(lease -> {
+        Set<PoolLease> validLeases = leases.stream()
+                .filter(lease -> transactionService.getTransactionDetails(lease.getTransactionHash()).isValid())
+                .collect(Collectors.toSet());
+        validLeases.forEach(lease -> {
             setTransactionDescription(lease);
             setChangeAddressDescriptionAndOwnership(lease);
             setChannelAddressDescriptionAndOwnership(lease);
         });
-        return leases.size();
+        return validLeases.size();
     }
 
     private void setTransactionDescription(PoolLease poolLease) {
