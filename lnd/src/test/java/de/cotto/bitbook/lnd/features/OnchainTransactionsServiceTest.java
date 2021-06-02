@@ -146,6 +146,18 @@ class OnchainTransactionsServiceTest {
             assertFailure(onchainTransaction);
         }
 
+        @Test
+        void nothing_for_funding_transaction_unknown_transaction() {
+            OnchainTransaction onchainTransaction = new OnchainTransaction(
+                    TRANSACTION_HASH,
+                    "",
+                    OUTPUT_VALUE_2.add(Coins.ofSatoshis(1)),
+                    Coins.NONE
+            );
+            when(transactionService.getTransactionDetails(anyString())).thenReturn(Transaction.UNKNOWN);
+            assertFailure(onchainTransaction);
+        }
+
         private void assertFailure(OnchainTransaction onchainTransaction) {
             lenient().when(transactionService.getTransactionDetails(anyString()))
                     .thenReturn(Transaction.UNKNOWN);
@@ -260,6 +272,20 @@ class OnchainTransactionsServiceTest {
             OnchainTransaction openingTransaction = new OnchainTransaction(
                     TRANSACTION_HASH,
                     "xxx",
+                    Coins.ofSatoshis(-1_234 - 21_513),
+                    Coins.ofSatoshis(21_513)
+            );
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(openingTransaction))).isEqualTo(0);
+            verifyNoInteractions(addressOwnershipService);
+        }
+
+        @Test
+        void unknown_transaction_details() {
+            when(transactionService.getTransactionDetails(OPENING_TRANSACTION.getTransactionHash()))
+                    .thenReturn(Transaction.UNKNOWN);
+            OnchainTransaction openingTransaction = new OnchainTransaction(
+                    TRANSACTION_HASH,
+                    "",
                     Coins.ofSatoshis(-1_234 - 21_513),
                     Coins.ofSatoshis(21_513)
             );
@@ -445,6 +471,18 @@ class OnchainTransactionsServiceTest {
             OnchainTransaction transaction = new OnchainTransaction(
                     SPEND_TRANSACTION.getTransactionHash(),
                     "x",
+                    SPEND_TRANSACTION.getAmount(),
+                    SPEND_TRANSACTION.getFees()
+            );
+            assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(transaction))).isEqualTo(0);
+        }
+
+        @Test
+        void unknown_transaction_details() {
+            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(Transaction.UNKNOWN);
+            OnchainTransaction transaction = new OnchainTransaction(
+                    SPEND_TRANSACTION.getTransactionHash(),
+                    "",
                     SPEND_TRANSACTION.getAmount(),
                     SPEND_TRANSACTION.getFees()
             );
