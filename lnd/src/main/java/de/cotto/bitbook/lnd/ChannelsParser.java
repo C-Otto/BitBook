@@ -2,10 +2,12 @@ package de.cotto.bitbook.lnd;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.cotto.bitbook.backend.transaction.TransactionService;
+import de.cotto.bitbook.backend.transaction.model.Transaction;
 import de.cotto.bitbook.lnd.model.Channel;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Component
@@ -25,7 +27,7 @@ public class ChannelsParser {
 
         Set<Channel> result = new LinkedHashSet<>();
         for (JsonNode channelNode : channels) {
-            result.add(parseChannel(channelNode));
+            parseChannel(channelNode).ifPresent(result::add);
         }
         return result;
     }
@@ -38,12 +40,16 @@ public class ChannelsParser {
         transactionService.getTransactionDetails(hashes);
     }
 
-    private Channel parseChannel(JsonNode channelNode) {
-        return new Channel(
+    private Optional<Channel> parseChannel(JsonNode channelNode) {
+        Transaction transaction = transactionService.getTransactionDetails(getOpeningTransactionHash(channelNode));
+        if (transaction.isInvalid()) {
+            return Optional.empty();
+        }
+        return Optional.of(new Channel(
                 channelNode.get("initiator").booleanValue(),
                 channelNode.get("remote_pubkey").textValue(),
-                transactionService.getTransactionDetails(getOpeningTransactionHash(channelNode)),
-                getOutputIndex(channelNode));
+                transaction,
+                getOutputIndex(channelNode)));
     }
 
     private String getOpeningTransactionHash(JsonNode channelNode) {
