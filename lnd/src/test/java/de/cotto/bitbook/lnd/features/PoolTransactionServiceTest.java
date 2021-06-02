@@ -4,6 +4,7 @@ import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.backend.transaction.model.Coins;
+import de.cotto.bitbook.backend.transaction.model.Transaction;
 import de.cotto.bitbook.lnd.model.OnchainTransaction;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.junit.jupiter.api.BeforeEach;
@@ -141,6 +142,19 @@ class PoolTransactionServiceTest {
             OnchainTransaction transaction = new OnchainTransaction(
                     TRANSACTION_HASH,
                     "poold -- AccountCreation(acct_key=" + POOL_ACCOUNT_ID + ")", // leading space missing
+                    Coins.ofSatoshis(-1_234 - 999),
+                    Coins.ofSatoshis(999)
+            );
+            assertFailure(transaction);
+        }
+
+        @Test
+        void unknown_transaction_details() {
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash()))
+                    .thenReturn(Transaction.UNKNOWN);
+            OnchainTransaction transaction = new OnchainTransaction(
+                    TRANSACTION_HASH,
+                    " poold -- AccountCreation(acct_key=" + POOL_ACCOUNT_ID + ")",
                     Coins.ofSatoshis(-1_234 - 999),
                     Coins.ofSatoshis(999)
             );
