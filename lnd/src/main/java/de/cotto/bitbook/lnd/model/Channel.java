@@ -1,5 +1,6 @@
 package de.cotto.bitbook.lnd.model;
 
+import com.google.common.base.Preconditions;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 
 import java.util.Objects;
@@ -11,6 +12,7 @@ public class Channel {
     private final int outputIndex;
 
     public Channel(boolean initiator, String remotePubkey, Transaction openingTransaction, int outputIndex) {
+        Preconditions.checkArgument(openingTransaction.isValid());
         this.initiator = initiator;
         this.remotePubkey = remotePubkey;
         this.openingTransaction = openingTransaction;
