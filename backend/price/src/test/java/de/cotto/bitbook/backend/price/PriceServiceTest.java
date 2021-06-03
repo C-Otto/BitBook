@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class PriceServiceTest {
+class PriceServiceTest {
     private static final LocalDate DATE = LocalDate.of(2013, 11, 12);
     private static final LocalDate DATE_2 = LocalDate.of(2015, 2, 3);
 

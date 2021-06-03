@@ -17,7 +17,7 @@ import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.SWEEP_TRANSACTION
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.WITH_RESOLUTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ClosedChannelTest {
+class ClosedChannelTest {
     @Test
     void invalid_for_other_genesis_block_hash() {
         ClosedChannel closedChannel = CLOSED_CHANNEL.toBuilder().withChainHash("xxx").build();

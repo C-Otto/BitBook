@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class SweepTransactionsServiceTest {
+class SweepTransactionsServiceTest {
     private static final String DEFAULT_DESCRIPTION = "lnd";
 
     @InjectMocks

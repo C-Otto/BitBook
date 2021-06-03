@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class PriceServiceIT {
+class PriceServiceIT {
     private static final Price PRICE = Price.of(1234);
     private static final LocalDate DATE = LocalDate.of(2014, 1, 1);
     private static final long DATE_IN_EPOCH_SECONDS = DATE.atStartOfDay(ZoneOffset.UTC).toEpochSecond();

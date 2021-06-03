@@ -33,7 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ClosedChannelsServiceTest {
+class ClosedChannelsServiceTest {
     private static final String DEFAULT_DESCRIPTION = "lnd";
 
     @InjectMocks

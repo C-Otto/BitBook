@@ -64,12 +64,6 @@
                       value="//ClassOrInterfaceDeclaration[ends-with(@SimpleName, 'Test') or ends-with(@SimpleName, 'IT')]"/>
         </properties>
     </rule>
-    <rule ref="category/java/codestyle.xml/DefaultPackage">
-        <properties>
-            <property name="violationSuppressXPath"
-                      value="//ClassOrInterfaceDeclaration[ends-with(@SimpleName, 'Test') or ends-with(@SimpleName, 'IT')]"/>
-        </properties>
-    </rule>
     <rule ref="category/java/codestyle.xml/LongVariable">
         <properties>
             <property name="minimum" value="35"/>
