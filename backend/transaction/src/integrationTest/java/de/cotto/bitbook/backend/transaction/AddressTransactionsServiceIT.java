@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class AddressTransactionsServiceIT {
+class AddressTransactionsServiceIT {
     @Autowired
     private AddressTransactionsService addressTransactionsService;
 

@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class PriceFormatterTest {
+class PriceFormatterTest {
     public static final Price PRICE = Price.of(100);
 
     @InjectMocks

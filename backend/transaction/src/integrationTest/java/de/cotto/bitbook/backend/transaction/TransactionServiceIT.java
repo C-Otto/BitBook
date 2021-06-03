@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class TransactionServiceIT {
+class TransactionServiceIT {
     private static final int BLOCK_HEIGHT = 700_000;
 
     @Autowired

@@ -36,7 +36,7 @@ class AddressWithDescriptionTest {
 
     @Test
     void compareTo_same_description_same_address() {
-        assertThat(create("x", "y").compareTo(ADDRESS_WITH_DESCRIPTION)).isEqualTo(0);
+        assertThat(ADDRESS_WITH_DESCRIPTION.compareTo(create("x", "y"))).isEqualTo(0);
     }
 
     @Test

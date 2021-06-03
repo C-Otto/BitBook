@@ -28,21 +28,21 @@ public final class Price {
     }
 
     public Price add(Price addend) {
-        if (this.equals(UNKNOWN) || addend.equals(UNKNOWN)) {
+        if (UNKNOWN.equals(this) || UNKNOWN.equals(addend)) {
             throw new UnsupportedOperationException();
         }
         return Price.of(Objects.requireNonNull(asBigDecimal).add(Objects.requireNonNull(addend.asBigDecimal)));
     }
 
     public Price subtract(Price subtrahend) {
-        if (this.equals(UNKNOWN) || subtrahend.equals(UNKNOWN)) {
+        if (UNKNOWN.equals(this) || UNKNOWN.equals(subtrahend)) {
             throw new UnsupportedOperationException();
         }
         return Price.of(Objects.requireNonNull(asBigDecimal).subtract(Objects.requireNonNull(subtrahend.asBigDecimal)));
     }
 
     public BigDecimal getAsBigDecimal() {
-        if (this.equals(UNKNOWN)) {
+        if (UNKNOWN.equals(this)) {
             throw new UnsupportedOperationException();
         }
         return Objects.requireNonNull(asBigDecimal);
@@ -67,7 +67,7 @@ public final class Price {
 
     @Override
     public String toString() {
-        if (this.equals(UNKNOWN)) {
+        if (UNKNOWN.equals(this)) {
             return "Price{UNKNOWN}";
         }
         return "Price{" + asBigDecimal + '}';

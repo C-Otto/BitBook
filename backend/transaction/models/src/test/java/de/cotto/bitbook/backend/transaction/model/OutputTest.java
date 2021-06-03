@@ -10,7 +10,7 @@ import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_V
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-public class OutputTest {
+class OutputTest {
     @Test
     void empty() {
         assertThat(Output.EMPTY).isEqualTo(new Output(Coins.NONE, ""));

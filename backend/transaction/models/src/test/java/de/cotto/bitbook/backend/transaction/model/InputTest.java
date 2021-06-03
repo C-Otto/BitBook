@@ -10,7 +10,7 @@ import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_VAL
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-public class InputTest {
+class InputTest {
     @Test
     void empty() {
         assertThat(Input.EMPTY).isEqualTo(new Input(Coins.NONE, ""));

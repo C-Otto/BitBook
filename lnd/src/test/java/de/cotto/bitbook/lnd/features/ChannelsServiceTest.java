@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ChannelsServiceTest {
+class ChannelsServiceTest {
     @InjectMocks
     private ChannelsService channelsService;
 

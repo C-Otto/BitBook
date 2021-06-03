@@ -35,7 +35,7 @@ class TransactionWithDescriptionTest {
 
     @Test
     void compareTo_same_description_same_hash() {
-        assertThat(create("x", "y").compareTo(TRANSACTION_WITH_DESCRIPTION)).isEqualTo(0);
+        assertThat(TRANSACTION_WITH_DESCRIPTION.compareTo(create("x", "y"))).isEqualTo(0);
     }
 
     @Test

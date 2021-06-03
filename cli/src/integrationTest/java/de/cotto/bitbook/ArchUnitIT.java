@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ArchUnitIT {
+class ArchUnitIT {
 
     private static JavaClasses importedClasses;
 
