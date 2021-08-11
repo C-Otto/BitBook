@@ -36,6 +36,14 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ClosedChannelsParserTest {
+    private static final String RESOLUTION_WITH_HASH =
+            "{" +
+            "\"sweep_txid\": \"" + SWEEP_TRANSACTION_HASH + "\"" +
+            ", \"amount_sat\": \"" + RESOLUTION_AMOUNT.getSatoshis() + "\"" +
+            ", \"resolution_type\": \"COMMIT\"" +
+            ", \"outcome\": \"CLAIMED\"" +
+            "}";
+
     @InjectMocks
     private ClosedChannelsParser closedChannelsParser;
 
@@ -115,15 +123,38 @@ class ClosedChannelsParserTest {
         mockTransactionDetails();
 
         Set<ClosedChannel> closedChannels = closedChannelsParser.parse(toJsonNode(
-                getJsonArrayWithSingleChannel("{" +
-                                              "\"sweep_txid\": \"" + SWEEP_TRANSACTION_HASH + "\"," +
-                                              "\"amount_sat\": \"" + RESOLUTION_AMOUNT.getSatoshis() + "\"" +
-                                              "}")
+                getJsonArrayWithSingleChannel(RESOLUTION_WITH_HASH)
         ));
         assertThat(closedChannels).hasSize(1)
                 .flatMap(ClosedChannel::getResolutions)
                 .map(Resolution::getSweepTransactionHash)
                 .contains(SWEEP_TRANSACTION_HASH);
+    }
+
+    @Test
+    void with_resolution_includes_resolution_type() throws IOException {
+        mockTransactionDetails();
+
+        Set<ClosedChannel> closedChannels = closedChannelsParser.parse(toJsonNode(
+                getJsonArrayWithSingleChannel(RESOLUTION_WITH_HASH)
+        ));
+        assertThat(closedChannels).hasSize(1)
+                .flatMap(ClosedChannel::getResolutions)
+                .map(Resolution::getResolutionType)
+                .contains("COMMIT");
+    }
+
+    @Test
+    void with_resolution_includes_outcome() throws IOException {
+        mockTransactionDetails();
+
+        Set<ClosedChannel> closedChannels = closedChannelsParser.parse(toJsonNode(
+                getJsonArrayWithSingleChannel(RESOLUTION_WITH_HASH)
+        ));
+        assertThat(closedChannels).hasSize(1)
+                .flatMap(ClosedChannel::getResolutions)
+                .map(Resolution::getOutcome)
+                .contains("CLAIMED");
     }
 
     private void mockTransactionDetails() {

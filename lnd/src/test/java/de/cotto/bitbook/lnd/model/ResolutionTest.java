@@ -6,17 +6,31 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ResolutionTest {
+
+    private static final Resolution RESOLUTION = new Resolution("bar", "resolutionType", "outcome");
+
     @Test
     void getSweepTransaction() {
-        assertThat(new Resolution("bar").getSweepTransactionHash()).isEqualTo("bar");
+        assertThat(RESOLUTION.getSweepTransactionHash()).isEqualTo("bar");
+    }
+
+    @Test
+    void getResolutionType() {
+        assertThat(RESOLUTION.getResolutionType()).isEqualTo("resolutionType");
+    }
+
+    @Test
+    void getOutcome() {
+        assertThat(RESOLUTION.getOutcome()).isEqualTo("outcome");
     }
 
     @Test
     void testToString() {
-        assertThat(new Resolution("foo"))
-                .hasToString("Resolution{" +
-                             "sweepTransactionHash='foo'" +
-                             "}");
+        assertThat(RESOLUTION).hasToString("Resolution{" +
+                                           "sweepTransactionHash='bar'" +
+                                           ", resolutionType='resolutionType'" +
+                                           ", outcome='outcome'" +
+                                           "}");
     }
 
     @Test

@@ -95,7 +95,7 @@ class ClosedChannelTest {
     @Test
     void getResolutions() {
         assertThat(WITH_RESOLUTION.getResolutions())
-                .containsExactlyInAnyOrder(new Resolution(SWEEP_TRANSACTION_HASH));
+                .containsExactlyInAnyOrder(new Resolution(SWEEP_TRANSACTION_HASH, "resolutionType", "outcome"));
     }
 
     @Test
