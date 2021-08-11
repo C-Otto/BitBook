@@ -83,7 +83,29 @@ public class ClosedChannelFixtures {
             .withSettledBalance(SETTLED_BALANCE)
             .withOpenInitiator(OPEN_INITIATOR)
             .withCloseType(CloseType.COOPERATIVE_REMOTE)
-            .withResolutions(Set.of(new Resolution(SWEEP_TRANSACTION_HASH, "resolutionType", "outcome")))
+            .withResolutions(Set.of(new Resolution(SWEEP_TRANSACTION_HASH, "COMMIT", "CLAIMED")))
+            .build();
+
+    public static final ClosedChannel WITH_RESOLUTION_CLAIMED_OUTGOING_HTLC = ClosedChannel.builder()
+            .withChainHash(BITCOIN_GENESIS_BLOCK_HASH)
+            .withOpeningTransaction(OPENING_TRANSACTION)
+            .withClosingTransaction(CLOSING_TRANSACTION)
+            .withRemotePubkey(REMOTE_PUBKEY)
+            .withSettledBalance(SETTLED_BALANCE)
+            .withOpenInitiator(OPEN_INITIATOR)
+            .withCloseType(CloseType.COOPERATIVE_REMOTE)
+            .withResolutions(Set.of(new Resolution(SWEEP_TRANSACTION_HASH, "OUTGOING_HTLC", "CLAIMED")))
+            .build();
+
+    public static final ClosedChannel WITH_RESOLUTION_TIMEOUT_INCOMING_HTLC = ClosedChannel.builder()
+            .withChainHash(BITCOIN_GENESIS_BLOCK_HASH)
+            .withOpeningTransaction(OPENING_TRANSACTION)
+            .withClosingTransaction(CLOSING_TRANSACTION)
+            .withRemotePubkey(REMOTE_PUBKEY)
+            .withSettledBalance(SETTLED_BALANCE)
+            .withOpenInitiator(OPEN_INITIATOR)
+            .withCloseType(CloseType.COOPERATIVE_REMOTE)
+            .withResolutions(Set.of(new Resolution(SWEEP_TRANSACTION_HASH, "INCOMING_HTLC", "TIMEOUT")))
             .build();
 
     public static final ClosedChannel WITH_RESOLUTION_BLANK_HASH = ClosedChannel.builder()

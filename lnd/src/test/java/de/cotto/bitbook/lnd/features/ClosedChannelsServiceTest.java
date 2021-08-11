@@ -22,6 +22,8 @@ import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.CLOSED_CHANNEL;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.SWEEP_TRANSACTION_HASH;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.WITH_RESOLUTION;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.WITH_RESOLUTION_BLANK_HASH;
+import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.WITH_RESOLUTION_CLAIMED_OUTGOING_HTLC;
+import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.WITH_RESOLUTION_TIMEOUT_INCOMING_HTLC;
 import static de.cotto.bitbook.lnd.model.Initiator.LOCAL;
 import static de.cotto.bitbook.lnd.model.Initiator.REMOTE;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
@@ -191,6 +193,18 @@ class ClosedChannelsServiceTest {
     @Test
     void ignores_blank_sweep_transaction_in_htlc_resolutions() {
         load(WITH_RESOLUTION_BLANK_HASH);
+        verify(sweepTransactionsService).addFromSweeps(Set.of());
+    }
+
+    @Test
+    void ignores_htlc_resolutions_with_claimed_outgoing_htlc() {
+        load(WITH_RESOLUTION_CLAIMED_OUTGOING_HTLC);
+        verify(sweepTransactionsService).addFromSweeps(Set.of());
+    }
+
+    @Test
+    void ignores_htlc_resolutions_with_timed_out_incoming_htlc() {
+        load(WITH_RESOLUTION_TIMEOUT_INCOMING_HTLC);
         verify(sweepTransactionsService).addFromSweeps(Set.of());
     }
 
