@@ -11,8 +11,8 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 dependencies {
-    errorprone 'com.google.errorprone:error_prone_core:2.7.1'
-    errorprone 'com.uber.nullaway:nullaway:0.9.1'
+    errorprone 'com.google.errorprone:error_prone_core:2.8.1'
+    errorprone 'com.uber.nullaway:nullaway:0.9.2'
 }
 
 nullaway {
