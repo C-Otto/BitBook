@@ -107,6 +107,7 @@ public class ClosedChannelsService {
 
     private void addFromHtlcSweepTransactions(ClosedChannel closedChannel) {
         Set<String> sweepTransactionHashes = closedChannel.getResolutions().stream()
+                .filter(Resolution::sweepTransactionClaimsFunds)
                 .map(Resolution::getSweepTransactionHash)
                 .filter(sweepTransactionHash -> !sweepTransactionHash.isBlank())
                 .collect(Collectors.toSet());
