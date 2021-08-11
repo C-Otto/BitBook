@@ -71,7 +71,9 @@ public class ClosedChannelsParser {
         Set<Resolution> result = new LinkedHashSet<>();
         for (JsonNode resolutionNode : channelNode.get("resolutions")) {
             String sweepTransactionHash = resolutionNode.get("sweep_txid").textValue();
-            result.add(new Resolution(sweepTransactionHash));
+            String resolutionType = resolutionNode.get("resolution_type").textValue();
+            String outcome = resolutionNode.get("outcome").textValue();
+            result.add(new Resolution(sweepTransactionHash, resolutionType, outcome));
         }
         return result;
     }

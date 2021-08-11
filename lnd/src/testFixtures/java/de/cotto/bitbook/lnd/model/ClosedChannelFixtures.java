@@ -83,7 +83,7 @@ public class ClosedChannelFixtures {
             .withSettledBalance(SETTLED_BALANCE)
             .withOpenInitiator(OPEN_INITIATOR)
             .withCloseType(CloseType.COOPERATIVE_REMOTE)
-            .withResolutions(Set.of(new Resolution(SWEEP_TRANSACTION_HASH)))
+            .withResolutions(Set.of(new Resolution(SWEEP_TRANSACTION_HASH, "resolutionType", "outcome")))
             .build();
 
     public static final ClosedChannel WITH_RESOLUTION_BLANK_HASH = ClosedChannel.builder()
@@ -94,6 +94,6 @@ public class ClosedChannelFixtures {
             .withSettledBalance(SETTLED_BALANCE)
             .withOpenInitiator(OPEN_INITIATOR)
             .withCloseType(CloseType.COOPERATIVE_REMOTE)
-            .withResolutions(Set.of(new Resolution(" ")))
+            .withResolutions(Set.of(new Resolution(" ", "resolutionType", "outcome")))
             .build();
 }
