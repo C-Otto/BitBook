@@ -49,6 +49,7 @@ class QuitCommandTest {
         verify(executorConfigurationSupport).shutdown();
     }
 
+    @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
     private void setHistoryField(QuitCommand quitCommand, History history) {
         Field historyField = Objects.requireNonNull(ReflectionUtils.findField(QuitCommand.class, "history"));
         historyField.setAccessible(true);

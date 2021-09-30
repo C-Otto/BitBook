@@ -5,8 +5,8 @@ plugins {
 
 pitest {
     targetClasses = ['de.cotto.*']
-    pitestVersion = '1.6.8'
-    junit5PluginVersion = '0.14'
+    pitestVersion = '1.7.1'
+    junit5PluginVersion = '0.15'
     outputFormats = ['XML', 'HTML']
     timestampedReports = false
     failWhenNoMutations = false
