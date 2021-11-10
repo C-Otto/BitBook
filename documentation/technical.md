@@ -13,11 +13,11 @@ use a "proper" database.
 Furthermore, this simplifies the setup and makes backups easier to do.
 Database schema updates may be applied via Flyway (scripts in `cli/src/main/resources/db/migration`).
 
-### Java 16
-At the time of writing this, Java 16 is the current Java version.
+### Java 17
+At the time of writing this, Java 17 is the current Java version.
 I picked this version mostly in order to experiment with tool support, whereas features like
 text blocks are nice additions. From a technical point of view, Java 11 support shouldn't be too hard to do.
-Due to limitations in tools like Nullaway, I don't use records. Hopefully this changes soon!
+Due to limitations in tools like Nullaway, I don't use records. Hopefully this changes soon! (November 2021: worth revisiting!)
 
 ### Gradle 
 The project is split into several subprojects, making use of test fixtures and

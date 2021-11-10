@@ -1,7 +1,7 @@
 # Frequently Asked Questions (FAQ)
 
 ## How do I start BitBook?
-Install Java 16 and run `./start.sh`.
+Install Java 17 and run `./start.sh`.
 Note that startup might take a few seconds. It is finished as soon as you see the `BitBook$ ` prompt.
 
 Please have a look at [issue #3](https://github.com/C-Otto/BitBook/issues/3) for further information.
