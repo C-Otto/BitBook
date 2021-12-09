@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
@@ -118,6 +119,22 @@ class PrioritizingProviderTest {
         await().atMost(1, SECONDS).untilAsserted(() ->
             assertThat(provider.seenKeys).hasSize(1)
         );
+    }
+
+    @Test
+    void merges_two_standard_priority_requests() {
+        AtomicReference<Optional<Integer>> result1 = new AtomicReference<>();
+        AtomicReference<Optional<Integer>> result2 = new AtomicReference<>();
+        executor.execute(() -> result1.set(prioritizingProvider.getForRequestBlocking(request("a", STANDARD))));
+        executor.execute(() -> result2.set(prioritizingProvider.getForRequestBlocking(request("a", STANDARD))));
+        executor.execute(() -> {
+            await().until(() -> prioritizingProvider.requestQueue.size() > 0);
+            prioritizingProvider.workOnRequests();
+        });
+        await().atMost(1, SECONDS).untilAsserted(() -> {
+            assertThat(provider.seenKeys).hasSize(1);
+            assertThat(result1.get()).isEqualTo(result2.get()).contains(1);
+        });
     }
 
     @Test
