@@ -16,7 +16,6 @@ public class QuitCommand implements Quit.Command {
     private final Set<ExecutorConfigurationSupport> executors;
 
     @Lazy
-
     @Autowired
     @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
     private History history;
