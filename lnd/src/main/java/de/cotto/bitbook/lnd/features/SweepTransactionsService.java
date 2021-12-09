@@ -3,6 +3,7 @@ package de.cotto.bitbook.lnd.features;
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
+import de.cotto.bitbook.backend.transaction.model.Input;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.springframework.stereotype.Component;
@@ -50,12 +51,13 @@ public class SweepTransactionsService {
     }
 
     private void addAddressDescriptions(Transaction transaction) {
-        addressDescriptionService.set(getInputAddress(transaction), DEFAULT_ADDRESS_DESCRIPTION);
+        getInputAddresses(transaction)
+                .forEach(address -> addressDescriptionService.set(address, DEFAULT_ADDRESS_DESCRIPTION));
         addressDescriptionService.set(getOutputAddress(transaction), DEFAULT_ADDRESS_DESCRIPTION);
     }
 
     private void setAddressesAsOwned(Transaction transaction) {
-        addressOwnershipService.setAddressAsOwned(getInputAddress(transaction));
+        getInputAddresses(transaction).forEach(addressOwnershipService::setAddressAsOwned);
         addressOwnershipService.setAddressAsOwned(getOutputAddress(transaction));
     }
 
@@ -67,7 +69,7 @@ public class SweepTransactionsService {
         return transaction.getOutputs().get(0).getAddress();
     }
 
-    private String getInputAddress(Transaction transaction) {
-        return transaction.getInputs().get(0).getAddress();
+    private Set<String> getInputAddresses(Transaction transaction) {
+        return transaction.getInputs().stream().map(Input::getAddress).collect(toSet());
     }
 }

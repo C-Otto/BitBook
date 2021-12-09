@@ -102,7 +102,7 @@ class SweepTransactionsServiceTest {
 
         @Test
         void accepts_two_inputs() {
-            // this may happen for closed channels with unsettled HTLCs
+            // this may happen for closed channels with unsettled HTLCs or claimed anchors
             when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
                     .thenReturn(Set.of(TRANSACTION_4, SWEEP_TRANSACTION_2));
             assertThat(sweepTransactionsService.addFromSweeps(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
@@ -130,6 +130,16 @@ class SweepTransactionsServiceTest {
         }
 
         @Test
+        void sets_address_descriptions_for_all_inputs() {
+            when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
+                    .thenReturn(Set.of(TRANSACTION_4));
+            sweepTransactionsService.addFromSweeps(hashes);
+
+            TRANSACTION_4.getInputs()
+                    .forEach(input -> verify(addressDescriptionService).set(input.getAddress(), DEFAULT_DESCRIPTION));
+        }
+
+        @Test
         void sets_address_ownership() {
             sweepTransactionsService.addFromSweeps(hashes);
 
@@ -137,6 +147,16 @@ class SweepTransactionsServiceTest {
             verify(addressOwnershipService).setAddressAsOwned(INPUT_SWEEP_2.getAddress());
             verify(addressOwnershipService).setAddressAsOwned(OUTPUT_SWEEP_1.getAddress());
             verify(addressOwnershipService).setAddressAsOwned(OUTPUT_SWEEP_2.getAddress());
+        }
+
+        @Test
+        void sets_address_ownership_for_all_inputs() {
+            when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
+                    .thenReturn(Set.of(TRANSACTION_4));
+            sweepTransactionsService.addFromSweeps(hashes);
+
+            TRANSACTION_4.getInputs()
+                    .forEach(input -> verify(addressOwnershipService).setAddressAsOwned(input.getAddress()));
         }
     }
 
