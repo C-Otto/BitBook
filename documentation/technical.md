@@ -51,7 +51,6 @@ Currently, the following providers are implemented:
  * blockstream.info: A
  * btc.com: AT
  * mempool.space: A
- * smartbit.com.au: AT
  * sochain: A
 
 #### Requests and Queue
