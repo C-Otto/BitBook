@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.price.model;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -13,7 +14,7 @@ class PriceTest {
 
     @Test
     void testEquals() {
-        EqualsVerifier.forClass(Price.class).usingGetClass().verify();
+        EqualsVerifier.forClass(Price.class).suppress(Warning.BIGDECIMAL_EQUALITY).usingGetClass().verify();
     }
 
     @Test
