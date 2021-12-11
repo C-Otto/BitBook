@@ -16,8 +16,8 @@ Database schema updates may be applied via Flyway (scripts in `cli/src/main/reso
 ### Java 17
 At the time of writing this, Java 17 is the current Java version.
 I picked this version mostly in order to experiment with tool support, whereas features like
-text blocks are nice additions. From a technical point of view, Java 11 support shouldn't be too hard to do.
-Due to limitations in tools like Nullaway, I don't use records. Hopefully this changes soon! (November 2021: worth revisiting!)
+records and text blocks are nice additions.
+From a technical point of view, Java 11 support shouldn't be too hard to do.
 
 ### Gradle 
 The project is split into several subprojects, making use of test fixtures and
