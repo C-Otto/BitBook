@@ -127,7 +127,7 @@ class ClosedChannelsParserTest {
         ));
         assertThat(closedChannels).hasSize(1)
                 .flatMap(ClosedChannel::getResolutions)
-                .map(Resolution::getSweepTransactionHash)
+                .map(Resolution::sweepTransactionHash)
                 .contains(SWEEP_TRANSACTION_HASH);
     }
 
@@ -140,7 +140,7 @@ class ClosedChannelsParserTest {
         ));
         assertThat(closedChannels).hasSize(1)
                 .flatMap(ClosedChannel::getResolutions)
-                .map(Resolution::getResolutionType)
+                .map(Resolution::resolutionType)
                 .contains("COMMIT");
     }
 
@@ -153,7 +153,7 @@ class ClosedChannelsParserTest {
         ));
         assertThat(closedChannels).hasSize(1)
                 .flatMap(ClosedChannel::getResolutions)
-                .map(Resolution::getOutcome)
+                .map(Resolution::outcome)
                 .contains("CLAIMED");
     }
 

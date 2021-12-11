@@ -59,28 +59,18 @@ class ResolutionTest {
     }
 
     @Test
-    void getSweepTransaction() {
-        assertThat(RESOLUTION_COMMIT_CLAIMED.getSweepTransactionHash()).isEqualTo(SWEEP_TRANSACTION_HASH);
+    void sweepTransaction() {
+        assertThat(RESOLUTION_COMMIT_CLAIMED.sweepTransactionHash()).isEqualTo(SWEEP_TRANSACTION_HASH);
     }
 
     @Test
-    void getResolutionType() {
-        assertThat(RESOLUTION_COMMIT_CLAIMED.getResolutionType()).isEqualTo(COMMIT);
+    void resolutionType() {
+        assertThat(RESOLUTION_COMMIT_CLAIMED.resolutionType()).isEqualTo(COMMIT);
     }
 
     @Test
-    void getOutcome() {
-        assertThat(RESOLUTION_COMMIT_CLAIMED.getOutcome()).isEqualTo(CLAIMED);
-    }
-
-    @Test
-    void testToString() {
-        assertThat(RESOLUTION_COMMIT_CLAIMED)
-                .hasToString("Resolution{" +
-                             "sweepTransactionHash='bar'" +
-                             ", resolutionType='COMMIT'" +
-                             ", outcome='CLAIMED'" +
-                             "}");
+    void outcome() {
+        assertThat(RESOLUTION_COMMIT_CLAIMED.outcome()).isEqualTo(CLAIMED);
     }
 
     @Test
