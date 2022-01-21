@@ -6,11 +6,11 @@ plugins {
     id 'bitbook.tests'
     id 'bitbook.mutationtests'
     id 'bitbook.integration-tests'
-    id 'bitbook.spotbugs'
     id 'bitbook.pmd'
     id 'bitbook.jacoco'
     id 'org.springframework.boot'
     id 'io.spring.dependency-management'
+    id 'bitbook.spotbugs'
 }
 
 java {
