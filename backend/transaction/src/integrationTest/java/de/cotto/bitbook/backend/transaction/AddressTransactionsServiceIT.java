@@ -50,7 +50,8 @@ class AddressTransactionsServiceIT {
         AddressTransactions addressTransactions2 = addressTransactionsService.getTransactions(ADDRESS);
 
         assertThat(addressTransactions1).isEqualTo(addressTransactions2);
-        verify(transactionAddressClient, atMostOnce()).get(any());
+        Optional<AddressTransactions> spotbugsWorkaround = verify(transactionAddressClient, atMostOnce()).get(any());
+        assertThat(spotbugsWorkaround).isNull();
     }
 
     @Test
