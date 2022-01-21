@@ -8,8 +8,15 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+testing {
+    suites {
+        test {
+            useJUnitJupiter()
+        }
+    }
+}
+
 tasks.withType(Test).configureEach {
-    useJUnitPlatform()
     afterTest { descriptor, result ->
         if (result.resultType == TestResult.ResultType.SKIPPED) {
             throw new GradleException('Do not ignore test cases')
