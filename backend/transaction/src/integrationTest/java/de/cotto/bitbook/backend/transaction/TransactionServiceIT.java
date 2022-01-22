@@ -75,7 +75,7 @@ class TransactionServiceIT {
     @Test
     @SuppressWarnings("FutureReturnValueIgnored")
     void many_pending_requests() {
-        int max = 500;
+        int max = 200;
         ExecutorService executor = Executors.newFixedThreadPool(max);
         when(transactionProvider.getTransaction(any())).then(invocation -> {
             ResultFuture<Transaction> future = new ResultFuture<>();
@@ -84,7 +84,7 @@ class TransactionServiceIT {
         });
         Set<String> hashes = IntStream.range(0, max).mapToObj(String::valueOf).collect(Collectors.toSet());
         AtomicReference<Set<Transaction>> results = new AtomicReference<>();
-        await().atMost(4, SECONDS).until(() -> {
+        await().atMost(10, SECONDS).until(() -> {
             results.set(transactionService.getTransactionDetails(hashes));
             return true;
         });
