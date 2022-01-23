@@ -11,8 +11,9 @@ dependencies {
     implementation project(':cli:lnd')
     implementation project(':cli:base')
     implementation 'org.flywaydb:flyway-core'
-    testImplementation testFixtures(project(':backend:transaction'))
+    integrationTestImplementation project(':cli:ownership')
     testImplementation testFixtures(project(':backend:transaction:models'))
+    integrationTestImplementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 }
 
 bootJar {

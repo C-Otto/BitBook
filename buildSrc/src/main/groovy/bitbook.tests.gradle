@@ -3,15 +3,19 @@ plugins {
     id 'com.adarshr.test-logger'
 }
 
-dependencies {
-    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.8'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-}
-
 testing {
     suites {
         test {
             useJUnitJupiter()
+            dependencies {
+                implementation 'nl.jqno.equalsverifier:equalsverifier:3.8'
+            }
+        }
+        withType(JvmTestSuite) {
+            dependencies {
+                implementation 'org.springframework.boot:spring-boot-starter-test'
+                implementation 'org.awaitility:awaitility:4.1.1'
+            }
         }
     }
 }

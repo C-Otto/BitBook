@@ -6,6 +6,7 @@ dependencies {
     implementation project(':backend')
     api project(':backend:request:models')
     implementation 'org.apache.commons:commons-collections4:4.4'
+    integrationTestImplementation project(':backend')
 }
 
 jar {
