@@ -9,11 +9,9 @@ dependencies {
     implementation project(':backend:blockheight')
     implementation project(':backend:price')
     implementation project(':backend:request')
-    testImplementation testFixtures(project(':backend:transaction:models'))
     testImplementation testFixtures(project(':backend:address-transactions'))
-    testFixturesImplementation testFixtures(project(':backend:transaction:models'))
+    integrationTestImplementation project(':backend:request')
+    integrationTestImplementation testFixtures(project(':backend:address-transactions'))
     testFixturesImplementation testFixtures(project(':backend:address-transactions'))
-    testFixturesImplementation 'javax.persistence:javax.persistence-api'
-    testFixturesImplementation project(':backend')
     testFixturesImplementation project(':backend:request:models')
 }
