@@ -1,0 +1,24 @@
+plugins {
+    id 'bitbook.java-library-conventions'
+}
+
+dependencies {
+    implementation project(':backend:provider:base')
+    implementation project(':backend:blockheight')
+    testFixturesApi testFixtures(project(':backend:provider:base'))
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rules.forEach {rule ->
+            rule.limits.forEach {limit ->
+                if (limit.counter == 'INSTRUCTION') {
+                    limit.minimum = 0.66
+                }
+                if (limit.counter == 'METHOD') {
+                    limit.minimum = 0.83
+                }
+            }
+        }
+    }
+}

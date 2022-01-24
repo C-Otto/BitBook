@@ -36,6 +36,8 @@ some API and returning the parsed responses as Java objects.
 BitBook uses Feign to implement the actual HTTP clients, and Jackson for deserialization.
 Additionally, BitBook uses resilience4j to add circuit-breakers and rate-limiters.
 
+A (local) bitcoind is used in addition to public APIs if `bitcoin-cli` is configured to use it. 
+
 Currently, the following providers are implemented:
 ```
  A: transaction hashes linked to address
@@ -43,6 +45,7 @@ Currently, the following providers are implemented:
  H: current block height of chain
  ```
 
+ * bitcoind: H
  * kraken.com: Euro prices
  * bitaps.com: ATH
  * blockchain.info: TH
