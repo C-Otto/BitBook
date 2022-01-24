@@ -50,7 +50,7 @@ Currently, the following providers are implemented:
  * bitaps.com: ATH
  * blockchain.info: TH
  * blockchair.com: AT
- * blockcypher.com: AT
+ * blockcypher.com: T
  * blockstream.info: A
  * btc.com: AT
  * mempool.space: A
