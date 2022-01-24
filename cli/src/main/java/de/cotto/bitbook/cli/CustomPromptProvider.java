@@ -14,7 +14,7 @@ public class CustomPromptProvider implements PromptProvider {
 
     @Override
     public AttributedString getPrompt() {
-        return new AttributedString("BitBook$ ", AttributedStyle.DEFAULT.foreground(AttributedStyle.YELLOW));
+        return new AttributedString("BitBook₿ ", AttributedStyle.DEFAULT.foreground(AttributedStyle.YELLOW));
     }
 
 }

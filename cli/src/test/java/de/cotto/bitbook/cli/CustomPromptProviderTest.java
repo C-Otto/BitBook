@@ -10,6 +10,6 @@ class CustomPromptProviderTest {
 
     @Test
     void customPrompt_text() {
-        assertThat(customPromptProvider.getPrompt()).hasToString("BitBook$ ");
+        assertThat(customPromptProvider.getPrompt()).hasToString("BitBook₿ ");
     }
 }

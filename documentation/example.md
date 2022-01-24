@@ -7,7 +7,7 @@ blockchain and all ownership details are purely fictional!**
 Let's assume you know that at one point you received coins as part of a transaction.
 You can query details for this transaction using the command `get-transaction-details`:
 ```
-BitBook$ get-transaction-details da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
+BitBook₿ get-transaction-details da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Description:    
 Block:          677171 (2021-03-31T16:23:14)
@@ -26,7 +26,7 @@ As you can see, with this transaction 0.124 BTC were transferred to address `35P
 Assuming you're the owner of this address, you can mark it as *owned*:
 
 ```
-BitBook$ mark-address-as-owned 35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS
+BitBook₿ mark-address-as-owned 35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS
 OK
 ```
 
@@ -39,7 +39,7 @@ Notes:
 If you query the transaction details again, the ownership information is displayed next to the
 address as indicated by the checkmark `✓` in the output:
 ```
-BitBook$ get-transaction-details da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
+BitBook₿ get-transaction-details da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Description:    
 Block:          677171 (2021-03-31T16:23:14)
@@ -55,11 +55,11 @@ Outputs:
 ## Mark as foreign
 Similarly, you can mark the input addresses as *foreign* using `mark-address-as-foreign` (or `foreign`):
 ```
-BitBook$ foreign 3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd 
+BitBook₿ foreign 3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd 
 OK
-BitBook$ foreign 39Kyuxzgs4jm61MYgJYeJNHfUq5RanKBHf 
+BitBook₿ foreign 39Kyuxzgs4jm61MYgJYeJNHfUq5RanKBHf 
 OK
-BitBook$ get-transaction-details da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
+BitBook₿ get-transaction-details da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Description:
 Block:          677171 (2021-03-31T16:23:14)
@@ -80,7 +80,7 @@ With the information provided above, BitBook can automatically find neighbour tr
 your owned address to an address with unknown ownership:
 
 ```
-BitBook$ get-neighbour-transactions
+BitBook₿ get-neighbour-transactions
 f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5:   -0.1238648  [    -6,203.89€] (block 677175, 2021-03-31T17:06:31)
 ```
 
@@ -88,7 +88,7 @@ In this list you can see that the transaction `f74b...` takes 0.1238648 coins ou
 address, and sends these coins to addresses with unknown ownership.
 
 ```
-BitBook$ get-transaction-details f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5
+BitBook₿ get-transaction-details f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5
 Transaction:    f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5
 Description:    
 Block:          677175 (2021-03-31T17:06:30)
@@ -109,9 +109,9 @@ Assuming we bought something for 0.1 coins, we can mark the address of the first
 and the address of the second output as owned:
 
 ```
-BitBook$ foreign 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS 
+BitBook₿ foreign 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS 
 OK
-BitBook$ owned 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a 
+BitBook₿ owned 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a 
 OK
 ```
 
@@ -122,7 +122,7 @@ At the time of writing this example, the coins in address `36WvZ...` have not be
 This can be seen by running `get-address-transactions 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a`:
 
 ```
-BitBook$ get-address-transactions 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a
+BitBook₿ get-address-transactions 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a
 Address: 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a ✓
 Description: 
 Transaction hashes (1):
@@ -136,7 +136,7 @@ As such, we are done and have complete ownership information about all owned add
 Using `get-owned-addresses` you can get an overview of all owned addresses:
 
 ```
-BitBook$ get-owned-addresses 
+BitBook₿ get-owned-addresses 
            35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS    0          [         0.00€]                     
            36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a    0.0238648  [     1,127.22€]     
 ```
@@ -144,13 +144,13 @@ BitBook$ get-owned-addresses
 With `get-balance` you can get the balance summed over all of your owned addresses:
 
 ```
-BitBook$ get-balance
+BitBook₿ get-balance
    0.0238648  [     1,127.22€]
 ```
 
 If you need to remove ownership information for an address, you can use the command `reset-ownership`:
 ```
-BitBook$ reset-ownership 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS 
+BitBook₿ reset-ownership 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS 
 OK
 ```
 
@@ -162,21 +162,21 @@ This can help to identify different wallets
 To set a description for an address, you may use the command `set-address-description`:
 
 ```
-BitBook$ set-address-description 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS "Pete Peterson"
+BitBook₿ set-address-description 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS "Pete Peterson"
 OK
 ```
 
 You may also provide a description with `mark-address-as-owned`/`owned`/`mark-address-as-foreign`/`foreign`:
 
 ```
-BitBook$ foreign 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS "Pete Peterson"
+BitBook₿ foreign 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS "Pete Peterson"
 OK
 ```
 
 Address descriptions are supported in address tab completion (`get-address-transactions Pete<tab>`).
 Furthermore, the description is shown anytime the address is presented to the user:
 ```
-BitBook$ get-transaction-details f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5
+BitBook₿ get-transaction-details f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5
 Transaction:    f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5
 Description:    
 Block:          677175 (2021-03-31T17:06:30)
@@ -191,7 +191,7 @@ Outputs:
 
 To remove a description, use `remove-address-description`:
 ```
-BitBook$ remove-address-description 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS
+BitBook₿ remove-address-description 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS
 OK
 ```
 
@@ -199,14 +199,14 @@ OK
 Similary, you can also set a description for a transaction:
 
 ```
-BitBook$ set-transaction-description f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5 "Stuff from Pete"
+BitBook₿ set-transaction-description f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5 "Stuff from Pete"
 OK
 ```
 
 This information is then included whenever the transaction hash is shown:
 
 ```
-BitBook$ get-address-transactions 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a
+BitBook₿ get-address-transactions 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a
 Address: 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a ✓
 Description: 
 Transaction hashes (1):
@@ -216,6 +216,6 @@ f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5:    0.0238648  
 To remove a description, use `remove-transaction-description`:
 
 ```
-BitBook$ remove-transaction-description f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5
+BitBook₿ remove-transaction-description f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5
 OK
 ```

@@ -41,7 +41,7 @@ This is done to avoid having outdated information in the case of chain reorganiz
 Using the `get-address-transactions` command you get information about all transactions connected to the address:
 
 ```
-BitBook$ get-address-transactions 3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd
+BitBook₿ get-address-transactions 3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd
 Address: 3AheoYDgWj3PLGA2XcmuZvyCzbsngz7sXd ?
 Description: 
 Transaction hashes (2):
@@ -90,7 +90,7 @@ Most importantly, the command [`get-neighbour-transactions`](#get-neighbour-tran
 To mark an address as owned, you can use `mark-address-as-owned` or the shorthand version `owned`:
 
 ```
-BitBook$ mark-address-as-owned 35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS
+BitBook₿ mark-address-as-owned 35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS
 OK
 ```
 
@@ -111,7 +111,7 @@ By default, the output is sorted by value, so that the addresses with the highes
 bottom of the list (see [Sort Order](#sort-order) if you want to change the sort order).
 
 ```
-BitBook$ get-owned-addresses
+BitBook₿ get-owned-addresses
 35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS    0          [         0.00€]                     
 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a    0.0238648  [     1,127.22€] Some Description
 ```
@@ -124,7 +124,7 @@ The commands `get-balance` and `get-balance-for-address` can be used to get the 
 owned addresses, or for a single (possibly foreign) address.
 
 ```
-BitBook$ get-balance-for-address 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a
+BitBook₿ get-balance-for-address 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a
    0.0238648  [     1,196.56€]
 ```
 
@@ -146,7 +146,7 @@ impact on your balance are shown at the bottom of the list (see [Sort Order](#so
 sort order).
 
 ```
-BitBook$ get-my-transactions
+BitBook₿ get-my-transactions
 da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f:   -0.12319446 [    -6,170.32€] (block height 677171, 2021-03-31T16:23:15) Some Description
 ```
 
@@ -160,7 +160,7 @@ from an address with unknown ownership, or where funds are sent to an address wi
 A simple case is shown in the [example](example.md):
 
 ```
-BitBook$ get-transaction-details da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
+BitBook₿ get-transaction-details da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Transaction:    da30fbe98d0e21968ec73a995a45291b1795e3006c0dcb432bc5f351b140573f
 Description:    
 Block:          677171 (2021-03-31T16:23:14)
@@ -199,7 +199,7 @@ This is due to the fact that BitBook is designed to help you track your coins.
 #### Command Output
 
 ```
-BitBook$ get-neighbour-transactions
+BitBook₿ get-neighbour-transactions
 f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5:   -0.1238648  [    -6,203.89€] (block 677175, 2021-03-31T17:06:31)          Description
 ```
 
@@ -230,9 +230,9 @@ commands' outputs in addition to the address/transaction hash.
 **Note that you have to use quotes (`"` or `'`) if the description includes a space!**
 
 ```
-BitBook$ set-address-description 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS "Pete Peterson"
+BitBook₿ set-address-description 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS "Pete Peterson"
 OK
-BitBook$ set-transaction-description f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5 "Stuff from Pete"
+BitBook₿ set-transaction-description f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5 "Stuff from Pete"
 OK
 ```
 
@@ -253,12 +253,12 @@ You may also use copy-paste. Invalid characters (like `:` or spaces) are automat
 In addition to this, you can also use the description to complete the command:
 
 ```
-BitBook$ get-address-transactions Pete<tab>
+BitBook₿ get-address-transactions Pete<tab>
 ```
 
 This completes to
 ```
-BitBook$ get-address-transactions 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS Pete Peterson
+BitBook₿ get-address-transactions 1ET8va8cJNGGLtG7pwRq79EeE7qNb7ofCS Pete Peterson
 ```
 
 *Note that this is implemented using a hack and might cause a messed up display. See [technical.md](technical.md).*

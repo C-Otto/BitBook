@@ -20,7 +20,7 @@ BitBook marks these addresses as owned and sets the description to "lnd".
 First, create and transfer the JSON file obtained by `lncli listunspent` (see [above](#creating-json-files)).
 Then, run the command `lnd-add-from-unspent-outputs` as follows:
 ```
-BitBook$ lnd-add-from-unspent-outputs /tmp/lnd-listunspent.json
+BitBook₿ lnd-add-from-unspent-outputs /tmp/lnd-listunspent.json
 Marked 6 addresses as owned by lnd
 ```
 
@@ -38,7 +38,7 @@ BitBook offers the command `lnd-add-from-sweeps` which parses `lnd` sweep inform
 First, create and transfer the JSON file obtained by `lncli wallet listsweeps` (see [above](#creating-json-files)).
 Then, run the command `lnd-add-from-sweeps` as follows:
 ```
-BitBook$ lnd-add-from-sweeps /tmp/lnd-wallet-listsweeps.json
+BitBook₿ lnd-add-from-sweeps /tmp/lnd-wallet-listsweeps.json
 Added information for 86 sweep transactions
 ```
 
@@ -56,7 +56,7 @@ BitBook uses this information and
 First, create and transfer the JSON file obtained by `lncli listchannels` (see [above](#creating-json-files)).
 Then, run the command `lnd-add-from-channels` as follows:
 ```
-BitBook$ lnd-add-from-channels /tmp/lnd-listchannels.json
+BitBook₿ lnd-add-from-channels /tmp/lnd-listchannels.json
 Added information for 67 channels
 ```
 
@@ -87,7 +87,7 @@ BitBook makes use of this information and
 First, create and transfer the JSON file obtained by `lncli closedchannels` (see [above](#creating-json-files)).
 Then, run the command `lnd-add-from-closed-channels` as follows:
 ```
-BitBook$ lnd-add-from-closed-channels /tmp/lnd-closedchannels.json
+BitBook₿ lnd-add-from-closed-channels /tmp/lnd-closedchannels.json
 Added information for 99 closed channels
 ```
   
@@ -145,7 +145,7 @@ BitBook is able to distinguish the following transaction types:
 First, create and transfer the JSON file obtained by `lncli listchaintxns` (see [above](#creating-json-files)).
 Then, run the command `lnd-add-from-onchain-transactions` as follows:
 ```
-BitBook$ lnd-add-from-onchain-transactions /tmp/lnd-listchaintxns.json
+BitBook₿ lnd-add-from-onchain-transactions /tmp/lnd-listchaintxns.json
 Added information from 671 transactions
 ```
 
@@ -165,7 +165,7 @@ You first need to create the JSON file using `pool auction leases > pool-auction
 Then, after transferring the file to the computer running BitBook, you can use the `pool-add-from-leases` command:
 
 ```
-BitBook$ pool-add-from-leases /tmp/pool-auction-leases.json
+BitBook₿ pool-add-from-leases /tmp/pool-auction-leases.json
 Added information for 12 leases
 ```
 
