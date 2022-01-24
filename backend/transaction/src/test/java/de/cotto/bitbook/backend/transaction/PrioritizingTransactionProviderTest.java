@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.ProviderException;
 import de.cotto.bitbook.backend.request.ResultFuture;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 import feign.FeignException;
@@ -43,41 +44,48 @@ class PrioritizingTransactionProviderTest {
     }
 
     @Test
-    void getTransaction() {
+    void getTransaction() throws Exception {
         when(transactionProvider1.get(any())).thenReturn(Optional.of(TRANSACTION));
         when(transactionProvider2.get(any())).thenReturn(Optional.of(TRANSACTION));
         assertThat(get()).isEqualTo(TRANSACTION);
     }
 
     @Test
-    void uses_second_provider_if_first_is_rate_limited() {
+    void uses_second_provider_if_first_throws_provider_exception() throws Exception {
+        when(transactionProvider1.get(any())).thenThrow(ProviderException.class);
+        when(transactionProvider2.get(any())).thenReturn(Optional.of(TRANSACTION));
+        assertThat(get()).isEqualTo(TRANSACTION);
+    }
+
+    @Test
+    void uses_second_provider_if_first_is_rate_limited() throws Exception {
         when(transactionProvider1.get(any())).thenThrow(RequestNotPermitted.class);
         when(transactionProvider2.get(any())).thenReturn(Optional.of(TRANSACTION));
         assertThat(get()).isEqualTo(TRANSACTION);
     }
 
     @Test
-    void uses_second_provider_if_first_has_feign_failure() {
+    void uses_second_provider_if_first_has_feign_failure() throws Exception {
         when(transactionProvider1.get(any())).thenThrow(FeignException.class);
         when(transactionProvider2.get(any())).thenReturn(Optional.of(TRANSACTION));
         assertThat(get()).isEqualTo(TRANSACTION);
     }
 
     @Test
-    void uses_second_provider_if_first_is_disabled_via_circuit_breaker() {
+    void uses_second_provider_if_first_is_disabled_via_circuit_breaker() throws Exception {
         when(transactionProvider1.get(any())).thenThrow(CallNotPermittedException.class);
         when(transactionProvider2.get(any())).thenReturn(Optional.of(TRANSACTION));
         assertThat(get()).isEqualTo(TRANSACTION);
     }
 
     @Test
-    void gives_unknown_transaction_if_all_providers_fail() {
+    void gives_unknown_transaction_if_all_providers_fail() throws Exception {
         mockAllFail();
         assertThat(get()).isEqualTo(Transaction.UNKNOWN);
     }
 
     @Test
-    void clears_lowest_priority_requests_if_all_providers_fail() {
+    void clears_lowest_priority_requests_if_all_providers_fail() throws Exception {
         mockAllFail();
         prioritizingTransactionProvider.getTransaction(new TransactionRequest(OTHER_HASH, LOWEST));
 
@@ -88,7 +96,7 @@ class PrioritizingTransactionProviderTest {
     }
 
     @Test
-    void retains_all_but_lowest_priority_requests_if_all_providers_fail() {
+    void retains_all_but_lowest_priority_requests_if_all_providers_fail() throws Exception {
         mockAllFail();
         prioritizingTransactionProvider.getTransaction(new TransactionRequest(OTHER_HASH, STANDARD));
         prioritizingTransactionProvider.getTransaction(new TransactionRequest(TRANSACTION_HASH, STANDARD));
@@ -116,7 +124,7 @@ class PrioritizingTransactionProviderTest {
         executor.execute(() -> prioritizingTransactionProvider.workOnRequests());
     }
 
-    private void mockAllFail() {
+    private void mockAllFail() throws Exception {
         when(transactionProvider1.get(any())).thenThrow(CallNotPermittedException.class);
         when(transactionProvider2.get(any())).thenThrow(RequestNotPermitted.class);
     }

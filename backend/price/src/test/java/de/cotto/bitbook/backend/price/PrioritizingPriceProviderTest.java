@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.price;
 
+import de.cotto.bitbook.backend.ProviderException;
 import de.cotto.bitbook.backend.price.model.Price;
 import de.cotto.bitbook.backend.price.model.PriceWithDate;
 import de.cotto.bitbook.backend.request.ResultFuture;
@@ -32,7 +33,7 @@ class PrioritizingPriceProviderTest {
     }
 
     @Test
-    void getPrices() {
+    void getPrices() throws Exception {
         PriceWithDate expected = new PriceWithDate(Price.of(2), DATE);
         when(priceProvider.get(DATE)).thenReturn(Optional.of(Set.of(expected)));
 
@@ -44,8 +45,19 @@ class PrioritizingPriceProviderTest {
     }
 
     @Test
-    void getPrices_failure() {
+    void getPrices_failure() throws Exception {
         when(priceProvider.get(DATE)).thenReturn(Optional.empty());
+
+        PriceRequest request = PriceRequest.forDateStandardPriority(DATE);
+        ResultFuture<Collection<PriceWithDate>> resultFuture = prioritizingPriceProvider.getPrices(request);
+        workOnRequestsInBackground();
+
+        assertThat(resultFuture.getResult()).isEmpty();
+    }
+
+    @Test
+    void getPrices_error() throws Exception {
+        when(priceProvider.get(DATE)).thenThrow(ProviderException.class);
 
         PriceRequest request = PriceRequest.forDateStandardPriority(DATE);
         ResultFuture<Collection<PriceWithDate>> resultFuture = prioritizingPriceProvider.getPrices(request);

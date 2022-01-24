@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 public class ScoreUpdate {
     public static final ScoreUpdate RATE_LIMITED = new ScoreUpdate(1_500);
     public static final ScoreUpdate CIRCUIT_BREAKER = new ScoreUpdate(2_000);
+    public static final ScoreUpdate PROVIDER_EXCEPTION = new ScoreUpdate(4_500);
     public static final ScoreUpdate UNKNOWN_EXCEPTION = new ScoreUpdate(5_000);
 
     private final long value;

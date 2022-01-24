@@ -45,7 +45,7 @@ class PrioritizingProviderTest {
     }
 
     @Test
-    void all_providers_fail() {
+    void all_providers_fail() throws Exception {
         workOnExpectedRequests(1);
         when(provider.get(any())).thenThrow(mock(FeignException.class));
         Optional<Integer> result = prioritizingProvider.getForRequestBlocking(request("xyz", STANDARD));
@@ -53,7 +53,7 @@ class PrioritizingProviderTest {
     }
 
     @Test
-    void all_providers_fail_removes_low_priority_requests_from_queue() {
+    void all_providers_fail_removes_low_priority_requests_from_queue() throws Exception {
         workOnExpectedRequests(2);
         when(provider.get(any())).thenThrow(mock(FeignException.class));
         prioritizingProvider.getForRequestBlocking(request("yyy", LOWEST));
@@ -65,7 +65,7 @@ class PrioritizingProviderTest {
     }
 
     @Test
-    void all_providers_fail_retains_standard_priority_request() {
+    void all_providers_fail_retains_standard_priority_request() throws Exception {
         workOnExpectedRequests(2);
         when(provider.get(any())).thenThrow(mock(FeignException.class));
         executor.execute(() -> {

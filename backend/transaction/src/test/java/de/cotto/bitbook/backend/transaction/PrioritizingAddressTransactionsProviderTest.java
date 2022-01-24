@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.ProviderException;
 import de.cotto.bitbook.backend.request.ResultFuture;
 import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +31,7 @@ class PrioritizingAddressTransactionsProviderTest {
     }
 
     @Test
-    void getAddressTransactions() {
+    void getAddressTransactions() throws Exception {
         when(addressTransactionsProvider.get(TRANSACTIONS_REQUEST_KEY)).thenReturn(Optional.of(ADDRESS_TRANSACTIONS));
 
         ResultFuture<AddressTransactions> resultFuture =
@@ -41,8 +42,19 @@ class PrioritizingAddressTransactionsProviderTest {
     }
 
     @Test
-    void getAddressTransactions_failure() {
+    void getAddressTransactions_failure() throws Exception {
         when(addressTransactionsProvider.get(TRANSACTIONS_REQUEST_KEY)).thenReturn(Optional.empty());
+
+        ResultFuture<AddressTransactions> resultFuture =
+                prioritizingPriceProvider.getAddressTransactions(ADDRESS_TRANSACTIONS_REQUEST);
+        workOnRequestsInBackground();
+
+        assertThat(resultFuture.getResult()).isEmpty();
+    }
+
+    @Test
+    void getAddressTransactions_error() throws Exception {
+        when(addressTransactionsProvider.get(TRANSACTIONS_REQUEST_KEY)).thenThrow(ProviderException.class);
 
         ResultFuture<AddressTransactions> resultFuture =
                 prioritizingPriceProvider.getAddressTransactions(ADDRESS_TRANSACTIONS_REQUEST);

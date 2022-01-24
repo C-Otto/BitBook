@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.bitaps;
 
+import de.cotto.bitbook.backend.ProviderException;
 import de.cotto.bitbook.backend.transaction.BlockHeightProvider;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +20,11 @@ public class BitapsBlockHeightProvider implements BlockHeightProvider {
     }
 
     @Override
-    public Optional<Integer> get() {
-        return bitapsClient.getBlockHeight().map(BitapsBlockHeightDto::getBlockHeight);
+    public Optional<Integer> get() throws ProviderException {
+        BitapsBlockHeightDto dto = bitapsClient.getBlockHeight().orElse(null);
+        if (dto == null) {
+            throw new ProviderException();
+        }
+        return Optional.of(dto.getBlockHeight());
     }
 }

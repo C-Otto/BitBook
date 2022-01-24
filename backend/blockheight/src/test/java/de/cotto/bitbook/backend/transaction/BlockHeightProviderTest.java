@@ -11,7 +11,7 @@ class BlockHeightProviderTest {
     private final BlockHeightProvider provider = new TestableBlockHeightProvider();
 
     @Test
-    void get_with_argument() {
+    void get_with_argument() throws Exception {
         assertThat(provider.get("foo")).contains(123);
     }
 
