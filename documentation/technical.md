@@ -54,7 +54,6 @@ Currently, the following providers are implemented:
  * blockstream.info: A
  * btc.com: AT
  * mempool.space: A
- * sochain: A
 
 #### Requests and Queue
 For each type of result (e.g. transaction details), a `PrioritizingProvider` implementation
