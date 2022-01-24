@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.request;
 
 import de.cotto.bitbook.backend.Provider;
+import de.cotto.bitbook.backend.ProviderException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +16,7 @@ class TestableProvider implements Provider<String, Integer> {
     }
 
     @Override
-    public Optional<Integer> get(String key) {
+    public Optional<Integer> get(String key) throws ProviderException {
         seenKeys.add(key);
         if (key == null) {
             return Optional.empty();
@@ -29,6 +30,9 @@ class TestableProvider implements Provider<String, Integer> {
             } catch (InterruptedException e) {
                 // ignore
             }
+        }
+        if ("providerException".equals(key)) {
+            throw new ProviderException();
         }
         return Optional.of(key.length());
     }

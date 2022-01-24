@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.request;
 
 import com.google.common.annotations.VisibleForTesting;
 import de.cotto.bitbook.backend.Provider;
+import de.cotto.bitbook.backend.ProviderException;
 import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
@@ -52,16 +53,20 @@ public class RequestWorker<K, R> {
             return result;
         } catch (RequestNotPermitted exception) {
             logger.warn("{} is rate limited, skipping.", providerName);
-            logger.debug("Reason: ", exception);
+            logReasonAsDebugMessage(exception);
             updateScore(provider, ScoreUpdate.RATE_LIMITED);
         } catch (CallNotPermittedException exception) {
             logger.warn("{} is disabled via circuit breaker, skipping.", providerName);
-            logger.debug("Reason: ", exception);
+            logReasonAsDebugMessage(exception);
             updateScore(provider, ScoreUpdate.CIRCUIT_BREAKER);
         } catch (FeignException exception) {
             logger.warn("{} experienced feign issue, skipping.", providerName);
-            logger.debug("Reason: ", exception);
+            logReasonAsDebugMessage(exception);
             updateScore(provider, ScoreUpdate.forHttpStatus(exception.status()));
+        } catch (ProviderException providerException) {
+            logger.warn("{} threw provider exception, skipping.", providerName);
+            logReasonAsDebugMessage(providerException);
+            updateScore(provider, ScoreUpdate.PROVIDER_EXCEPTION);
         } catch (Exception exception) {
             logger.error("{} threw unknown exception: ", providerName, exception);
             updateScore(provider, ScoreUpdate.UNKNOWN_EXCEPTION);
@@ -89,5 +94,9 @@ public class RequestWorker<K, R> {
                 entry.setValue(Score.DEFAULT);
             }
         }
+    }
+
+    private void logReasonAsDebugMessage(Exception exception) {
+        logger.debug("Reason: ", exception);
     }
 }

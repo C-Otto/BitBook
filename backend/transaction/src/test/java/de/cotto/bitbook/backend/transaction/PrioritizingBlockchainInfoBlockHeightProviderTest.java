@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.ProviderException;
 import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,16 +40,16 @@ class PrioritizingBlockchainInfoBlockHeightProviderTest {
     }
 
     @Test
-    void getBlockHeight() {
+    void getBlockHeight() throws Exception {
         when(blockHeightProvider1.get(any())).thenReturn(Optional.of(123));
         workOnRequestsInBackground();
         assertThat(getHeight()).isEqualTo(123);
     }
 
     @Test
-    void all_fail() {
+    void all_fail() throws Exception {
         when(blockHeightProvider1.get(any())).thenThrow(FeignException.class);
-        when(blockHeightProvider2.get(any())).thenThrow(FeignException.class);
+        when(blockHeightProvider2.get(any())).thenThrow(ProviderException.class);
         workOnRequestsInBackground();
         assertThat(getHeight()).isEqualTo(-1);
     }
