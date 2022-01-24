@@ -26,12 +26,23 @@ class BlockHeightServiceTest {
     }
 
     @Test
-    void caches_block_count() {
+    void caches_block_height() {
         when(prioritizingBlockHeightProvider.getBlockHeight()).thenReturn(123);
         blockHeightService.getBlockHeight();
         blockHeightService.getBlockHeight();
 
         verify(prioritizingBlockHeightProvider, times(1)).getBlockHeight();
+    }
+
+    @Test
+    void does_not_cache_height_count_lower_than_previous_height() {
+        blockHeightService.blockHeightCache.put(0, 123);
+        when(prioritizingBlockHeightProvider.getBlockHeight()).thenReturn(123).thenReturn(100);
+        blockHeightService.getBlockHeight();
+        blockHeightService.blockHeightCache.getUnchecked(1); // this removes the value for key 0
+        blockHeightService.blockHeightCache.cleanUp();
+        assertThat(blockHeightService.getBlockHeight()).isEqualTo(123);
+        verify(prioritizingBlockHeightProvider, times(2)).getBlockHeight();
     }
 
     @Test

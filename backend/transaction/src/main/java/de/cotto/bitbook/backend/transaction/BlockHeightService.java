@@ -12,7 +12,8 @@ import static de.cotto.bitbook.backend.transaction.PrioritizingBlockHeightProvid
 
 @Component
 public class BlockHeightService {
-    private final LoadingCache<Integer, Integer> blockHeightCache;
+    protected final LoadingCache<Integer, Integer> blockHeightCache;
+    private int lastKnown = INVALID;
     private final PrioritizingBlockHeightProvider prioritizingBlockHeightProvider;
 
     public BlockHeightService(PrioritizingBlockHeightProvider prioritizingBlockHeightProvider) {
@@ -20,7 +21,7 @@ public class BlockHeightService {
         blockHeightCache = CacheBuilder.newBuilder()
                 .maximumSize(1)
                 .expireAfterWrite(60, TimeUnit.SECONDS)
-                .build(CacheLoader.from(prioritizingBlockHeightProvider::getBlockHeight));
+                .build(CacheLoader.from(this::getFromProvider));
     }
 
     public int getBlockHeight() {
@@ -33,5 +34,12 @@ public class BlockHeightService {
         } catch (ExecutionException e) {
             return INVALID;
         }
+    }
+
+    private int getFromProvider() {
+        int fromProvider = prioritizingBlockHeightProvider.getBlockHeight();
+        int newResult = Math.max(lastKnown, fromProvider);
+        lastKnown = newResult;
+        return newResult;
     }
 }
