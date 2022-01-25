@@ -35,6 +35,7 @@ import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.POOL_ACCOUNT
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -296,6 +297,17 @@ class PoolTransactionServiceTest {
             );
             assertFailure(transaction);
         }
+
+        @Test
+        void paid_fees() {
+            OnchainTransaction transaction = new OnchainTransaction(
+                    POOL_ACCOUNT_CLOSE.getTransactionHash(),
+                    POOL_ACCOUNT_CLOSE.getLabel(),
+                    POOL_ACCOUNT_CLOSE.getAmount(),
+                    Coins.ofSatoshis(1)
+            );
+            assertFailure(transaction);
+        }
     }
 
     @Nested
@@ -360,6 +372,12 @@ class PoolTransactionServiceTest {
 
     @Nested
     class PoolAccountDepositFailure {
+        @BeforeEach
+        void setUp() {
+            lenient().when(addressDescriptionService.getDescription(INPUT_ADDRESS_1)).thenReturn("");
+            lenient().when(addressDescriptionService.getDescription(INPUT_ADDRESS_2)).thenReturn(DEFAULT_DESCRIPTION);
+        }
+
         @Test
         void non_negative_amount() {
             OnchainTransaction transaction = new OnchainTransaction(
