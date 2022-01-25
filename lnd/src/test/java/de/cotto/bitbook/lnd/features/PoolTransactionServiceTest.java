@@ -272,13 +272,26 @@ class PoolTransactionServiceTest {
         }
 
         @Test
-        void two_outputs() {
+        void two_outputs_sum_matches_pool_amount() {
             when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash()))
                     .thenReturn(TRANSACTION);
             OnchainTransaction transaction = new OnchainTransaction(
                     POOL_ACCOUNT_CLOSE.getTransactionHash(),
                     POOL_ACCOUNT_CLOSE.getLabel(),
                     OUTPUT_VALUE_1.add(OUTPUT_VALUE_2),
+                    POOL_ACCOUNT_CLOSE.getFees()
+            );
+            assertFailure(transaction);
+        }
+
+        @Test
+        void two_outputs_first_matches_pool_amount() {
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash()))
+                    .thenReturn(TRANSACTION);
+            OnchainTransaction transaction = new OnchainTransaction(
+                    POOL_ACCOUNT_CLOSE.getTransactionHash(),
+                    POOL_ACCOUNT_CLOSE.getLabel(),
+                    OUTPUT_VALUE_1,
                     POOL_ACCOUNT_CLOSE.getFees()
             );
             assertFailure(transaction);

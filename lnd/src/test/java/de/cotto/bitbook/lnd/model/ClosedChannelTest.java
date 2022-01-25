@@ -1,9 +1,12 @@
 package de.cotto.bitbook.lnd.model;
 
 import de.cotto.bitbook.backend.transaction.model.Coins;
+import de.cotto.bitbook.backend.transaction.model.Input;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.lnd.model.CloseType.COOPERATIVE_REMOTE;
@@ -39,6 +42,22 @@ class ClosedChannelTest {
     @Test
     void invalid_for_unknown_close_transaction() {
         ClosedChannel closedChannel = CLOSED_CHANNEL.toBuilder().withClosingTransaction(Transaction.UNKNOWN).build();
+        assertThat(closedChannel.isValid()).isFalse();
+    }
+
+    @Test
+    void invalid_for_invalid_close_transaction_with_one_input() {
+        Transaction validClosingTransaction = CLOSED_CHANNEL.getClosingTransaction();
+        Coins fees = validClosingTransaction.getInputs().stream().map(Input::getValue).reduce(Coins.NONE, Coins::add);
+        Transaction closingTransaction = new Transaction(
+                "",
+                0,
+                validClosingTransaction.getTime(),
+                fees,
+                validClosingTransaction.getInputs(),
+                List.of()
+        );
+        ClosedChannel closedChannel = CLOSED_CHANNEL.toBuilder().withClosingTransaction(closingTransaction).build();
         assertThat(closedChannel.isValid()).isFalse();
     }
 
