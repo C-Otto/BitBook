@@ -101,6 +101,12 @@ class OnchainTransactionsServiceTest {
 
     @Nested
     class FundingTransactionFailure {
+        @BeforeEach
+        void setUp() {
+            lenient().when(transactionService.getTransactionDetails(FUNDING_TRANSACTION.getTransactionHash()))
+                    .thenReturn(FUNDING_TRANSACTION_DETAILS);
+        }
+
         @Test
         void nothing_for_funding_transaction_but_with_label() {
             OnchainTransaction onchainTransaction = new OnchainTransaction(
@@ -159,8 +165,6 @@ class OnchainTransactionsServiceTest {
         }
 
         private void assertFailure(OnchainTransaction onchainTransaction) {
-            lenient().when(transactionService.getTransactionDetails(anyString()))
-                    .thenReturn(Transaction.UNKNOWN);
             assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(onchainTransaction))).isEqualTo(0);
             verify(addressDescriptionService, never()).set(eq(OUTPUT_ADDRESS_2), any());
         }
