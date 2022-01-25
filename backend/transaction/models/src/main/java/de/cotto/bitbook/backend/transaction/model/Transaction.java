@@ -140,7 +140,7 @@ public class Transaction {
     public Optional<Output> getOutputWithValue(Coins expectedValue) {
         List<Output> candidates = getOutputs().stream()
                 .filter(output -> expectedValue.equals(output.getValue()))
-                .collect(toList());
+                .toList();
         if (candidates.size() == 1) {
             return Optional.of(candidates.get(0));
         }
