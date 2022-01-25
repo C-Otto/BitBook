@@ -66,12 +66,12 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
     }
 
     private long handleFundingTransaction(OnchainTransaction onchainTransaction) {
-        Coins amount = onchainTransaction.getAmount();
-        if (onchainTransaction.hasFees() || amount.isNegative() || onchainTransaction.hasLabel()) {
+        if (onchainTransaction.hasFees() || onchainTransaction.hasLabel()) {
             return 0;
         }
         Transaction transaction =
                 transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
+        Coins amount = onchainTransaction.getAmount();
         String address = transaction.getOutputWithValue(amount).map(InputOutput::getAddress).orElse(null);
         if (address == null) {
             return 0;
