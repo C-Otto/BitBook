@@ -8,7 +8,7 @@ testing {
         test {
             useJUnitJupiter()
             dependencies {
-                implementation 'nl.jqno.equalsverifier:equalsverifier:3.8'
+                implementation 'nl.jqno.equalsverifier:equalsverifier:3.8.3'
             }
         }
         withType(JvmTestSuite) {
