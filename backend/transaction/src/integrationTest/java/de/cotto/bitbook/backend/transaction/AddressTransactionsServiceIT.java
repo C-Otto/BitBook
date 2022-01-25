@@ -1,6 +1,8 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,9 +32,14 @@ class AddressTransactionsServiceIT {
     @MockBean
     private PrioritizingBlockHeightProvider blockHeightProvider;
 
+    @BeforeEach
+    void setUp() {
+        when(transactionAddressClient.isSupported(any())).thenReturn(true);
+    }
+
     @Test
     void getAddressTransactions() {
-        when(blockHeightProvider.getBlockHeight()).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
+        when(blockHeightProvider.getBlockHeight(Chain.BTC)).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
         TransactionsRequestKey request = new TransactionsRequestKey(ADDRESS, LAST_CHECKED_AT_BLOCK_HEIGHT);
         when(transactionAddressClient.get(request)).thenReturn(Optional.of(ADDRESS_TRANSACTIONS));
 

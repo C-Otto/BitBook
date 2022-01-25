@@ -20,6 +20,7 @@ import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRA
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.timeout;
@@ -39,6 +40,8 @@ class PrioritizingTransactionProviderTest {
     void setUp() {
         transactionProvider1 = mock(TransactionProvider.class);
         transactionProvider2 = mock(TransactionProvider.class);
+        lenient().when(transactionProvider1.isSupported(any())).thenReturn(true);
+        lenient().when(transactionProvider2.isSupported(any())).thenReturn(true);
         prioritizingTransactionProvider =
                 new PrioritizingTransactionProvider(List.of(transactionProvider1, transactionProvider2));
     }

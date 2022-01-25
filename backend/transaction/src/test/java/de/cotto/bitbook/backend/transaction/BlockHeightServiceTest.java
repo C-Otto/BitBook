@@ -6,6 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static de.cotto.bitbook.backend.model.Chain.BCH;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -21,37 +23,38 @@ class BlockHeightServiceTest {
 
     @Test
     void getBlockHeight() {
-        when(prioritizingBlockHeightProvider.getBlockHeight()).thenReturn(123);
-        assertThat(blockHeightService.getBlockHeight()).isEqualTo(123);
+        when(prioritizingBlockHeightProvider.getBlockHeight(BTC)).thenReturn(123);
+        assertThat(blockHeightService.getBlockHeight(BTC)).isEqualTo(123);
     }
 
     @Test
     void caches_block_height() {
-        when(prioritizingBlockHeightProvider.getBlockHeight()).thenReturn(123);
-        blockHeightService.getBlockHeight();
-        blockHeightService.getBlockHeight();
+        when(prioritizingBlockHeightProvider.getBlockHeight(BTC)).thenReturn(123);
+        blockHeightService.getBlockHeight(BTC);
+        blockHeightService.getBlockHeight(BTC);
 
-        verify(prioritizingBlockHeightProvider, times(1)).getBlockHeight();
+        verify(prioritizingBlockHeightProvider, times(1)).getBlockHeight(BTC);
     }
 
     @Test
     void does_not_cache_height_count_lower_than_previous_height() {
-        blockHeightService.blockHeightCache.put(0, 123);
-        when(prioritizingBlockHeightProvider.getBlockHeight()).thenReturn(123).thenReturn(100);
-        blockHeightService.getBlockHeight();
-        blockHeightService.blockHeightCache.getUnchecked(1); // this removes the value for key 0
+        when(prioritizingBlockHeightProvider.getBlockHeight(BTC)).thenReturn(123).thenReturn(100);
+        when(prioritizingBlockHeightProvider.getBlockHeight(BCH)).thenReturn(900);
+        blockHeightService.getBlockHeight(BTC);
+        blockHeightService.blockHeightCache.getUnchecked(BCH); // this removes the value for key BTC
         blockHeightService.blockHeightCache.cleanUp();
-        assertThat(blockHeightService.getBlockHeight()).isEqualTo(123);
-        verify(prioritizingBlockHeightProvider, times(2)).getBlockHeight();
+
+        assertThat(blockHeightService.getBlockHeight(BTC)).isEqualTo(123);
+        verify(prioritizingBlockHeightProvider, times(2)).getBlockHeight(BTC);
     }
 
     @Test
     void does_not_cache_block_count_on_failure() {
-        when(prioritizingBlockHeightProvider.getBlockHeight()).thenReturn(-1);
-        blockHeightService.getBlockHeight();
+        when(prioritizingBlockHeightProvider.getBlockHeight(BTC)).thenReturn(-1);
+        blockHeightService.getBlockHeight(BTC);
 
-        when(prioritizingBlockHeightProvider.getBlockHeight()).thenReturn(123);
-        int blockHeight = blockHeightService.getBlockHeight();
+        when(prioritizingBlockHeightProvider.getBlockHeight(BTC)).thenReturn(123);
+        int blockHeight = blockHeightService.getBlockHeight(BTC);
         assertThat(blockHeight).isEqualTo(123);
     }
 }

@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.backend.transaction.model.Input;
@@ -264,7 +265,7 @@ class TransactionUpdateHeuristicsTest {
     }
 
     private void mockAge(int age) {
-        when(blockHeightService.getBlockHeight()).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT + age);
+        when(blockHeightService.getBlockHeight(Chain.BTC)).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT + age);
     }
 
     private void mockBalance() {

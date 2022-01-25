@@ -21,9 +21,9 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.org.lidalia.slf4jtest.LoggingEvent.debug;
 import static uk.org.lidalia.slf4jtest.LoggingEvent.error;
@@ -48,17 +48,26 @@ class RequestWorkerTest {
     }
 
     @Test
-    void getNow() throws AllProvidersFailedException {
+    void getNow() throws Exception {
         Optional<Integer> result = requestWorker.getNow("x");
         assertThat(result).contains(1);
-        verifyNoInteractions(provider2);
+        verify(provider2, never()).get(any());
     }
 
     @Test
-    void getNow_no_result() throws AllProvidersFailedException {
+    void getNow_no_result() throws Exception {
         Optional<Integer> result = requestWorker.getNow("");
         assertThat(result).isEmpty();
-        verifyNoInteractions(provider2);
+        verify(provider2, never()).get(any());
+    }
+
+    @Test
+    void uses_second_provider_if_first_does_not_supported_key() throws Exception {
+        when(provider1.isSupported(any())).thenReturn(false);
+        when(provider2.get(any())).thenCallRealMethod();
+        Optional<Integer> result = requestWorker.getNow("xxx");
+        assertThat(result).contains(3);
+        verify(provider1).isSupported("xxx");
     }
 
     @Test
@@ -97,9 +106,7 @@ class RequestWorkerTest {
     @Test
     void reuses_first_provider_after_successful_request() throws Exception {
         request(2);
-
-        verify(provider1).get(KEY);
-        verifyNoInteractions(provider2);
+        verifyUsesOnlyFirstProvider();
     }
 
     @Test
@@ -107,8 +114,7 @@ class RequestWorkerTest {
         when(provider1.get(any())).thenThrow(mock(RequestNotPermitted.class));
         request(2);
 
-        verifyNoInteractions(provider1);
-        verify(provider2).get(KEY);
+        verifyUsesOnlySecondProvider();
     }
 
     @Test
@@ -117,8 +123,7 @@ class RequestWorkerTest {
         when(provider2.get(any())).thenThrow(mock(ArithmeticException.class));
         request(2);
 
-        verify(provider1).get(KEY);
-        verifyNoInteractions(provider2);
+        verifyUsesOnlyFirstProvider();
     }
 
     @Test
@@ -127,8 +132,7 @@ class RequestWorkerTest {
         when(provider2.get(any())).thenThrow(mock(CallNotPermittedException.class));
         request(2);
 
-        verifyNoInteractions(provider1);
-        verify(provider2).get(KEY);
+        verifyUsesOnlySecondProvider();
     }
 
     @Test
@@ -137,8 +141,7 @@ class RequestWorkerTest {
         when(provider2.get(any())).thenThrow(mock(RequestNotPermitted.class));
         request(2);
 
-        verifyNoInteractions(provider1);
-        verify(provider2).get(KEY);
+        verifyUsesOnlySecondProvider();
     }
 
     @Test
@@ -147,8 +150,7 @@ class RequestWorkerTest {
         when(provider2.get(any())).thenThrow(mock(CallNotPermittedException.class));
         request(2);
 
-        verify(provider1).get(KEY);
-        verifyNoInteractions(provider2);
+        verifyUsesOnlyFirstProvider();
     }
 
     @Test
@@ -158,8 +160,7 @@ class RequestWorkerTest {
         when(provider2.get(any())).thenThrow(mock(FeignException.class));
         request(2);
 
-        verifyNoInteractions(provider1);
-        verify(provider2).get(KEY);
+        verifyUsesOnlySecondProvider();
     }
 
     @Test
@@ -169,8 +170,7 @@ class RequestWorkerTest {
         when(provider2.get(any())).thenThrow(ProviderException.class);
         request(2);
 
-        verify(provider1).get(KEY);
-        verifyNoInteractions(provider2);
+        verifyUsesOnlyFirstProvider();
     }
 
     @Test
@@ -179,8 +179,7 @@ class RequestWorkerTest {
         when(provider2.get(any())).thenThrow(mock(ArithmeticException.class));
         request(2);
 
-        verify(provider1).get(KEY);
-        verifyNoInteractions(provider2);
+        verifyUsesOnlyFirstProvider();
     }
 
     @Test
@@ -230,7 +229,7 @@ class RequestWorkerTest {
         when(provider2.get(any())).thenThrow(mock(FeignException.class)).thenCallRealMethod();
         request(3);
 
-        verifyNoInteractions(provider1);
+        verify(provider1, never()).get(any());
         verify(provider2).get(KEY);
     }
 
@@ -246,7 +245,7 @@ class RequestWorkerTest {
         });
         request(3);
 
-        verifyNoInteractions(provider1);
+        verify(provider1, never()).get(any());
         verify(provider2).get(KEY);
     }
 
@@ -257,7 +256,7 @@ class RequestWorkerTest {
         request(7);
 
         verify(provider1).get(KEY);
-        verifyNoInteractions(provider2);
+        verify(provider2, never()).get(any());
     }
 
     private void assertWarnAndDebugLogs(
@@ -299,5 +298,15 @@ class RequestWorkerTest {
         } catch (AllProvidersFailedException exception) {
             // ignored
         }
+    }
+
+    private void verifyUsesOnlyFirstProvider() throws ProviderException {
+        verify(provider1).get(KEY);
+        verify(provider2, never()).get(any());
+    }
+
+    private void verifyUsesOnlySecondProvider() throws ProviderException {
+        verify(provider2).get(KEY);
+        verify(provider1, never()).get(any());
     }
 }

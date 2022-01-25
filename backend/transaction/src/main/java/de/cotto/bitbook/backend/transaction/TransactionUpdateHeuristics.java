@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
@@ -46,7 +47,7 @@ public class TransactionUpdateHeuristics {
     }
 
     public boolean isRecentEnough(AddressTransactions addressTransactions) {
-        int currentBlockHeight = blockHeightService.getBlockHeight();
+        int currentBlockHeight = blockHeightService.getBlockHeight(Chain.BTC);
         int age = currentBlockHeight - addressTransactions.getLastCheckedAtBlockHeight();
         if (age <= MANY_TRANSACTIONS_AGE_LIMIT) {
             return true;

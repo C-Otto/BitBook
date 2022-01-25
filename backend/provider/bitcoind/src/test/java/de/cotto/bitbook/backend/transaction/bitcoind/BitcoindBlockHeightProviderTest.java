@@ -9,11 +9,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static de.cotto.bitbook.backend.model.Chain.BCH;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("CPD-START")
 @ExtendWith(MockitoExtension.class)
 class BitcoindBlockHeightProviderTest {
 
@@ -24,21 +28,31 @@ class BitcoindBlockHeightProviderTest {
     private BitcoinCliWrapper bitcoinCliWrapper;
 
     @Test
-    void getBlockHeight_error() {
+    void isSupported_btc() {
+        assertThat(provider.isSupported(BTC)).isTrue();
+    }
+
+    @Test
+    void isSupported_bch() {
+        assertThat(provider.isSupported(BCH)).isFalse();
+    }
+
+    @Test
+    void get_unsupported_chain() {
+        assertThatExceptionOfType(ProviderException.class).isThrownBy(() -> provider.get(BCH));
+        verifyNoInteractions(bitcoinCliWrapper);
+    }
+
+    @Test
+    void get_error() {
         when(bitcoinCliWrapper.getBlockCount()).thenReturn(Optional.empty());
-        assertThatExceptionOfType(ProviderException.class).isThrownBy(provider::get);
+        assertThatExceptionOfType(ProviderException.class).isThrownBy(() -> provider.get(BTC));
     }
 
     @Test
-    void getBlockHeight() throws Exception {
+    void get() throws Exception {
         when(bitcoinCliWrapper.getBlockCount()).thenReturn(Optional.of(BLOCK_HEIGHT));
-        assertThat(provider.get()).contains(BLOCK_HEIGHT);
-    }
-
-    @Test
-    void get_with_argument() throws Exception {
-        when(bitcoinCliWrapper.getBlockCount()).thenReturn(Optional.of(BLOCK_HEIGHT));
-        assertThat(provider.get("x")).contains(BLOCK_HEIGHT);
+        assertThat(provider.get(BTC)).contains(BLOCK_HEIGHT);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.request.PrioritizedRequestWithResult;
 import de.cotto.bitbook.backend.request.ResultFuture;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
@@ -53,7 +54,7 @@ class TransactionServiceIT {
         ResultFuture<Transaction> resultFuture = new ResultFuture<>();
         resultFuture.provideResult(TRANSACTION);
         when(transactionProvider.getTransaction(any())).thenReturn(resultFuture);
-        when(blockHeightProvider.getBlockHeight()).thenReturn(BLOCK_HEIGHT);
+        when(blockHeightProvider.getBlockHeight(Chain.BTC)).thenReturn(BLOCK_HEIGHT);
 
         Transaction transaction = transactionService.getTransactionDetails(TRANSACTION_HASH);
 
@@ -62,7 +63,7 @@ class TransactionServiceIT {
 
     @Test
     void async_request_results_are_persisted() {
-        when(blockHeightProvider.getBlockHeight()).thenReturn(BLOCK_HEIGHT);
+        when(blockHeightProvider.getBlockHeight(Chain.BTC)).thenReturn(BLOCK_HEIGHT);
         mockResult();
 
         transactionService.requestInBackground(Set.of(TRANSACTION_HASH));

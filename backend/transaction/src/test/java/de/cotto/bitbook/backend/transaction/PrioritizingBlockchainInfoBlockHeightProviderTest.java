@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.ProviderException;
+import de.cotto.bitbook.backend.model.Chain;
 import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,6 +39,8 @@ class PrioritizingBlockchainInfoBlockHeightProviderTest {
     void setUp() {
         prioritizingBlockHeightProvider =
                 new PrioritizingBlockHeightProvider(List.of(blockHeightProvider1, blockHeightProvider2));
+        lenient().when(blockHeightProvider1.isSupported(Chain.BTC)).thenReturn(true);
+        lenient().when(blockHeightProvider2.isSupported(Chain.BTC)).thenReturn(true);
     }
 
     @Test
@@ -61,7 +65,7 @@ class PrioritizingBlockchainInfoBlockHeightProviderTest {
 
     private int getHeight() {
         requestInFlight = true;
-        return prioritizingBlockHeightProvider.getBlockHeight();
+        return prioritizingBlockHeightProvider.getBlockHeight(Chain.BTC);
     }
 
     private void workOnRequestsInBackground() {

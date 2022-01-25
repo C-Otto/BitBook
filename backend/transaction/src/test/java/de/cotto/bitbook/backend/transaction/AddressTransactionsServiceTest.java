@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.request.PrioritizedRequestWithResult;
 import de.cotto.bitbook.backend.request.RequestPriority;
 import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
@@ -52,7 +53,7 @@ class AddressTransactionsServiceTest {
 
     @Test
     void getTransactionsForAddresses() {
-        when(blockHeightService.getBlockHeight()).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
+        when(blockHeightService.getBlockHeight(Chain.BTC)).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
         when(addressTransactionsDao.getAddressTransactions(any())).thenReturn(UNKNOWN);
         TransactionsRequestKey requestKey = new TransactionsRequestKey(ADDRESS, LAST_CHECKED_AT_BLOCK_HEIGHT);
         mockAddressTransactionsFromProvider(requestKey, STANDARD, ADDRESS_TRANSACTIONS);
@@ -97,7 +98,7 @@ class AddressTransactionsServiceTest {
 
         @Test
         void downloads_transactions_for_address() {
-            when(blockHeightService.getBlockHeight()).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
+            when(blockHeightService.getBlockHeight(Chain.BTC)).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
             mockAddressTransactionsFromProvider(requestKey, STANDARD, ADDRESS_TRANSACTIONS);
             AddressTransactions addressTransactions = addressTransactionsService.getTransactions(ADDRESS);
             assertThat(addressTransactions).isEqualTo(ADDRESS_TRANSACTIONS);
@@ -105,7 +106,7 @@ class AddressTransactionsServiceTest {
 
         @Test
         void requests_transactions() {
-            when(blockHeightService.getBlockHeight()).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
+            when(blockHeightService.getBlockHeight(Chain.BTC)).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
             mockAddressTransactionsFromProvider(requestKey, STANDARD, ADDRESS_TRANSACTIONS);
             AddressTransactions addressTransactions = addressTransactionsService.getTransactions(ADDRESS);
             verify(transactionService).requestInBackground(addressTransactions.getTransactionHashes());
@@ -113,7 +114,7 @@ class AddressTransactionsServiceTest {
 
         @Test
         void requestTransactionsInBackground_requests_transaction_details_in_background() {
-            when(blockHeightService.getBlockHeight()).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
+            when(blockHeightService.getBlockHeight(Chain.BTC)).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
             mockAddressTransactionsFromProvider(requestKey, LOWEST, ADDRESS_TRANSACTIONS);
             addressTransactionsService.requestTransactionsInBackground(ADDRESS);
             verify(transactionService).requestInBackground(ADDRESS_TRANSACTIONS.getTransactionHashes());
@@ -121,7 +122,7 @@ class AddressTransactionsServiceTest {
 
         @Test
         void does_not_persist_unknown_transaction_addresses() {
-            when(blockHeightService.getBlockHeight()).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
+            when(blockHeightService.getBlockHeight(Chain.BTC)).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
             mockAddressTransactionsFromProvider(requestKey, STANDARD, UNKNOWN);
             addressTransactionsService.getTransactions(ADDRESS);
             verify(addressTransactionsDao, never()).saveAddressTransactions(any());
@@ -129,7 +130,7 @@ class AddressTransactionsServiceTest {
 
         @Test
         void persists_transaction_addresses() {
-            when(blockHeightService.getBlockHeight()).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
+            when(blockHeightService.getBlockHeight(Chain.BTC)).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
             mockAddressTransactionsFromProvider(requestKey, STANDARD, ADDRESS_TRANSACTIONS);
             addressTransactionsService.getTransactions(ADDRESS);
             verify(addressTransactionsDao).saveAddressTransactions(ADDRESS_TRANSACTIONS);
@@ -147,7 +148,7 @@ class AddressTransactionsServiceTest {
             when(addressTransactionsDao.getAddressTransactions(ADDRESS)).thenReturn(ADDRESS_TRANSACTIONS);
             updateBlockHeight = ADDRESS_TRANSACTIONS_UPDATED.getLastCheckedAtBlockHeight();
             requestKey = new TransactionsRequestKey(ADDRESS_TRANSACTIONS, updateBlockHeight);
-            when(blockHeightService.getBlockHeight()).thenReturn(updateBlockHeight);
+            when(blockHeightService.getBlockHeight(Chain.BTC)).thenReturn(updateBlockHeight);
         }
 
         @Test

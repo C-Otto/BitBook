@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.request.ResultFuture;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
@@ -52,7 +53,7 @@ class TransactionServiceTest {
     @BeforeEach
     void setUp() {
         when(transactionDao.getTransaction(any())).thenReturn(Transaction.UNKNOWN);
-        lenient().when(blockHeightService.getBlockHeight()).thenReturn(BLOCK_COUNT_IN_CHAIN);
+        lenient().when(blockHeightService.getBlockHeight(Chain.BTC)).thenReturn(BLOCK_COUNT_IN_CHAIN);
     }
 
     @Test

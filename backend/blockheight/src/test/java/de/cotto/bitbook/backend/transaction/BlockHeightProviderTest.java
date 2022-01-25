@@ -1,9 +1,11 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.Chain;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static de.cotto.bitbook.backend.model.Chain.BCH;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class BlockHeightProviderTest {
@@ -12,7 +14,7 @@ class BlockHeightProviderTest {
 
     @Test
     void get_with_argument() throws Exception {
-        assertThat(provider.get("foo")).contains(123);
+        assertThat(provider.get(BCH)).contains(123);
     }
 
     private static class TestableBlockHeightProvider implements BlockHeightProvider {
@@ -22,7 +24,7 @@ class BlockHeightProviderTest {
         }
 
         @Override
-        public Optional<Integer> get() {
+        public Optional<Integer> get(Chain chain) {
             return Optional.of(123);
         }
     }

@@ -15,6 +15,8 @@ import static de.cotto.bitbook.backend.transaction.TransactionsRequestKeyFixture
 import static de.cotto.bitbook.backend.transaction.TransactionsRequestKeyFixtures.TRANSACTIONS_REQUEST_KEY;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +29,7 @@ class PrioritizingAddressTransactionsProviderTest {
     @BeforeEach
     void setUp() {
         addressTransactionsProvider = mock(AddressTransactionsProvider.class);
+        lenient().when(addressTransactionsProvider.isSupported(any())).thenReturn(true);
         prioritizingPriceProvider = new PrioritizingAddressTransactionsProvider(List.of(addressTransactionsProvider));
     }
 

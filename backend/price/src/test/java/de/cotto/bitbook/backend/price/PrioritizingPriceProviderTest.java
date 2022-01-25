@@ -16,6 +16,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,6 +31,7 @@ class PrioritizingPriceProviderTest {
     @BeforeEach
     void setUp() {
         priceProvider = mock(PriceProvider.class);
+        lenient().when(priceProvider.isSupported(any())).thenReturn(true);
         prioritizingPriceProvider = new PrioritizingPriceProvider(List.of(priceProvider));
     }
 

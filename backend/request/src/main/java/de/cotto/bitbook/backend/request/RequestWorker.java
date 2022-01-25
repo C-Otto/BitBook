@@ -15,7 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.Objects.requireNonNull;
@@ -31,7 +30,7 @@ public class RequestWorker<K, R> {
     }
 
     public Optional<R> getNow(K key) throws AllProvidersFailedException {
-        for (Provider<K, R> provider : getSortedProviders()) {
+        for (Provider<K, R> provider : getSortedProviders(key)) {
             ResultFromProvider<R> resultFromProvider = getWithProvider(key, provider);
             if (resultFromProvider.isSuccessful()) {
                 return resultFromProvider.getAsOptional();
@@ -78,12 +77,13 @@ public class RequestWorker<K, R> {
         providerScores.compute(provider, (key, currentValue) -> requireNonNull(currentValue).add(update));
     }
 
-    private Iterable<? extends Provider<K, R>> getSortedProviders() {
+    private Iterable<? extends Provider<K, R>> getSortedProviders(K key) {
         synchronized (providerScores) {
             return providerScores.entrySet().stream()
                     .sorted(comparingByValue())
                     .map(Map.Entry::getKey)
-                    .collect(Collectors.toList());
+                    .filter(provider -> provider.isSupported(key))
+                    .toList();
         }
     }
 

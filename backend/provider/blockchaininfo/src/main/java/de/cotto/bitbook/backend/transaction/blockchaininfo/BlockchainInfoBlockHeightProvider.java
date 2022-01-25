@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.transaction.blockchaininfo;
 
 import de.cotto.bitbook.backend.ProviderException;
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.transaction.BlockHeightProvider;
 import org.springframework.stereotype.Component;
 
@@ -20,11 +21,23 @@ public class BlockchainInfoBlockHeightProvider implements BlockHeightProvider {
     }
 
     @Override
-    public Optional<Integer> get() throws ProviderException {
+    public Optional<Integer> get(Chain chain) throws ProviderException {
+        throwIfUnsupported(chain);
         try {
             return Optional.of(Integer.parseInt(blockchainInfoClient.getBlockHeight()));
         } catch (NumberFormatException exception) {
             throw new ProviderException(exception);
+        }
+    }
+
+    @Override
+    public boolean isSupported(Chain chain) {
+        return chain == Chain.BTC;
+    }
+
+    private void throwIfUnsupported(Chain chain) throws ProviderException {
+        if (!isSupported(chain)) {
+            throw new ProviderException();
         }
     }
 }

@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.request.RequestPriority;
 import de.cotto.bitbook.backend.request.ResultFuture;
@@ -107,7 +108,7 @@ public class TransactionService {
     }
 
     private int getChainBlockHeight() {
-        return blockHeightService.getBlockHeight();
+        return blockHeightService.getBlockHeight(Chain.BTC);
     }
 
     private Transaction getFromFuture(Future<Transaction> future) {
