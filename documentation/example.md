@@ -196,7 +196,7 @@ OK
 ```
 
 ### Transaction Descriptions
-Similary, you can also set a description for a transaction:
+Similarly, you can also set a description for a transaction:
 
 ```
 BitBook₿ set-transaction-description f74b5dd425497eaabbee8562cf9b41b1f99ba7209d199ca0ac9c0aee4b4804c5 "Stuff from Pete"

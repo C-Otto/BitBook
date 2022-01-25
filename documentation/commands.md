@@ -94,7 +94,7 @@ BitBook₿ mark-address-as-owned 35PWdG8CHar1dUj9RrYBneCyQcN6kzXqFS
 OK
 ```
 
-Similary, you can use `mark-address-as-foreign` and the shorthand version `foreign`.
+Similarly, you can use `mark-address-as-foreign` and the shorthand version `foreign`.
 
 Both commands accept an optional second argument to set the description for the address.
 

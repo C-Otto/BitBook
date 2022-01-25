@@ -348,7 +348,7 @@ class PoolTransactionServiceTest {
     @Nested
     class PoolAccountDepositFailure {
         @Test
-        void nonnegative_amount() {
+        void non_negative_amount() {
             OnchainTransaction transaction = new OnchainTransaction(
                     POOL_ACCOUNT_DEPOSIT.getTransactionHash(),
                     POOL_ACCOUNT_DEPOSIT.getLabel(),

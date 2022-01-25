@@ -27,7 +27,7 @@ Please have a look at [issue #2](https://github.com/C-Otto/BitBook/issues/2) and
 What kind of export do you need?
 
 ## Which commands are available?
-See [comands.md](commands.md).
+See [commands.md](commands.md).
 
 ## How should I interpret the shown prices/values?
 While the coin information is accurate to the Satoshi, for fiat (Euro) values only a single price per

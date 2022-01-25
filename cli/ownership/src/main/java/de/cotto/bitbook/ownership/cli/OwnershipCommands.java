@@ -100,7 +100,7 @@ public class OwnershipCommands {
                 .collect(Collectors.joining("\n"));
     }
 
-    @ShellMethod(value = "Mark an address as owened", key = {"mark-address-as-owned", "owned"})
+    @ShellMethod(value = "Mark an address as owned", key = {"mark-address-as-owned", "owned"})
     public String markAddressAsOwned(
             @ShellOption(valueProvider = AddressCompletionProvider.class) CliAddress address,
             @ShellOption(defaultValue = "") String description

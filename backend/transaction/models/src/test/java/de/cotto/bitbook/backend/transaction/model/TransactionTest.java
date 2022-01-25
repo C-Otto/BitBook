@@ -253,7 +253,7 @@ class TransactionTest {
     }
 
     @Test
-    void outputs_are_umodifiable() {
+    void outputs_are_unmodifiable() {
         assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() ->
             TRANSACTION.getOutputs().clear()
         );
@@ -289,7 +289,7 @@ class TransactionTest {
     }
 
     @Test
-    void inputs_are_umodifiable() {
+    void inputs_are_unmodifiable() {
         assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() ->
                 TRANSACTION.getInputs().clear()
         );

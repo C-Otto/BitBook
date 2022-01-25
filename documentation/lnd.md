@@ -97,7 +97,7 @@ Notes:
   remote node as *foreign* may be wrong. To avoid this, for addresses already marked as *owned* the ownership is not
   changed.
 - If a transaction opens more than one channel, only one of these is mentioned in the description.
-- Currently, BitBook is unable to determine all neccessary ownership information for addresses that result out of
+- Currently, BitBook is unable to determine all necessary ownership information for addresses that result out of
   unsettled HTLC transactions. See [issue #90](https://github.com/C-Otto/BitBook/issues/89).
 
 ### On-Chain Transactions
@@ -114,7 +114,7 @@ BitBook is able to distinguish the following transaction types:
 
    For transactions that send funds from `lnd`'s wallet, the source and change addresses are marked as owned, and
    the description "lnd" is set for the addresses.
-   This is only done if all addresses are alreayd marked as owned and if no label is set for the transaction (in `lnd`).
+   This is only done if all addresses are already marked as owned and if no label is set for the transaction (in `lnd`).
 
 3. **Channel Opening Transactions**
    

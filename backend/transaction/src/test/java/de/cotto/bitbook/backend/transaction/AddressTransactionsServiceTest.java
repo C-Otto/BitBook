@@ -112,7 +112,7 @@ class AddressTransactionsServiceTest {
         }
 
         @Test
-        void requestTransactionsInBackground_requests_transaction_details_in_backgorund() {
+        void requestTransactionsInBackground_requests_transaction_details_in_background() {
             when(blockHeightService.getBlockHeight()).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
             mockAddressTransactionsFromProvider(requestKey, LOWEST, ADDRESS_TRANSACTIONS);
             addressTransactionsService.requestTransactionsInBackground(ADDRESS);

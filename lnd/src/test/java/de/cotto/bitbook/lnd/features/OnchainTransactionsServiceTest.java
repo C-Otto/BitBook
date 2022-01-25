@@ -490,7 +490,7 @@ class OnchainTransactionsServiceTest {
         }
 
         @Test
-        void nonnegative_amount() {
+        void non_negative_amount() {
             OnchainTransaction transaction = new OnchainTransaction(
                     SPEND_TRANSACTION.getTransactionHash(),
                     SPEND_TRANSACTION.getLabel(),

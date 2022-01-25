@@ -71,7 +71,7 @@ class AddressTransactionsTest {
     }
 
     @Test
-    void transactionHashes_are_umodifiable() {
+    void transactionHashes_are_unmodifiable() {
         assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() ->
                 ADDRESS_TRANSACTIONS.getTransactionHashes().clear()
         );

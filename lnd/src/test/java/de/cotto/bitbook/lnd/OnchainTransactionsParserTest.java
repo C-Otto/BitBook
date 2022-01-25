@@ -30,7 +30,7 @@ class OnchainTransactionsParserTest {
     }
 
     @Test
-    void two_transactionss() throws IOException {
+    void two_transactions() throws IOException {
         String json = "{\"transactions\":[" +
                       "{\"tx_hash\": \"a\", \"total_fees\": \"12\", \"amount\": \"900\", \"label\": \"\"}," +
                       "{\"tx_hash\": \"b\", \"total_fees\": \"0\", \"amount\": \"111\", \"label\": \"xxx\"}" +

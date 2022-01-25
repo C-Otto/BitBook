@@ -167,7 +167,7 @@ class ClosedChannelsServiceTest {
     }
 
     @Test
-    void does_not_add_description_for_ambigous_settlement_address() {
+    void does_not_add_description_for_ambiguous_settlement_address() {
         load(AMBIGUOUS_SETTLEMENT_ADDRESS);
         verify(addressDescriptionService, never()).set(any(), eq(DEFAULT_DESCRIPTION));
     }
