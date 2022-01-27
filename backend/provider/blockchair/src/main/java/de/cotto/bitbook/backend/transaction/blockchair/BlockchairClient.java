@@ -17,4 +17,7 @@ public interface BlockchairClient {
 
     @GetMapping("/bitcoin/dashboards/address/{address}")
     Optional<BlockchairAddressTransactionsDto> getAddressDetails(@PathVariable String address);
+
+    @GetMapping("/bitcoin/stats")
+    Optional<BlockchairBlockHeightDto> getBlockHeight();
 }

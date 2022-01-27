@@ -1,4 +1,4 @@
-package de.cotto.bitbook.backend.transaction.bitaps;
+package de.cotto.bitbook.backend.transaction.blockchair;
 
 import de.cotto.bitbook.backend.ProviderException;
 import de.cotto.bitbook.backend.model.Chain;
@@ -8,22 +8,23 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-public class BitapsBlockHeightProvider implements BlockHeightProvider {
-    private final BitapsClient bitapsClient;
+@SuppressWarnings("CPD-START")
+public class BlockchairBlockHeightProvider implements BlockHeightProvider {
+    private final BlockchairClient blockchairClient;
 
-    public BitapsBlockHeightProvider(BitapsClient bitapsClient) {
-        this.bitapsClient = bitapsClient;
+    public BlockchairBlockHeightProvider(BlockchairClient blockchairClient) {
+        this.blockchairClient = blockchairClient;
     }
 
     @Override
     public String getName() {
-        return "BitapsBlockHeightProvider";
+        return "BlockchairBlockHeightProvider";
     }
 
     @Override
     public Optional<Integer> get(Chain chain) throws ProviderException {
         throwIfUnsupported(chain);
-        BitapsBlockHeightDto dto = bitapsClient.getBlockHeight().orElseThrow(ProviderException::new);
+        BlockchairBlockHeightDto dto = blockchairClient.getBlockHeight().orElseThrow(ProviderException::new);
         return Optional.of(dto.getBlockHeight());
     }
 

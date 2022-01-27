@@ -49,7 +49,7 @@ Currently, the following providers are implemented:
  * kraken.com: Euro prices
  * bitaps.com: ATH
  * blockchain.info: TH
- * blockchair.com: AT
+ * blockchair.com: ATH
  * blockcypher.com: T
  * blockstream.info: A
  * btc.com: AT
