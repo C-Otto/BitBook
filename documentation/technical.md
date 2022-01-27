@@ -55,6 +55,9 @@ Currently, the following providers are implemented:
  * btc.com: AT
  * mempool.space: A
 
+For Bitcoin Cash:
+* blockchair.com: H
+
 #### Requests and Queue
 For each type of result (e.g. transaction details), a `PrioritizingProvider` implementation
 is responsible for transforming requests into results. Each request has a priority (at the moment either 'standard'

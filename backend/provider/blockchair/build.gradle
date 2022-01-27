@@ -8,3 +8,15 @@ dependencies {
     implementation project(':backend:address-transactions')
     testFixturesApi testFixtures(project(':backend:provider:base'))
 }
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rules.forEach {rule ->
+            rule.limits.forEach {limit ->
+                if (limit.counter == 'BRANCH') {
+                    limit.minimum = 0.94
+                }
+            }
+        }
+    }
+}
