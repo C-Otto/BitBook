@@ -106,13 +106,13 @@ BitBook is able to distinguish the following transaction types:
    
    For transactions that send funds to `lnd`'s wallet, the target address is marked as owned, and
    the description "lnd" is set for the address.
-   This is only done if no label is set for the transaction (in `lnd`).
+   This is only done if `lnd` does not specify a label for the transaction.
    
 2. **Spending Transactions**
 
-   For transactions that send funds from `lnd`'s wallet, the source and change addresses are marked as owned, and
-   the description "lnd" is set for the addresses.
-   This is only done if all addresses are already marked as owned and if no label is set for the transaction (in `lnd`).
+   For transactions that send funds from `lnd`'s wallet, the change address is marked as owned, and
+   the description "lnd" is set for the source and change addresses.
+   This is only done if all source addresses are already marked as owned and if `lnd` does not specify a label for the transaction.
 
 3. **Channel Opening Transactions**
    
