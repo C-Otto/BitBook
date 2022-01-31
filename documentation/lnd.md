@@ -97,8 +97,6 @@ Notes:
   remote node as *foreign* may be wrong. To avoid this, for addresses already marked as *owned* the ownership is not
   changed.
 - If a transaction opens more than one channel, only one of these is mentioned in the description.
-- Currently, BitBook is unable to determine all necessary ownership information for addresses that result out of
-  unsettled HTLC transactions. See [issue #90](https://github.com/C-Otto/BitBook/issues/89).
 
 ### On-Chain Transactions
 `lnd` keeps a record of all on-chain transactions, which includes regular transactions from/to `lnd`'s wallet.
