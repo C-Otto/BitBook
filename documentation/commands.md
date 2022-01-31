@@ -116,8 +116,8 @@ BitBook₿ get-owned-addresses
 36WvZoFtn8ng6V8RyfB76dF73rJD6FLz9a    0.0238648  [     1,127.22€] Some Description
 ```
 
-Note that the list of hashes associated with each owned address is updated as part of this computation, which might
-cause a delay (see [Get Address Transactions](#get-address-transactions)).
+Note that the list of transaction hashes associated with each owned address is updated as part of this computation,
+which might cause a delay (see [Get Address Transactions](#get-address-transactions)).
 
 ### Get Balance
 The commands `get-balance` and `get-balance-for-address` can be used to get the balance, either aggregated over all
@@ -220,8 +220,8 @@ returned list is empty.**
 The fiat value shown next to the coin amount is based on the exchange rate at the day of the corresponding transaction.
 Descriptions set for transactions are included in the output.
 
-Note that the list of hashes associated with each owned address is updated as part of this computation, which might
-cause a delay (see [Get Address Transactions](#get-address-transactions)).
+Note that the list of transaction hashes associated with each owned address is updated as part of this computation,
+which might cause a delay (see [Get Address Transactions](#get-address-transactions)).
 
 ## Descriptions
 You can set textual descriptions to addresses and transactions so that this additional information is shown in the
