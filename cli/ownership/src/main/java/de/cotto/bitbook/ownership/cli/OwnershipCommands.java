@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.stream.Collectors.toSet;
 
@@ -63,14 +62,14 @@ public class OwnershipCommands {
     @ShellMethod("Get the total balance over all owned addresses")
     public String getBalance() {
         Coins balance = addressOwnershipService.getBalance();
-        Price price = priceService.getCurrentPrice(BTC);
+        Price price = priceService.getCurrentPrice(selectedChain.getChain());
         String formattedPrice = priceFormatter.format(balance, price);
         return "%s [%s]".formatted(balance, formattedPrice);
     }
 
     @ShellMethod("Get all owned addresses")
     public String getOwnedAddresses() {
-        Price currentPrice = priceService.getCurrentPrice(BTC);
+        Price currentPrice = priceService.getCurrentPrice(selectedChain.getChain());
         Set<AddressWithDescription> ownedAddressesWithDescription =
                 addressOwnershipService.getOwnedAddressesWithDescription();
         preloadAddressTransactions(ownedAddressesWithDescription);
