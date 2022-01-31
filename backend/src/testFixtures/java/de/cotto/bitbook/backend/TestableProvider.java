@@ -1,18 +1,23 @@
-package de.cotto.bitbook.backend.request;
-
-import de.cotto.bitbook.backend.Provider;
-import de.cotto.bitbook.backend.ProviderException;
+package de.cotto.bitbook.backend;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-class TestableProvider implements Provider<String, Integer> {
-    protected final List<String> seenKeys = Collections.synchronizedList(new ArrayList<>());
+public class TestableProvider implements Provider<String, Integer> {
+    public final List<String> seenKeys = Collections.synchronizedList(new ArrayList<>());
 
     public TestableProvider() {
         // default constructor
+    }
+
+    @Override
+    public boolean isSupported(String key) {
+        if ("unsupported".equals(key)) {
+            return false;
+        }
+        return Provider.super.isSupported(key);
     }
 
     @Override

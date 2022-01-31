@@ -10,4 +10,10 @@ public interface Provider<K, R> {
     default boolean isSupported(K key) {
         return true;
     }
+
+    default void throwIfUnsupported(K key) throws ProviderException {
+        if (!isSupported(key)) {
+            throw new ProviderException();
+        }
+    }
 }

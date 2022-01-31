@@ -14,7 +14,7 @@ jacocoTestCoverageVerification {
         rules.forEach {rule ->
             rule.limits.forEach {limit ->
                 if (limit.counter == 'BRANCH') {
-                    limit.minimum = 0.94
+                    limit.minimum = 0.93
                 }
             }
         }

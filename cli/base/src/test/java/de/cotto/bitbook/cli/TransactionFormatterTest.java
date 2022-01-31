@@ -24,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_1;
 import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_2;
 import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_1;
@@ -42,6 +43,7 @@ import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRA
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,6 +69,14 @@ class TransactionFormatterTest {
     @Mock
     private AddressOwnershipService addressOwnershipService;
 
+    @Mock
+    private SelectedChain selectedChain;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(selectedChain.getChain()).thenReturn(BTC);
+    }
+
     @Test
     void format() {
         when(priceFormatter.format(any(), any()))
@@ -83,7 +93,7 @@ class TransactionFormatterTest {
     private void testFormatForPrice(Price price) {
         String transactionDescription = "xxx";
         mockPrice(Price.UNKNOWN);
-        when(priceService.getPrice(TRANSACTION.getTime())).thenReturn(price);
+        when(priceService.getPrice(TRANSACTION.getTime(), BTC)).thenReturn(price);
         when(addressFormatter.getFormattedOwnershipStatus(any())).thenReturn("?");
         when(addressDescriptionService.get(any()))
                 .then(invocation -> new AddressWithDescription(invocation.getArgument(0)));
@@ -226,7 +236,7 @@ class TransactionFormatterTest {
     private Price mockPrice(Price price) {
         when(priceFormatter.format(any(), any()))
                 .then(invocation -> invocation.getArgument(0) + "/" + invocation.getArgument(1));
-        when(priceService.getPrice(TRANSACTION.getTime())).thenReturn(price);
+        when(priceService.getPrice(TRANSACTION.getTime(), BTC)).thenReturn(price);
         return price;
     }
 

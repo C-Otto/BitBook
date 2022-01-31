@@ -1,6 +1,5 @@
 package de.cotto.bitbook.backend.transaction;
 
-import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.request.RequestPriority;
 import de.cotto.bitbook.backend.request.ResultFuture;
@@ -12,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
 import static java.util.stream.Collectors.toSet;
@@ -104,11 +104,11 @@ public class TransactionService {
     }
 
     private void triggerPriceRequest(Transaction transaction) {
-        priceService.requestPriceInBackground(transaction.getTime());
+        priceService.requestPriceInBackground(transaction.getTime(), BTC);
     }
 
     private int getChainBlockHeight() {
-        return blockHeightService.getBlockHeight(Chain.BTC);
+        return blockHeightService.getBlockHeight(BTC);
     }
 
     private Transaction getFromFuture(Future<Transaction> future) {

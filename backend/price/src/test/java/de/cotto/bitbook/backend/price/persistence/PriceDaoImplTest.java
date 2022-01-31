@@ -1,7 +1,8 @@
 package de.cotto.bitbook.backend.price.persistence;
 
 import de.cotto.bitbook.backend.price.model.Price;
-import de.cotto.bitbook.backend.price.model.PriceWithDate;
+import de.cotto.bitbook.backend.price.model.PriceContext;
+import de.cotto.bitbook.backend.price.model.PriceWithContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -24,6 +26,7 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class PriceDaoImplTest {
     private static final LocalDate DATE = LocalDate.of(2010, 1, 1);
+    private static final PriceContext PRICE_CONTEXT = new PriceContext(DATE, BTC);
 
     @InjectMocks
     private PriceDaoImpl priceDao;
@@ -34,9 +37,10 @@ class PriceDaoImplTest {
     @Test
     void getPrice() {
         Price price = Price.of(123);
-        PriceWithDate priceWithDate = new PriceWithDate(price, DATE);
-        doReturn(Optional.of(PriceWithDateJpaDto.fromModel(priceWithDate))).when(priceRepository).findById(DATE);
-        assertThat(priceDao.getPrice(DATE)).contains(price);
+        PriceWithContext priceWithContext = new PriceWithContext(price, PRICE_CONTEXT);
+        doReturn(Optional.of(PriceWithContextJpaDto.fromModel(priceWithContext)))
+                .when(priceRepository).findById(PriceWithContextId.fromModel(PRICE_CONTEXT));
+        assertThat(priceDao.getPrice(PRICE_CONTEXT)).contains(price);
     }
 
     @Test
@@ -47,32 +51,37 @@ class PriceDaoImplTest {
         LocalDate date1 = DATE;
         LocalDate date2 = DATE.plusDays(1);
         LocalDate date3 = DATE.plusWeeks(5);
-        Collection<PriceWithDate> pricesWithDates = List.of(
-                new PriceWithDate(price1, date1),
-                new PriceWithDate(price2, date2),
-                new PriceWithDate(price3, date3)
+        Collection<PriceWithContext> pricesWithContexts = List.of(
+                new PriceWithContext(price1, new PriceContext(date1, BTC)),
+                new PriceWithContext(price2, new PriceContext(date2, BTC)),
+                new PriceWithContext(price3, new PriceContext(date3, BTC))
         );
 
-        priceDao.savePrices(pricesWithDates);
+        priceDao.savePrices(pricesWithContexts);
 
-        PriceWithDateJpaDto dto1 = dto(price1, date1);
-        PriceWithDateJpaDto dto2 = dto(price2, date2);
-        PriceWithDateJpaDto dto3 = dto(price3, date3);
+        PriceWithContextJpaDto dto1 = dto(price1, date1);
+        PriceWithContextJpaDto dto2 = dto(price2, date2);
+        PriceWithContextJpaDto dto3 = dto(price3, date3);
         verify(priceRepository).saveAll(iterableWithDtos(dto1, dto2, dto3));
     }
 
-    private List<PriceWithDateJpaDto> iterableWithDtos(PriceWithDateJpaDto... dtos) {
+    private List<PriceWithContextJpaDto> iterableWithDtos(PriceWithContextJpaDto... dtos) {
         return argThat(iterable -> {
-            Set<PriceWithDate> fromIterable = iterable.stream().map(PriceWithDateJpaDto::toModel).collect(toSet());
-            Set<PriceWithDate> expected = Arrays.stream(dtos).map(PriceWithDateJpaDto::toModel).collect(toSet());
+            Set<PriceWithContext> fromIterable = iterable.stream()
+                    .map(PriceWithContextJpaDto::toModel)
+                    .collect(toSet());
+            Set<PriceWithContext> expected = Arrays.stream(dtos)
+                    .map(PriceWithContextJpaDto::toModel)
+                    .collect(toSet());
             return fromIterable.equals(expected);
         });
     }
 
-    private PriceWithDateJpaDto dto(Price price, LocalDate date) {
-        PriceWithDateJpaDto dto = new PriceWithDateJpaDto();
+    private PriceWithContextJpaDto dto(Price price, LocalDate date) {
+        PriceWithContextJpaDto dto = new PriceWithContextJpaDto();
         dto.setDate(date);
         dto.setPrice(PriceJpaDto.fromModel(price));
+        dto.setChain(BTC.toString());
         return dto;
     }
 }

@@ -4,6 +4,7 @@ import de.cotto.bitbook.backend.price.kraken.KrakenClient;
 import de.cotto.bitbook.backend.price.kraken.KrakenTradesDto;
 import de.cotto.bitbook.backend.price.kraken.KrakenTradesDto.Trade;
 import de.cotto.bitbook.backend.price.model.Price;
+import de.cotto.bitbook.backend.price.model.PriceContext;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertTimeout;
@@ -46,7 +47,7 @@ class PriceServiceIT {
     void getPrice() {
         when(krakenClient.getTrades(DATE_IN_EPOCH_SECONDS)).thenReturn(Optional.of(trades(DATE)));
 
-        Price price = priceService.getPrice(DATE.atStartOfDay());
+        Price price = priceService.getPrice(DATE.atStartOfDay(), BTC);
 
         verify(krakenClient).getTrades(DATE_IN_EPOCH_SECONDS);
         assertThat(price).isEqualTo(PRICE);
@@ -60,11 +61,11 @@ class PriceServiceIT {
             Thread.sleep(delay);
             return Optional.of(trades(dateTime.toLocalDate()));
         });
-        await().atMost((long) (0.9 * delay), TimeUnit.MILLISECONDS).untilAsserted(
-                () -> priceService.requestPriceInBackground(dateTime)
+        await().atMost((long) (0.9 * delay), MILLISECONDS).untilAsserted(
+                () -> priceService.requestPriceInBackground(dateTime, BTC)
         );
-        await().atMost(2 * delay, SECONDS).untilAsserted(() ->
-                assertThat(priceDao.getPrice(dateTime.toLocalDate())).contains(PRICE)
+        await().atMost(4 * delay, MILLISECONDS).untilAsserted(() ->
+                assertThat(priceDao.getPrice(new PriceContext(dateTime.toLocalDate(), BTC))).contains(PRICE)
         );
     }
 
@@ -81,8 +82,8 @@ class PriceServiceIT {
         long epochSeconds2 = dateTime2.toLocalDate().atStartOfDay().toEpochSecond(ZoneOffset.UTC);
         when(krakenClient.getTrades(epochSeconds2)).thenReturn(Optional.of(trades(DATE)));
 
-        priceService.requestPriceInBackground(dateTime1);
-        assertTimeout(Duration.ofMillis(100), () -> priceService.requestPriceInBackground(dateTime2));
+        priceService.requestPriceInBackground(dateTime1, BTC);
+        assertTimeout(Duration.ofMillis(100), () -> priceService.requestPriceInBackground(dateTime2, BTC));
     }
 
     private KrakenTradesDto trades(LocalDate date) {

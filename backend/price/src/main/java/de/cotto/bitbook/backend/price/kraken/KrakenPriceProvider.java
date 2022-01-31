@@ -1,9 +1,11 @@
 package de.cotto.bitbook.backend.price.kraken;
 
 import de.cotto.bitbook.backend.Provider;
+import de.cotto.bitbook.backend.ProviderException;
 import de.cotto.bitbook.backend.price.kraken.KrakenTradesDto.Trade;
 import de.cotto.bitbook.backend.price.model.Price;
-import de.cotto.bitbook.backend.price.model.PriceWithDate;
+import de.cotto.bitbook.backend.price.model.PriceContext;
+import de.cotto.bitbook.backend.price.model.PriceWithContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -20,8 +22,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
+
 @Component
-public class KrakenPriceProvider implements Provider<LocalDate, Collection<PriceWithDate>> {
+public class KrakenPriceProvider implements Provider<PriceContext, Collection<PriceWithContext>> {
     private static final LocalDate NO_PRICE_BEFORE = LocalDate.of(2013, 9, 1);
     private static final long ONE_DAY_IN_SECONDS = 24 * 60 * 60;
     private final KrakenClient krakenClient;
@@ -37,7 +41,14 @@ public class KrakenPriceProvider implements Provider<LocalDate, Collection<Price
     }
 
     @Override
-    public Optional<Collection<PriceWithDate>> get(LocalDate date) {
+    public boolean isSupported(PriceContext key) {
+        return key.chain() == BTC;
+    }
+
+    @Override
+    public Optional<Collection<PriceWithContext>> get(PriceContext priceContext) throws ProviderException {
+        throwIfUnsupported(priceContext);
+        LocalDate date = priceContext.date();
         if (tooOld(date)) {
             return Optional.empty();
         }
@@ -47,22 +58,30 @@ public class KrakenPriceProvider implements Provider<LocalDate, Collection<Price
         return Optional.of(getFromTrades(date));
     }
 
-    private Collection<PriceWithDate> getFromTrades(LocalDate date) {
+    private Collection<PriceWithContext> getFromTrades(LocalDate date) {
         Optional<Price> averagePriceForFirstTrades = getAveragePriceForFirstTrades(date);
         if (averagePriceForFirstTrades.isEmpty()) {
             return Set.of();
         }
-        return Set.of(new PriceWithDate(averagePriceForFirstTrades.get(), date));
+        return Set.of(new PriceWithContext(averagePriceForFirstTrades.get(), toContext(date)));
     }
 
-    private Collection<PriceWithDate> getFromOhlcData() {
+    private Collection<PriceWithContext> getFromOhlcData() {
         Optional<KrakenOhlcDataDto> ohlcData = getWithFeignClient(krakenClient::getOhlcData);
         if (ohlcData.isEmpty()) {
             return Set.of();
         }
         return ohlcData.get().getOhlcEntries().stream()
-                .map(entry -> new PriceWithDate(entry.getOpenPrice(), toLocalDate(entry.getTimestamp())))
+                .map(entry -> new PriceWithContext(entry.getOpenPrice(), toContext(entry.getTimestamp())))
                 .collect(Collectors.toList());
+    }
+
+    private PriceContext toContext(long timestamp) {
+        return toContext(toLocalDate(timestamp));
+    }
+
+    private PriceContext toContext(LocalDate date) {
+        return new PriceContext(date, BTC);
     }
 
     private Optional<Price> getAveragePriceForFirstTrades(LocalDate date) {

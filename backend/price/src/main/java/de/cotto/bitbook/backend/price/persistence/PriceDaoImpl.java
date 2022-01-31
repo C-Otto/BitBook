@@ -2,11 +2,11 @@ package de.cotto.bitbook.backend.price.persistence;
 
 import de.cotto.bitbook.backend.price.PriceDao;
 import de.cotto.bitbook.backend.price.model.Price;
-import de.cotto.bitbook.backend.price.model.PriceWithDate;
+import de.cotto.bitbook.backend.price.model.PriceContext;
+import de.cotto.bitbook.backend.price.model.PriceWithContext;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -23,15 +23,15 @@ public class PriceDaoImpl implements PriceDao {
     }
 
     @Override
-    public Optional<Price> getPrice(LocalDate date) {
-        return priceRepository.findById(date)
-                .map(PriceWithDateJpaDto::toModel)
-                .map(PriceWithDate::getPrice);
+    public Optional<Price> getPrice(PriceContext priceContext) {
+        return priceRepository.findById(PriceWithContextId.fromModel(priceContext))
+                .map(PriceWithContextJpaDto::toModel)
+                .map(PriceWithContext::getPrice);
     }
 
     @Override
-    public void savePrices(Collection<PriceWithDate> prices) {
-        List<PriceWithDateJpaDto> dtos = prices.stream().map(PriceWithDateJpaDto::fromModel).collect(toList());
+    public void savePrices(Collection<PriceWithContext> prices) {
+        List<PriceWithContextJpaDto> dtos = prices.stream().map(PriceWithContextJpaDto::fromModel).collect(toList());
         priceRepository.saveAll(dtos);
     }
 }

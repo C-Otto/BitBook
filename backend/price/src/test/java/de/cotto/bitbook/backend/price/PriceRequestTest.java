@@ -1,47 +1,51 @@
 package de.cotto.bitbook.backend.price;
 
+import de.cotto.bitbook.backend.price.model.PriceContext;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PriceRequestTest {
     private static final LocalDate DATE = LocalDate.of(2021, 1, 2);
+    public static final PriceContext PRICE_CONTEXT = new PriceContext(DATE, BTC);
 
     @Test
-    void getDate() {
-        assertThat(PriceRequest.forDateStandardPriority(DATE).getDate()).isEqualTo(DATE);
+    void getPriceContext() {
+        assertThat(PriceRequest.createWithStandardPriority(PRICE_CONTEXT).getPriceContext()).isEqualTo(PRICE_CONTEXT);
     }
 
     @Test
     void getPriority_standard() {
-        assertThat(PriceRequest.forDateStandardPriority(DATE).getPriority()).isEqualTo(STANDARD);
+        assertThat(PriceRequest.createWithStandardPriority(PRICE_CONTEXT).getPriority()).isEqualTo(STANDARD);
     }
 
     @Test
     void getPriority_lowest() {
-        assertThat(PriceRequest.forDateLowestPriority(DATE).getPriority()).isEqualTo(LOWEST);
+        assertThat(PriceRequest.createWithLowestPriority(PRICE_CONTEXT).getPriority()).isEqualTo(LOWEST);
     }
 
     @Test
     void forCurrentPrice_priority() {
-        assertThat(PriceRequest.forCurrentPrice().getPriority()).isEqualTo(STANDARD);
+        assertThat(PriceRequest.forCurrentPrice(BTC).getPriority()).isEqualTo(STANDARD);
     }
 
     @Test
-    void forCurrentPrice_date() {
-        assertThat(PriceRequest.forCurrentPrice().getDate()).isEqualTo(LocalDate.now(ZoneOffset.UTC));
+    void forCurrentPrice_priceContext() {
+        assertThat(PriceRequest.forCurrentPrice(BTC).getPriceContext())
+                .isEqualTo(new PriceContext(LocalDate.now(ZoneOffset.UTC), BTC));
     }
 
     @Test
     void testToString() {
-        assertThat(PriceRequest.forDateStandardPriority(DATE)).hasToString(
+        assertThat(PriceRequest.createWithStandardPriority(PRICE_CONTEXT)).hasToString(
                 "PriceRequest{" +
-                "date=2021-01-02" +
+                "priceContext=" + PRICE_CONTEXT +
                 ", priority=STANDARD" +
                 "}");
     }

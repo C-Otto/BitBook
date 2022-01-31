@@ -5,14 +5,17 @@ import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.price.model.Price;
 import de.cotto.bitbook.backend.transaction.BalanceService;
 import de.cotto.bitbook.backend.transaction.model.Coins;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -34,11 +37,19 @@ class AddressCommandsTest {
     @Mock
     private PriceFormatter priceFormatter;
 
+    @Mock
+    private SelectedChain selectedChain;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(selectedChain.getChain()).thenReturn(BTC);
+    }
+
     @Test
     void getBalanceForAddress() {
         Coins expectedCoins = Coins.ofSatoshis(456);
         Price price = Price.of(200);
-        when(priceService.getCurrentPrice()).thenReturn(price);
+        when(priceService.getCurrentPrice(BTC)).thenReturn(price);
         when(priceFormatter.format(expectedCoins, price)).thenReturn("formattedPrice");
         when(balanceService.getBalance(ADDRESS)).thenReturn(expectedCoins);
         String currentBalanceForAddress = addressCommands.getBalanceForAddress(new CliAddress(ADDRESS));

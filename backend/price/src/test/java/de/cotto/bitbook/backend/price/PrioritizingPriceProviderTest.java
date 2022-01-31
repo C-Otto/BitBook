@@ -2,7 +2,8 @@ package de.cotto.bitbook.backend.price;
 
 import de.cotto.bitbook.backend.ProviderException;
 import de.cotto.bitbook.backend.price.model.Price;
-import de.cotto.bitbook.backend.price.model.PriceWithDate;
+import de.cotto.bitbook.backend.price.model.PriceContext;
+import de.cotto.bitbook.backend.price.model.PriceWithContext;
 import de.cotto.bitbook.backend.request.ResultFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
@@ -23,6 +25,7 @@ import static org.mockito.Mockito.when;
 
 class PrioritizingPriceProviderTest {
     private static final LocalDate DATE = LocalDate.of(2021, 1, 2);
+    private static final PriceContext PRICE_CONTEXT = new PriceContext(DATE, BTC);
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
 
     private PriceProvider priceProvider;
@@ -37,11 +40,11 @@ class PrioritizingPriceProviderTest {
 
     @Test
     void getPrices() throws Exception {
-        PriceWithDate expected = new PriceWithDate(Price.of(2), DATE);
-        when(priceProvider.get(DATE)).thenReturn(Optional.of(Set.of(expected)));
+        PriceWithContext expected = new PriceWithContext(Price.of(2), PRICE_CONTEXT);
+        when(priceProvider.get(PRICE_CONTEXT)).thenReturn(Optional.of(Set.of(expected)));
 
-        PriceRequest request = PriceRequest.forDateStandardPriority(DATE);
-        ResultFuture<Collection<PriceWithDate>> resultFuture = prioritizingPriceProvider.getPrices(request);
+        PriceRequest request = PriceRequest.createWithStandardPriority(PRICE_CONTEXT);
+        ResultFuture<Collection<PriceWithContext>> resultFuture = prioritizingPriceProvider.getPrices(request);
         workOnRequestsInBackground();
 
         assertThat(resultFuture.getResult().orElseThrow()).contains(expected);
@@ -49,10 +52,10 @@ class PrioritizingPriceProviderTest {
 
     @Test
     void getPrices_failure() throws Exception {
-        when(priceProvider.get(DATE)).thenReturn(Optional.empty());
+        when(priceProvider.get(PRICE_CONTEXT)).thenReturn(Optional.empty());
 
-        PriceRequest request = PriceRequest.forDateStandardPriority(DATE);
-        ResultFuture<Collection<PriceWithDate>> resultFuture = prioritizingPriceProvider.getPrices(request);
+        PriceRequest request = PriceRequest.createWithStandardPriority(PRICE_CONTEXT);
+        ResultFuture<Collection<PriceWithContext>> resultFuture = prioritizingPriceProvider.getPrices(request);
         workOnRequestsInBackground();
 
         assertThat(resultFuture.getResult()).isEmpty();
@@ -60,10 +63,10 @@ class PrioritizingPriceProviderTest {
 
     @Test
     void getPrices_error() throws Exception {
-        when(priceProvider.get(DATE)).thenThrow(ProviderException.class);
+        when(priceProvider.get(PRICE_CONTEXT)).thenThrow(ProviderException.class);
 
-        PriceRequest request = PriceRequest.forDateStandardPriority(DATE);
-        ResultFuture<Collection<PriceWithDate>> resultFuture = prioritizingPriceProvider.getPrices(request);
+        PriceRequest request = PriceRequest.createWithStandardPriority(PRICE_CONTEXT);
+        ResultFuture<Collection<PriceWithContext>> resultFuture = prioritizingPriceProvider.getPrices(request);
         workOnRequestsInBackground();
 
         assertThat(resultFuture.getResult()).isEmpty();

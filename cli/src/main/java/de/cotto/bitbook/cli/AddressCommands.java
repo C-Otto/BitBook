@@ -16,17 +16,20 @@ public class AddressCommands {
     private final PriceService priceService;
     private final PriceFormatter priceFormatter;
     private final AddressDescriptionService addressDescriptionService;
+    private final SelectedChain selectedChain;
 
     public AddressCommands(
             BalanceService balanceService,
             PriceService priceService,
             PriceFormatter priceFormatter,
-            AddressDescriptionService addressDescriptionService
+            AddressDescriptionService addressDescriptionService,
+            SelectedChain selectedChain
     ) {
         this.balanceService = balanceService;
         this.priceService = priceService;
         this.priceFormatter = priceFormatter;
         this.addressDescriptionService = addressDescriptionService;
+        this.selectedChain = selectedChain;
     }
 
     @ShellMethod("Get balance for address")
@@ -38,7 +41,7 @@ public class AddressCommands {
             return CliAddress.ERROR_MESSAGE;
         }
         Coins balance = balanceService.getBalance(addressString);
-        Price price = priceService.getCurrentPrice();
+        Price price = priceService.getCurrentPrice(selectedChain.getChain());
         return "%s [%s]".formatted(balance, priceFormatter.format(balance, price));
     }
 

@@ -45,7 +45,7 @@ class KrakenTradesDtoTest {
                 trade3 +
                 "],\"last\":\"1577845610442700000\"}}";
         KrakenTradesDto krakenTradesDto = objectMapper.readValue(json, KrakenTradesDto.class);
-        assertThat(krakenTradesDto.getTrades()).usingFieldByFieldElementComparator()
+        assertThat(krakenTradesDto.getTrades()).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(expectedTrade1, expectedTrade2, expectedTrade3);
     }
 

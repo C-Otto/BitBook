@@ -36,12 +36,6 @@ public class BlockchairBlockHeightProvider implements BlockHeightProvider {
         return chain == BTC || chain == Chain.BCH;
     }
 
-    private void throwIfUnsupported(Chain chain) throws ProviderException {
-        if (!isSupported(chain)) {
-            throw new ProviderException();
-        }
-    }
-
     private String getChainName(Chain chain) {
         //noinspection EnhancedSwitchMigration
         switch (chain) {

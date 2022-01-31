@@ -24,6 +24,7 @@ public class TransactionFormatter {
     private final PriceService priceService;
     private final PriceFormatter priceFormatter;
     private final AddressOwnershipService addressOwnershipService;
+    private final SelectedChain selectedChain;
 
     public TransactionFormatter(
             AddressDescriptionService addressDescriptionService,
@@ -31,7 +32,8 @@ public class TransactionFormatter {
             AddressFormatter addressFormatter,
             PriceService priceService,
             PriceFormatter priceFormatter,
-            AddressOwnershipService addressOwnershipService
+            AddressOwnershipService addressOwnershipService,
+            SelectedChain selectedChain
     ) {
         this.addressDescriptionService = addressDescriptionService;
         this.transactionDescriptionService = transactionDescriptionService;
@@ -39,11 +41,12 @@ public class TransactionFormatter {
         this.priceService = priceService;
         this.priceFormatter = priceFormatter;
         this.addressOwnershipService = addressOwnershipService;
+        this.selectedChain = selectedChain;
     }
 
     public String format(Transaction transaction) {
         String formattedTime = transaction.getTime().format(DateTimeFormatter.ISO_DATE_TIME);
-        Price price = priceService.getPrice(transaction.getTime());
+        Price price = priceService.getPrice(transaction.getTime(), selectedChain.getChain());
         String fees = formatWithPrice(transaction.getFees(), price);
         Coins differenceToOwnedAddresses =
                 transaction.getDifferenceForAddresses(addressOwnershipService.getOwnedAddresses());
@@ -90,7 +93,7 @@ public class TransactionFormatter {
     }
 
     public String formatSingleLineForValue(Transaction transaction, Coins value) {
-        Price price = priceService.getPrice(transaction.getTime());
+        Price price = priceService.getPrice(transaction.getTime(), selectedChain.getChain());
         String description = transactionDescriptionService.get(transaction.getHash()).getFormattedDescription();
         String descriptionSuffix;
         if (description.isBlank()) {

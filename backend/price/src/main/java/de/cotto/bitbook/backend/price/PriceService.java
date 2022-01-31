@@ -1,12 +1,13 @@
 package de.cotto.bitbook.backend.price;
 
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.price.model.Price;
-import de.cotto.bitbook.backend.price.model.PriceWithDate;
+import de.cotto.bitbook.backend.price.model.PriceContext;
+import de.cotto.bitbook.backend.price.model.PriceWithContext;
 import de.cotto.bitbook.backend.request.ResultFuture;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Map;
@@ -26,29 +27,30 @@ public class PriceService {
         this.priceDao = priceDao;
     }
 
-    public Price getCurrentPrice() {
-        return getPrice(PriceRequest.forCurrentPrice());
+    public Price getCurrentPrice(Chain chain) {
+        return getPrice(PriceRequest.forCurrentPrice(chain));
     }
 
     @Async
-    public void requestPriceInBackground(LocalDateTime dateTime) {
-        getPrice(PriceRequest.forDateLowestPriority(dateTime.toLocalDate()));
+    public void requestPriceInBackground(LocalDateTime dateTime, Chain chain) {
+        getPrice(PriceRequest.createWithLowestPriority(new PriceContext(dateTime.toLocalDate(), chain)));
     }
 
-    public Map<LocalDate, Price> getPrices(Set<LocalDateTime> dates) {
-        Map<LocalDate, Future<Price>> futures = dates.stream()
+    public Map<PriceContext, Price> getPrices(Set<LocalDateTime> dates, Chain chain) {
+        Map<PriceContext, Future<Price>> futures = dates.stream()
                 .map(LocalDateTime::toLocalDate)
                 .distinct()
-                .map(PriceRequest::forDateStandardPriority)
-                .collect(toMap(PriceRequest::getDate, this::getPriceFuture));
+                .map(date -> new PriceContext(date, chain))
+                .map(PriceRequest::createWithStandardPriority)
+                .collect(toMap(PriceRequest::getPriceContext, this::getPriceFuture));
         return futures.entrySet().stream().collect(toMap(
                 Map.Entry::getKey,
                 entry -> ResultFuture.getOrElse(entry.getValue(), Price.UNKNOWN)
         ));
     }
 
-    public Price getPrice(LocalDateTime dateTime) {
-        return getPrice(PriceRequest.forDateStandardPriority(dateTime.toLocalDate()));
+    public Price getPrice(LocalDateTime dateTime, Chain chain) {
+        return getPrice(PriceRequest.createWithStandardPriority(new PriceContext(dateTime.toLocalDate(), chain)));
     }
 
     private Price getPrice(PriceRequest priceRequest) {
@@ -57,22 +59,22 @@ public class PriceService {
     }
 
     private Future<Price> getPriceFuture(PriceRequest priceRequest) {
-        Price persistedPrice = priceDao.getPrice(priceRequest.getDate()).orElse(null);
+        Price persistedPrice = priceDao.getPrice(priceRequest.getPriceContext()).orElse(null);
         if (persistedPrice == null) {
             return priceProvider.getPrices(priceRequest).getFuture()
                     .thenApply(result -> {
                         priceDao.savePrices(result);
                         return result;
                     })
-                    .thenApply(set -> getForDate(set, priceRequest.getDate()));
+                    .thenApply(set -> getForContext(set, priceRequest.getPriceContext()));
         }
         return CompletableFuture.completedFuture(persistedPrice);
     }
 
-    private Price getForDate(Collection<PriceWithDate> priceWithDates, LocalDate date) {
-        return priceWithDates.stream()
-                .filter(priceWithDate -> date.equals(priceWithDate.getDate()))
-                .map(PriceWithDate::getPrice)
+    private Price getForContext(Collection<PriceWithContext> pricesWithContexts, PriceContext expectedContext) {
+        return pricesWithContexts.stream()
+                .filter(priceWithContext -> expectedContext.equals(priceWithContext.getPriceContext()))
+                .map(PriceWithContext::getPrice)
                 .findFirst()
                 .orElse(Price.UNKNOWN);
     }

@@ -1,23 +1,20 @@
 package de.cotto.bitbook.backend.price.model;
 
-import java.time.LocalDate;
-
-public class PriceWithDate {
+public class PriceWithContext {
     private final Price price;
+    private final PriceContext priceContext;
 
-    private final LocalDate date;
-
-    public PriceWithDate(Price price, LocalDate date) {
+    public PriceWithContext(Price price, PriceContext priceContext) {
         this.price = price;
-        this.date = date;
-    }
-
-    public LocalDate getDate() {
-        return date;
+        this.priceContext = priceContext;
     }
 
     public Price getPrice() {
         return price;
+    }
+
+    public PriceContext getPriceContext() {
+        return priceContext;
     }
 
     @Override
@@ -29,18 +26,18 @@ public class PriceWithDate {
             return false;
         }
 
-        PriceWithDate that = (PriceWithDate) other;
+        PriceWithContext that = (PriceWithContext) other;
 
         if (!price.equals(that.price)) {
             return false;
         }
-        return date.equals(that.date);
+        return priceContext.equals(that.priceContext);
     }
 
     @Override
     public int hashCode() {
         int result = price.hashCode();
-        result = 31 * result + date.hashCode();
+        result = 31 * result + priceContext.hashCode();
         return result;
     }
 }

@@ -2,6 +2,7 @@ package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
@@ -9,6 +10,7 @@ import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.backend.transaction.model.Input;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
@@ -20,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
@@ -35,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -74,6 +78,14 @@ class TransactionsCommandsTest {
 
     @Mock
     private TransactionSorter transactionSorter;
+
+    @Mock
+    private SelectedChain selectedChain;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(selectedChain.getChain()).thenReturn(BTC);
+    }
 
     @Test
     void getTransactionDetails() {
@@ -188,7 +200,7 @@ class TransactionsCommandsTest {
         transactionsCommands.getAddressTransactions(new CliAddress(ADDRESS));
 
         InOrder inOrder = inOrder(priceService, transactionFormatter);
-        inOrder.verify(priceService).getPrices(Set.of(TRANSACTION.getTime()));
+        inOrder.verify(priceService).getPrices(Set.of(TRANSACTION.getTime()), getChain());
         inOrder.verify(transactionFormatter).formatSingleLineForAddress(any(), any());
     }
 
@@ -237,5 +249,9 @@ class TransactionsCommandsTest {
     private void mockSortByHash() {
         when(transactionSorter.getComparator())
                 .thenReturn(Comparator.comparing(entry -> entry.getKey().getHash()));
+    }
+
+    private Chain getChain() {
+        return BTC;
     }
 }

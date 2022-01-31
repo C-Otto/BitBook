@@ -1,7 +1,9 @@
 package de.cotto.bitbook.backend.price.kraken;
 
+import de.cotto.bitbook.backend.ProviderException;
 import de.cotto.bitbook.backend.price.model.Price;
-import de.cotto.bitbook.backend.price.model.PriceWithDate;
+import de.cotto.bitbook.backend.price.model.PriceContext;
+import de.cotto.bitbook.backend.price.model.PriceWithContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,7 +20,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BCH;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -42,92 +47,109 @@ class KrakenPriceProviderTest {
     }
 
     @Test
-    void current_price() {
+    void isSupported_btc() {
+        assertThat(krakenPriceProvider.isSupported(new PriceContext(today(), BTC))).isTrue();
+    }
+
+    @Test
+    void isSupported_bch() {
+        assertThat(krakenPriceProvider.isSupported(new PriceContext(today(), BCH))).isFalse();
+    }
+
+    @Test
+    void get_unsupported_chain() {
+        PriceContext priceContext = new PriceContext(today(), BCH);
+        assertThatExceptionOfType(ProviderException.class).isThrownBy(() -> krakenPriceProvider.get(priceContext));
+    }
+
+    @Test
+    void current_price() throws Exception {
         Price expectedPrice = Price.of(35_000);
-        LocalDate today = now();
+        PriceContext priceContext = new PriceContext(today(), BTC);
 
-        Optional<KrakenOhlcDataDto> mockedOhlcData = mockOhlcData(expectedPrice, today);
-        when(krakenClient.getOhlcData()).thenReturn(mockedOhlcData);
-        Optional<Collection<PriceWithDate>> prices = krakenPriceProvider.get(today);
+        returnMockedOhlcData(expectedPrice, today());
+        Optional<Collection<PriceWithContext>> prices = krakenPriceProvider.get(priceContext);
 
-        Collection<PriceWithDate> priceWithDateCollection = prices.orElseThrow();
-        assertThat(priceWithDateCollection).usingFieldByFieldElementComparator()
-                .contains(new PriceWithDate(expectedPrice, today));
+        Collection<PriceWithContext> priceWithContextCollection = prices.orElseThrow();
+        assertThat(priceWithContextCollection).usingRecursiveFieldByFieldElementComparator()
+                .contains(new PriceWithContext(expectedPrice, priceContext));
         verify(krakenClient, never()).getTrades(anyLong());
     }
 
     @Test
-    void getYesterdaysPrice() {
+    void getYesterdaysPrice() throws Exception {
         Price expectedPrice = Price.of(30_000);
-        LocalDate yesterday = now().minusDays(1);
+        LocalDate yesterday = today().minusDays(1);
+        PriceContext priceContext = new PriceContext(yesterday, BTC);
 
-        Optional<KrakenOhlcDataDto> mockedOhlcData = mockOhlcData(expectedPrice, yesterday);
-        when(krakenClient.getOhlcData()).thenReturn(mockedOhlcData);
-        Optional<Collection<PriceWithDate>> prices = krakenPriceProvider.get(yesterday);
+        returnMockedOhlcData(expectedPrice, yesterday);
+        Optional<Collection<PriceWithContext>> prices = krakenPriceProvider.get(priceContext);
 
-        Collection<PriceWithDate> priceWithDateCollection = prices.orElseThrow();
-        assertThat(priceWithDateCollection).usingFieldByFieldElementComparator()
-                .contains(new PriceWithDate(expectedPrice, yesterday));
-        assertThat(priceWithDateCollection).hasSize(3);
+        Collection<PriceWithContext> priceWithContextCollection = prices.orElseThrow();
+        assertThat(priceWithContextCollection).usingRecursiveFieldByFieldElementComparator()
+                .contains(new PriceWithContext(expectedPrice, priceContext));
+        assertThat(priceWithContextCollection).hasSize(3);
         verify(krakenClient, never()).getTrades(anyLong());
     }
 
     @Test
-    void getYesterdaysPrice_no_data() {
-        LocalDate yesterday = now().minusDays(1);
+    void getYesterdaysPrice_no_data() throws Exception {
+        LocalDate yesterday = today().minusDays(1);
 
         when(krakenClient.getOhlcData()).thenReturn(Optional.empty());
 
-        Optional<Collection<PriceWithDate>> prices = krakenPriceProvider.get(yesterday);
+        Optional<Collection<PriceWithContext>> prices = krakenPriceProvider.get(new PriceContext(yesterday, BTC));
 
         assertThat(prices.orElseThrow()).isEmpty();
         verify(krakenClient, never()).getTrades(anyLong());
     }
 
     @Test
-    void getPriceTwoYearsAgo() {
+    void getPriceTwoYearsAgo() throws Exception {
         Price expectedPrice = Price.of(20_000);
-        LocalDate twoYearsAgo = now().minusYears(2);
+        LocalDate twoYearsAgo = today().minusYears(2);
+        PriceContext priceContext = new PriceContext(twoYearsAgo, BTC);
+
         long expectedSinceEpochSeconds = twoYearsAgo.atStartOfDay().toEpochSecond(ZoneOffset.UTC);
         Optional<KrakenTradesDto> mockedTrades = mockTradesWithAverage(expectedPrice, expectedSinceEpochSeconds);
         when(krakenClient.getTrades(anyLong())).thenReturn(mockedTrades);
 
-        Optional<Collection<PriceWithDate>> prices = krakenPriceProvider.get(twoYearsAgo);
+        Optional<Collection<PriceWithContext>> prices = krakenPriceProvider.get(priceContext);
 
         verify(krakenClient).getTrades(expectedSinceEpochSeconds);
         assertThat(prices).isNotEmpty();
-        assertThat(prices.get()).usingFieldByFieldElementComparator()
-                .containsExactly(new PriceWithDate(expectedPrice, twoYearsAgo));
+        assertThat(prices.get()).usingRecursiveFieldByFieldElementComparator()
+                .containsExactly(new PriceWithContext(expectedPrice, priceContext));
     }
 
     @Test
-    void getPriceTwoYearsAgo_no_trade() {
-        LocalDate twoYearsAgo = now().minusYears(2);
+    void getPriceTwoYearsAgo_no_trade() throws Exception {
+        LocalDate twoYearsAgo = today().minusYears(2);
         long expectedSinceEpochSeconds = twoYearsAgo.atStartOfDay().toEpochSecond(ZoneOffset.UTC);
         when(krakenClient.getTrades(anyLong())).thenReturn(noTrades());
 
-        Optional<Collection<PriceWithDate>> prices = krakenPriceProvider.get(twoYearsAgo);
+        Optional<Collection<PriceWithContext>> prices = krakenPriceProvider.get(new PriceContext(twoYearsAgo, BTC));
 
         verify(krakenClient).getTrades(expectedSinceEpochSeconds);
         assertThat(prices).contains(Set.of());
     }
 
     @Test
-    void getPriceTwoYearsAgo_only_zero_volume_trade() {
-        LocalDate twoYearsAgo = now().minusYears(2);
+    void getPriceTwoYearsAgo_only_zero_volume_trade() throws Exception {
+        LocalDate twoYearsAgo = today().minusYears(2);
         long expectedSinceEpochSeconds = twoYearsAgo.atStartOfDay().toEpochSecond(ZoneOffset.UTC);
         Optional<KrakenTradesDto> mockedTrades = mockTradesWithZeroVolume(expectedSinceEpochSeconds);
         when(krakenClient.getTrades(anyLong())).thenReturn(mockedTrades);
 
-        Optional<Collection<PriceWithDate>> prices = krakenPriceProvider.get(twoYearsAgo);
+        Optional<Collection<PriceWithContext>> prices = krakenPriceProvider.get(new PriceContext(twoYearsAgo, BTC));
         assertThat(prices).contains(Set.of());
     }
 
     @Test
-    void getPriceUnknown() {
-        LocalDate wayTooEarly = now().minusYears(20);
+    void getPriceUnknown() throws Exception {
+        LocalDate wayTooEarly = today().minusYears(20);
 
-        Optional<Collection<PriceWithDate>> prices = krakenPriceProvider.get(wayTooEarly);
+        Optional<Collection<PriceWithContext>> prices = krakenPriceProvider.get(new PriceContext(wayTooEarly, BTC));
 
         verify(krakenClient, never()).getTrades(anyLong());
         assertThat(prices).isEmpty();
@@ -163,6 +185,11 @@ class KrakenPriceProviderTest {
         return trade;
     }
 
+    private void returnMockedOhlcData(Price expectedPrice, LocalDate today) {
+        Optional<KrakenOhlcDataDto> mockedOhlcData = mockOhlcData(expectedPrice, today);
+        when(krakenClient.getOhlcData()).thenReturn(mockedOhlcData);
+    }
+
     private Optional<KrakenOhlcDataDto> mockOhlcData(Price openPrice, LocalDate date) {
         long timestamp = date.atStartOfDay().toEpochSecond(ZoneOffset.UTC);
         KrakenOhlcDataDto krakenOhlcDataDto = mock(KrakenOhlcDataDto.class);
@@ -185,7 +212,7 @@ class KrakenPriceProviderTest {
         return Optional.of(krakenTradesDto);
     }
 
-    private LocalDate now() {
+    private LocalDate today() {
         return LocalDate.now(ZoneOffset.UTC);
     }
 }

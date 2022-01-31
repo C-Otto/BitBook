@@ -8,6 +8,7 @@ import de.cotto.bitbook.backend.transaction.BalanceService;
 import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.cli.CliAddress;
 import de.cotto.bitbook.cli.PriceFormatter;
+import de.cotto.bitbook.cli.SelectedChain;
 import de.cotto.bitbook.cli.TransactionFormatter;
 import de.cotto.bitbook.cli.TransactionSorter;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
@@ -24,6 +25,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
@@ -35,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -68,11 +71,19 @@ class OwnershipCommandsTest {
     @Mock
     private TransactionSorter transactionSorter;
 
+    @Mock
+    private SelectedChain selectedChain;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(selectedChain.getChain()).thenReturn(BTC);
+    }
+
     @Test
     void getBalance() {
         Coins coins = Coins.ofSatoshis(123);
         Price price = Price.of(456);
-        when(priceService.getCurrentPrice()).thenReturn(price);
+        when(priceService.getCurrentPrice(BTC)).thenReturn(price);
         when(priceFormatter.format(coins, price)).thenReturn("formattedPrice");
         String expected = coins + " [formattedPrice]";
         when(addressOwnershipService.getBalance()).thenReturn(coins);
@@ -156,7 +167,7 @@ class OwnershipCommandsTest {
             ownershipCommands.getMyTransactions();
 
             InOrder inOrder = inOrder(priceService, transactionFormatter);
-            inOrder.verify(priceService).getPrices(Set.of(TRANSACTION_2.getTime(), TRANSACTION_3.getTime()));
+            inOrder.verify(priceService).getPrices(Set.of(TRANSACTION_2.getTime(), TRANSACTION_3.getTime()), BTC);
             inOrder.verify(transactionFormatter, atLeastOnce()).formatSingleLineForValue(any(), any());
         }
 
@@ -192,7 +203,7 @@ class OwnershipCommandsTest {
             ownershipCommands.getNeighbourTransactions();
 
             InOrder inOrder = inOrder(priceService, transactionFormatter);
-            inOrder.verify(priceService).getPrices(Set.of(TRANSACTION.getTime(), TRANSACTION_2.getTime()));
+            inOrder.verify(priceService).getPrices(Set.of(TRANSACTION.getTime(), TRANSACTION_2.getTime()), BTC);
             inOrder.verify(transactionFormatter).formatSingleLineForValue(any(), any());
         }
     }

@@ -1,12 +1,12 @@
 package de.cotto.bitbook.backend.price;
 
 import de.cotto.bitbook.backend.Provider;
-import de.cotto.bitbook.backend.price.model.PriceWithDate;
+import de.cotto.bitbook.backend.price.model.PriceContext;
+import de.cotto.bitbook.backend.price.model.PriceWithContext;
 
-import java.time.LocalDate;
 import java.util.Collection;
 
-public abstract class PriceProvider implements Provider<LocalDate, Collection<PriceWithDate>> {
+public abstract class PriceProvider implements Provider<PriceContext, Collection<PriceWithContext>> {
     protected PriceProvider() {
         // just used for tests
     }

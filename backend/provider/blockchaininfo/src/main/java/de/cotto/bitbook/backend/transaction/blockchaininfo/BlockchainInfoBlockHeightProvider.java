@@ -34,10 +34,4 @@ public class BlockchainInfoBlockHeightProvider implements BlockHeightProvider {
     public boolean isSupported(Chain chain) {
         return chain == Chain.BTC;
     }
-
-    private void throwIfUnsupported(Chain chain) throws ProviderException {
-        if (!isSupported(chain)) {
-            throw new ProviderException();
-        }
-    }
 }

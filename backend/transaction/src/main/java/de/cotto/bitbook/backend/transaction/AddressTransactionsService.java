@@ -1,6 +1,5 @@
 package de.cotto.bitbook.backend.transaction;
 
-import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.request.RequestPriority;
 import de.cotto.bitbook.backend.request.ResultFuture;
 import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
@@ -11,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static java.util.stream.Collectors.toSet;
 
 @Component
@@ -54,7 +54,7 @@ public class AddressTransactionsService {
     }
 
     private Future<AddressTransactions> getTransactions(String address, RequestPriority requestPriority) {
-        int currentBlockHeight = blockHeightService.getBlockHeight(Chain.BTC);
+        int currentBlockHeight = blockHeightService.getBlockHeight(BTC);
         AddressTransactions persistedAddressTransactions = addressTransactionsDao.getAddressTransactions(address);
         if (isValid(persistedAddressTransactions)) {
             return getUpdatedIfNecessary(persistedAddressTransactions, currentBlockHeight, requestPriority);

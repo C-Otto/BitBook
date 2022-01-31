@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.request;
 
 import de.cotto.bitbook.backend.ProviderException;
+import de.cotto.bitbook.backend.TestableProvider;
 import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
@@ -31,8 +32,8 @@ import static uk.org.lidalia.slf4jtest.LoggingEvent.warn;
 
 @ExtendWith(MockitoExtension.class)
 class RequestWorkerTest {
+    public static final String KEY = "xxx";
     private final TestLogger logger = TestLoggerFactory.getTestLogger(RequestWorker.class);
-    private static final String KEY = "a";
 
     private RequestWorker<String, Integer> requestWorker;
 
@@ -49,8 +50,8 @@ class RequestWorkerTest {
 
     @Test
     void getNow() throws Exception {
-        Optional<Integer> result = requestWorker.getNow("x");
-        assertThat(result).contains(1);
+        Optional<Integer> result = requestWorker.getNow(KEY);
+        assertThat(result).contains(3);
         verify(provider2, never()).get(any());
     }
 
@@ -63,18 +64,18 @@ class RequestWorkerTest {
 
     @Test
     void uses_second_provider_if_first_does_not_supported_key() throws Exception {
-        when(provider1.isSupported(any())).thenReturn(false);
+        when(provider1.isSupported(KEY)).thenReturn(false);
         when(provider2.get(any())).thenCallRealMethod();
-        Optional<Integer> result = requestWorker.getNow("xxx");
+        Optional<Integer> result = requestWorker.getNow(KEY);
         assertThat(result).contains(3);
-        verify(provider1).isSupported("xxx");
+        verify(provider1).isSupported(KEY);
     }
 
     @Test
     void uses_second_provider_on_request_not_permitted_exception() throws Exception {
         when(provider1.get(any())).thenThrow(mock(RequestNotPermitted.class));
         when(provider2.get(any())).thenCallRealMethod();
-        Optional<Integer> result = requestWorker.getNow("xxx");
+        Optional<Integer> result = requestWorker.getNow(KEY);
         assertThat(result).contains(3);
     }
 
@@ -82,7 +83,7 @@ class RequestWorkerTest {
     void uses_second_provider_on_call_not_permitted_exception() throws Exception {
         when(provider1.get(any())).thenThrow(mock(CallNotPermittedException.class));
         when(provider2.get(any())).thenCallRealMethod();
-        Optional<Integer> result = requestWorker.getNow("abc");
+        Optional<Integer> result = requestWorker.getNow(KEY);
         assertThat(result).contains(3);
     }
 

@@ -30,6 +30,7 @@ public class TransactionsCommands {
     private final AddressFormatter addressFormatter;
     private final PriceService priceService;
     private final TransactionSorter transactionSorter;
+    private final SelectedChain selectedChain;
 
     public TransactionsCommands(
             TransactionService transactionService,
@@ -39,7 +40,8 @@ public class TransactionsCommands {
             TransactionFormatter transactionFormatter,
             AddressFormatter addressFormatter,
             PriceService priceService,
-            TransactionSorter transactionSorter
+            TransactionSorter transactionSorter,
+            SelectedChain selectedChain
     ) {
         this.transactionService = transactionService;
         this.addressTransactionsService = addressTransactionsService;
@@ -49,6 +51,7 @@ public class TransactionsCommands {
         this.addressFormatter = addressFormatter;
         this.priceService = priceService;
         this.transactionSorter = transactionSorter;
+        this.selectedChain = selectedChain;
     }
 
     @ShellMethod("Get data for a given transaction")
@@ -138,7 +141,6 @@ public class TransactionsCommands {
 
     private void preloadPrices(Set<Transaction> transactionDetails) {
         Set<LocalDateTime> transactionTimes = transactionDetails.stream().map(Transaction::getTime).collect(toSet());
-        priceService.getPrices(transactionTimes);
+        priceService.getPrices(transactionTimes, selectedChain.getChain());
     }
-
 }

@@ -12,6 +12,7 @@ import de.cotto.bitbook.cli.AddressCompletionProvider;
 import de.cotto.bitbook.cli.AddressWithOwnershipCompletionProvider;
 import de.cotto.bitbook.cli.CliAddress;
 import de.cotto.bitbook.cli.PriceFormatter;
+import de.cotto.bitbook.cli.SelectedChain;
 import de.cotto.bitbook.cli.TransactionFormatter;
 import de.cotto.bitbook.cli.TransactionSorter;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.stream.Collectors.toSet;
 
@@ -36,6 +38,7 @@ public class OwnershipCommands {
     private final TransactionFormatter transactionFormatter;
     private final AddressTransactionsService addressTransactionsService;
     private final TransactionSorter transactionSorter;
+    private final SelectedChain selectedChain;
 
     public OwnershipCommands(
             AddressOwnershipService addressOwnershipService,
@@ -44,7 +47,8 @@ public class OwnershipCommands {
             PriceFormatter priceFormatter,
             TransactionFormatter transactionFormatter,
             AddressTransactionsService addressTransactionsService,
-            TransactionSorter transactionSorter
+            TransactionSorter transactionSorter,
+            SelectedChain selectedChain
     ) {
         this.addressOwnershipService = addressOwnershipService;
         this.balanceService = balanceService;
@@ -53,19 +57,20 @@ public class OwnershipCommands {
         this.transactionFormatter = transactionFormatter;
         this.addressTransactionsService = addressTransactionsService;
         this.transactionSorter = transactionSorter;
+        this.selectedChain = selectedChain;
     }
 
     @ShellMethod("Get the total balance over all owned addresses")
     public String getBalance() {
         Coins balance = addressOwnershipService.getBalance();
-        Price price = priceService.getCurrentPrice();
+        Price price = priceService.getCurrentPrice(BTC);
         String formattedPrice = priceFormatter.format(balance, price);
         return "%s [%s]".formatted(balance, formattedPrice);
     }
 
     @ShellMethod("Get all owned addresses")
     public String getOwnedAddresses() {
-        Price currentPrice = priceService.getCurrentPrice();
+        Price currentPrice = priceService.getCurrentPrice(BTC);
         Set<AddressWithDescription> ownedAddressesWithDescription =
                 addressOwnershipService.getOwnedAddressesWithDescription();
         preloadAddressTransactions(ownedAddressesWithDescription);
@@ -156,6 +161,7 @@ public class OwnershipCommands {
     }
 
     private void preloadPrices(Set<Transaction> transactions) {
-        priceService.getPrices(transactions.stream().map(Transaction::getTime).collect(toSet()));
+        priceService.getPrices(transactions.stream()
+                .map(Transaction::getTime).collect(toSet()), selectedChain.getChain());
     }
 }

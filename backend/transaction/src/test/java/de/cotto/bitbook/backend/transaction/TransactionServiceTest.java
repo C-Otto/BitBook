@@ -1,6 +1,5 @@
 package de.cotto.bitbook.backend.transaction;
 
-import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.request.ResultFuture;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
@@ -13,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
@@ -53,7 +53,7 @@ class TransactionServiceTest {
     @BeforeEach
     void setUp() {
         when(transactionDao.getTransaction(any())).thenReturn(Transaction.UNKNOWN);
-        lenient().when(blockHeightService.getBlockHeight(Chain.BTC)).thenReturn(BLOCK_COUNT_IN_CHAIN);
+        lenient().when(blockHeightService.getBlockHeight(BTC)).thenReturn(BLOCK_COUNT_IN_CHAIN);
     }
 
     @Test
@@ -82,7 +82,7 @@ class TransactionServiceTest {
 
         Transaction transaction = transactionService.getTransactionDetails(TRANSACTION_HASH);
 
-        verify(priceService, atLeastOnce()).requestPriceInBackground(transaction.getTime());
+        verify(priceService, atLeastOnce()).requestPriceInBackground(transaction.getTime(), BTC);
     }
 
     @Test
@@ -91,7 +91,7 @@ class TransactionServiceTest {
 
         transactionService.getTransactionDetails(TRANSACTION_HASH);
 
-        verify(priceService).requestPriceInBackground(TRANSACTION.getTime());
+        verify(priceService).requestPriceInBackground(TRANSACTION.getTime(), BTC);
     }
 
     @Test
@@ -204,7 +204,7 @@ class TransactionServiceTest {
     void requests_price_when_transaction_was_persisted() {
         when(transactionDao.getTransaction(TRANSACTION_HASH)).thenReturn(TRANSACTION);
         Transaction transaction = transactionService.getTransactionDetails(TRANSACTION_HASH);
-        verify(priceService).requestPriceInBackground(transaction.getTime());
+        verify(priceService).requestPriceInBackground(transaction.getTime(), BTC);
     }
 
     @Test
