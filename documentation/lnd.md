@@ -10,8 +10,8 @@ by not giving BitBook access to lnd, there's no risk of undesired side effects.
 ### Creating JSON files
 Before you can use any of the command listed below, you need to create and transfer the necessary JSON input files:
 
-1. first create the JSON file using lnd: `$ lncli COMMAND > lnd-COMMAND.json` (where `COMMAND` is described below)
-2. transfer the JSON file to the host where you are running BitBook: `$ scp server:/home/lnd/lnd-COMMAND.json /tmp/`
+1. first create the JSON file using lnd (run this on the machine where you run lnd): `$ lncli COMMAND > lnd-COMMAND.json` (where `COMMAND` is described below)
+2. transfer the JSON file to the host where you are running BitBook (run this command on the machine where you run BitBook): `$ scp server:/home/lnd/lnd-COMMAND.json /tmp/`
 
 ### Unspent Outputs
 Using `lncli listunspent` you can get a list of all unspent outputs managed by `lnd`.
