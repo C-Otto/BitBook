@@ -66,8 +66,8 @@ address are shown at the bottom (see [Sort Order](#sort-order) if you want to ch
 Note that the underlying network requests may be slow for addresses with many transactions.
 The list of associated transactions is persisted, so it will not be downloaded more than once.
 However, as new transactions may be added to the blockchain, BitBook needs to update the list.
-This update is performed according to some heuristics based on how enough blocks have been added to the blockchain since
-the last update.
+This update is performed according to some heuristics taking into account how enough blocks have been added to the
+blockchain since the last update.
 For example, for addresses with an empty balance fewer updates are required.
 Similarly, more frequent updates are required for addresses with many transactions, or if a transactions
 associated with the address is recent.
