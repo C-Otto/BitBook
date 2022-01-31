@@ -3,6 +3,8 @@ package de.cotto.bitbook.backend.model;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
+
 import static de.cotto.bitbook.backend.model.Chain.BCD;
 import static de.cotto.bitbook.backend.model.Chain.BCH;
 import static de.cotto.bitbook.backend.model.Chain.BSV;
@@ -17,6 +19,9 @@ class ChainTest {
     @Nested
     @SuppressWarnings(CLASS_CAN_BE_STATIC)
     class Bitcoin {
+
+        private final LocalDate forkDate = LocalDate.of(2009, 1, 3);
+
         @Test
         void enum_string_value() {
             assertThat(BTC).hasToString("BTC");
@@ -31,6 +36,26 @@ class ChainTest {
         @Test
         void getFirstBlockAfterFork() {
             assertThat(BTC.getFirstBlockAfterFork()).isEqualTo(0);
+        }
+
+        @Test
+        void getChainForDate_before_fork_date() {
+            assertThat(BTC.getChainForDate(forkDate.minusDays(1))).isEqualTo(BTC);
+        }
+
+        @Test
+        void getChainForDate_at_fork_date() {
+            assertThat(BTC.getChainForDate(forkDate)).isEqualTo(BTC);
+        }
+
+        @Test
+        void getChainForDate_after_fork_date() {
+            assertThat(BTC.getChainForDate(forkDate.plusDays(1))).isEqualTo(BTC);
+        }
+
+        @Test
+        void getChainForDate_future() {
+            assertThat(BTC.getChainForDate(forkDate.plusYears(30))).isEqualTo(BTC);
         }
 
         @Test
@@ -52,6 +77,9 @@ class ChainTest {
     @Nested
     @SuppressWarnings(CLASS_CAN_BE_STATIC)
     class BitcoinCash {
+
+        private final LocalDate forkDate = LocalDate.of(2017, 8, 1);
+
         @Test
         void enum_string_value() {
             assertThat(BCH).hasToString("BCH");
@@ -66,6 +94,21 @@ class ChainTest {
         @Test
         void getFirstBlockAfterFork() {
             assertThat(BCH.getFirstBlockAfterFork()).isEqualTo(478_559);
+        }
+
+        @Test
+        void getChainForDate_before_fork_date() {
+            assertThat(BCH.getChainForDate(forkDate.minusDays(1))).isEqualTo(BTC);
+        }
+
+        @Test
+        void getChainForDate_at_fork_date() {
+            assertThat(BCH.getChainForDate(forkDate)).isEqualTo(BCH);
+        }
+
+        @Test
+        void getChainForDate_after_fork_date() {
+            assertThat(BCH.getChainForDate(forkDate.plusDays(1))).isEqualTo(BCH);
         }
 
         @Test
@@ -93,6 +136,8 @@ class ChainTest {
     @SuppressWarnings(CLASS_CAN_BE_STATIC)
     class BitcoinGold {
 
+        private final LocalDate forkDate = LocalDate.of(2017, 10, 24);
+
         @Test
         void enum_string_value() {
             assertThat(BTG).hasToString("BTG");
@@ -107,6 +152,21 @@ class ChainTest {
         @Test
         void getFirstBlockAfterFork() {
             assertThat(BTG.getFirstBlockAfterFork()).isEqualTo(491_407);
+        }
+
+        @Test
+        void getChainForDate_before_fork_date() {
+            assertThat(BTG.getChainForDate(forkDate.minusDays(1))).isEqualTo(BTC);
+        }
+
+        @Test
+        void getChainForDate_at_fork_date() {
+            assertThat(BTG.getChainForDate(forkDate)).isEqualTo(BTG);
+        }
+
+        @Test
+        void getChainForDate_after_fork_date() {
+            assertThat(BTG.getChainForDate(forkDate.plusDays(1))).isEqualTo(BTG);
         }
 
         @Test
@@ -133,6 +193,9 @@ class ChainTest {
     @Nested
     @SuppressWarnings(CLASS_CAN_BE_STATIC)
     class BitcoinSV {
+
+        private final LocalDate forkDate = LocalDate.of(2018, 11, 15);
+
         @Test
         void enum_string_value() {
             assertThat(BSV).hasToString("BSV");
@@ -147,6 +210,26 @@ class ChainTest {
         @Test
         void getFirstBlockAfterFork() {
             assertThat(BSV.getFirstBlockAfterFork()).isEqualTo(556_767);
+        }
+
+        @Test
+        void getChainForDate_very_early() {
+            assertThat(BSV.getChainForDate(LocalDate.of(2013, 12, 24))).isEqualTo(BTC);
+        }
+
+        @Test
+        void getChainForDate_before_fork_date() {
+            assertThat(BSV.getChainForDate(forkDate.minusDays(1))).isEqualTo(BCH);
+        }
+
+        @Test
+        void getChainForDate_at_fork_date() {
+            assertThat(BSV.getChainForDate(forkDate)).isEqualTo(BSV);
+        }
+
+        @Test
+        void getChainForDate_after_fork_date() {
+            assertThat(BSV.getChainForDate(forkDate.plusDays(1))).isEqualTo(BSV);
         }
 
         @Test
@@ -178,6 +261,9 @@ class ChainTest {
     @Nested
     @SuppressWarnings(CLASS_CAN_BE_STATIC)
     class BitcoinDiamond {
+
+        private final LocalDate forkDate = LocalDate.of(2017, 11, 24);
+
         @Test
         void enum_string_value() {
             assertThat(BCD).hasToString("BCD");
@@ -192,6 +278,21 @@ class ChainTest {
         @Test
         void getFirstBlockAfterFork() {
             assertThat(BCD.getFirstBlockAfterFork()).isEqualTo(495_867);
+        }
+
+        @Test
+        void getChainForDate_before_fork_date() {
+            assertThat(BCD.getChainForDate(forkDate.minusDays(1))).isEqualTo(BTC);
+        }
+
+        @Test
+        void getChainForDate_at_fork_date() {
+            assertThat(BCD.getChainForDate(forkDate)).isEqualTo(BCD);
+        }
+
+        @Test
+        void getChainForDate_after_fork_date() {
+            assertThat(BCD.getChainForDate(forkDate.plusDays(1))).isEqualTo(BCD);
         }
 
         @Test

@@ -1,10 +1,12 @@
 package de.cotto.bitbook.backend.price.model;
 
+import javax.annotation.Nonnull;
+
 public class PriceWithContext {
     private final Price price;
     private final PriceContext priceContext;
 
-    public PriceWithContext(Price price, PriceContext priceContext) {
+    public PriceWithContext(@Nonnull Price price, @Nonnull PriceContext priceContext) {
         this.price = price;
         this.priceContext = priceContext;
     }
