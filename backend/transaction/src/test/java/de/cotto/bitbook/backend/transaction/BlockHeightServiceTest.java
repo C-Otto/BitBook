@@ -6,7 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static de.cotto.bitbook.backend.model.Chain.BCH;
 import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
@@ -39,10 +38,8 @@ class BlockHeightServiceTest {
     @Test
     void does_not_cache_height_count_lower_than_previous_height() {
         when(prioritizingBlockHeightProvider.getBlockHeight(BTC)).thenReturn(123).thenReturn(100);
-        when(prioritizingBlockHeightProvider.getBlockHeight(BCH)).thenReturn(900);
         blockHeightService.getBlockHeight(BTC);
-        blockHeightService.blockHeightCache.getUnchecked(BCH); // this removes the value for key BTC
-        blockHeightService.blockHeightCache.cleanUp();
+        blockHeightService.blockHeightCache.invalidate(BTC);
 
         assertThat(blockHeightService.getBlockHeight(BTC)).isEqualTo(123);
         verify(prioritizingBlockHeightProvider, times(2)).getBlockHeight(BTC);

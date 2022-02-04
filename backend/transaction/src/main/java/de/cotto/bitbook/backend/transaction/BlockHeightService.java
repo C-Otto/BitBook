@@ -22,7 +22,7 @@ public class BlockHeightService {
     public BlockHeightService(PrioritizingBlockHeightProvider prioritizingBlockHeightProvider) {
         this.prioritizingBlockHeightProvider = prioritizingBlockHeightProvider;
         blockHeightCache = CacheBuilder.newBuilder()
-                .maximumSize(1)
+                .maximumSize(Chain.values().length)
                 .expireAfterWrite(60, TimeUnit.SECONDS)
                 .build(CacheLoader.from(this::getFromProvider));
     }
