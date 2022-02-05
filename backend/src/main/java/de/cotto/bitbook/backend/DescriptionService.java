@@ -28,8 +28,8 @@ public class DescriptionService<T extends StringWithDescription<T>> {
         dao.save(stringWithDescription);
     }
 
-    public void remove(String transactionHash) {
-        dao.remove(transactionHash);
+    public void remove(String key) {
+        dao.remove(key);
     }
 
     public Set<T> getWithDescriptionInfix(String infix) {
