@@ -3,7 +3,6 @@ package de.cotto.bitbook.backend.transaction.blockcypher;
 import de.cotto.bitbook.backend.Provider;
 import de.cotto.bitbook.backend.transaction.deserialization.TransactionDto;
 import de.cotto.bitbook.backend.transaction.model.Transaction;
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -20,7 +19,6 @@ public class BlockcypherTransactionProvider implements Provider<String, Transact
     }
 
     @Override
-    @RateLimiter(name = "blockcypher2")
     public Optional<Transaction> get(String transactionHash) {
         return getTransactionFromApi(transactionHash)
                 .map(TransactionDto::toModel);
