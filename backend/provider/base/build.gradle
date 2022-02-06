@@ -3,8 +3,8 @@ plugins {
 }
 
 dependencies {
-    api project(':backend:transaction:models')
-    testFixturesApi testFixtures(project(':backend:transaction:models'))
+    api project(':backend:models')
+    testFixturesApi testFixtures(project(':backend:models'))
 }
 
 jar {

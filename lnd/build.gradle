@@ -5,6 +5,6 @@ plugins {
 dependencies {
     implementation project(':backend:transaction')
     implementation project(':ownership')
-    testImplementation testFixtures(project(':backend:transaction:models'))
-    testFixturesImplementation testFixtures(project(':backend:transaction:models'))
+    testImplementation testFixtures(project(':backend:models'))
+    testFixturesImplementation testFixtures(project(':backend:models'))
 }

@@ -12,7 +12,7 @@ dependencies {
     implementation project(':cli:base')
     implementation 'org.flywaydb:flyway-core'
     integrationTestImplementation project(':cli:ownership')
-    testImplementation testFixtures(project(':backend:transaction:models'))
+    testImplementation testFixtures(project(':backend:models'))
     integrationTestImplementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 }
 

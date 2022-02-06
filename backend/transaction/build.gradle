@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     api project(':backend')
-    api project(':backend:transaction:models')
+    api project(':backend:models')
     implementation project(':backend:address-transactions')
     implementation project(':backend:blockheight')
     implementation project(':backend:price')
