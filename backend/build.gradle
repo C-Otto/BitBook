@@ -8,6 +8,7 @@ ext {
 
 dependencies {
     api platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
+    api implementation(project(':backend:models'))
     api 'org.springframework.cloud:spring-cloud-starter-openfeign'
     api 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
     api 'io.github.resilience4j:resilience4j-spring-boot2:1.7.1'

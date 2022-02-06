@@ -1,7 +1,7 @@
 package de.cotto.bitbook.backend.transaction;
 
-import de.cotto.bitbook.backend.Provider;
 import de.cotto.bitbook.backend.model.AddressTransactions;
+import de.cotto.bitbook.backend.model.Provider;
 import de.cotto.bitbook.backend.request.PrioritizingProvider;
 import de.cotto.bitbook.backend.request.ResultFuture;
 import org.springframework.stereotype.Component;

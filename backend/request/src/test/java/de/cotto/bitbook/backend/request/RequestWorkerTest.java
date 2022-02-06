@@ -1,7 +1,7 @@
 package de.cotto.bitbook.backend.request;
 
-import de.cotto.bitbook.backend.ProviderException;
-import de.cotto.bitbook.backend.TestableProvider;
+import de.cotto.bitbook.backend.model.ProviderException;
+import de.cotto.bitbook.backend.model.TestableProvider;
 import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;

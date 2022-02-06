@@ -1,7 +1,7 @@
 package de.cotto.bitbook.backend.price.kraken;
 
-import de.cotto.bitbook.backend.Provider;
-import de.cotto.bitbook.backend.ProviderException;
+import de.cotto.bitbook.backend.model.Provider;
+import de.cotto.bitbook.backend.model.ProviderException;
 import de.cotto.bitbook.backend.price.kraken.KrakenTradesDto.Trade;
 import de.cotto.bitbook.backend.price.model.Price;
 import de.cotto.bitbook.backend.price.model.PriceContext;

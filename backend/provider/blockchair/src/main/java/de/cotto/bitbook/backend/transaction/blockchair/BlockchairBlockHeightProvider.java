@@ -1,7 +1,7 @@
 package de.cotto.bitbook.backend.transaction.blockchair;
 
-import de.cotto.bitbook.backend.ProviderException;
 import de.cotto.bitbook.backend.model.Chain;
+import de.cotto.bitbook.backend.model.ProviderException;
 import de.cotto.bitbook.backend.transaction.BlockHeightProvider;
 import org.springframework.stereotype.Component;
 

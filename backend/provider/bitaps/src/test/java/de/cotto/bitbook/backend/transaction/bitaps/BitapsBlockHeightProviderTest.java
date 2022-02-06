@@ -1,6 +1,6 @@
 package de.cotto.bitbook.backend.transaction.bitaps;
 
-import de.cotto.bitbook.backend.ProviderException;
+import de.cotto.bitbook.backend.model.ProviderException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

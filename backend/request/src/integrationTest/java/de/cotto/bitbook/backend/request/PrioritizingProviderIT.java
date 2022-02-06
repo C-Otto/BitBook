@@ -1,6 +1,6 @@
 package de.cotto.bitbook.backend.request;
 
-import de.cotto.bitbook.backend.Provider;
+import de.cotto.bitbook.backend.model.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

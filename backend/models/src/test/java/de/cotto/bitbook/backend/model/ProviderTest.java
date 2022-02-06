@@ -1,4 +1,4 @@
-package de.cotto.bitbook.backend;
+package de.cotto.bitbook.backend.model;
 
 import org.junit.jupiter.api.Test;
 

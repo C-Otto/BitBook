@@ -1,6 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
-import de.cotto.bitbook.backend.ProviderException;
+import de.cotto.bitbook.backend.model.ProviderException;
 import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.request.ResultFuture;
 import feign.FeignException;

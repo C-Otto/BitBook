@@ -1,6 +1,6 @@
 package de.cotto.bitbook.backend.request;
 
-import de.cotto.bitbook.backend.Provider;
+import de.cotto.bitbook.backend.model.Provider;
 import org.apache.commons.collections4.QueueUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,8 +1,8 @@
 package de.cotto.bitbook.backend.request;
 
 import com.google.common.annotations.VisibleForTesting;
-import de.cotto.bitbook.backend.Provider;
-import de.cotto.bitbook.backend.ProviderException;
+import de.cotto.bitbook.backend.model.Provider;
+import de.cotto.bitbook.backend.model.ProviderException;
 import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;

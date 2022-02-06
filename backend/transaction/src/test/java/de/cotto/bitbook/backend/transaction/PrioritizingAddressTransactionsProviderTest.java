@@ -1,7 +1,7 @@
 package de.cotto.bitbook.backend.transaction;
 
-import de.cotto.bitbook.backend.ProviderException;
 import de.cotto.bitbook.backend.model.AddressTransactions;
+import de.cotto.bitbook.backend.model.ProviderException;
 import de.cotto.bitbook.backend.request.ResultFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

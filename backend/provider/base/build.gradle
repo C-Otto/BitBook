@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    api project(':backend:models')
+    api project(':backend')
     testFixturesApi testFixtures(project(':backend:models'))
 }
 

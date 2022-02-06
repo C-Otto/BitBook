@@ -1,7 +1,7 @@
 package de.cotto.bitbook.backend.transaction;
 
-import de.cotto.bitbook.backend.ProviderException;
 import de.cotto.bitbook.backend.model.Chain;
+import de.cotto.bitbook.backend.model.ProviderException;
 import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

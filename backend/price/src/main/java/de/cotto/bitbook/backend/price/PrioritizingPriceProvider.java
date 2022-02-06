@@ -1,6 +1,6 @@
 package de.cotto.bitbook.backend.price;
 
-import de.cotto.bitbook.backend.Provider;
+import de.cotto.bitbook.backend.model.Provider;
 import de.cotto.bitbook.backend.price.model.PriceContext;
 import de.cotto.bitbook.backend.price.model.PriceWithContext;
 import de.cotto.bitbook.backend.request.PrioritizingProvider;
