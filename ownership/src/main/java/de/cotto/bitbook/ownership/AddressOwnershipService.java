@@ -2,13 +2,13 @@ package de.cotto.bitbook.ownership;
 
 import com.google.common.base.Functions;
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.BalanceService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
-import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

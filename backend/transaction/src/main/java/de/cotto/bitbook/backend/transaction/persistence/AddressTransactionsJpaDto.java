@@ -1,7 +1,7 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
 import com.google.common.annotations.VisibleForTesting;
-import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
+import de.cotto.bitbook.backend.model.AddressTransactions;
 
 import javax.annotation.Nullable;
 import javax.persistence.ElementCollection;

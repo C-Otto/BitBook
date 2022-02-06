@@ -2,10 +2,10 @@ package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.Chain;
-import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Transaction;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

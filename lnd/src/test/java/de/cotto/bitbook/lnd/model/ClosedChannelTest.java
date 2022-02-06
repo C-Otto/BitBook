@@ -1,14 +1,14 @@
 package de.cotto.bitbook.lnd.model;
 
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Input;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Input;
+import de.cotto.bitbook.backend.model.Transaction;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.lnd.model.CloseType.COOPERATIVE_REMOTE;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.AMBIGUOUS_SETTLEMENT_ADDRESS;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.CHANNEL_ADDRESS;

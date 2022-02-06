@@ -1,8 +1,8 @@
 package de.cotto.bitbook.lnd;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.transaction.TransactionService;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
 import de.cotto.bitbook.lnd.model.Channel;
 import org.springframework.stereotype.Component;
 

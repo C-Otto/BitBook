@@ -3,7 +3,7 @@ package de.cotto.bitbook.lnd;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.cotto.bitbook.backend.transaction.model.Coins;
+import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.lnd.model.OnchainTransaction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

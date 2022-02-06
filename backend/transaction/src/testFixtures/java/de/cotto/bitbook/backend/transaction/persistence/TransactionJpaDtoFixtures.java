@@ -3,10 +3,10 @@ package de.cotto.bitbook.backend.transaction.persistence;
 import java.time.ZoneOffset;
 import java.util.List;
 
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.DATE_TIME;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.FEES;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.FEES;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.transaction.persistence.InputJpaDtoFixtures.INPUT_JPA_DTO_1;
 import static de.cotto.bitbook.backend.transaction.persistence.InputJpaDtoFixtures.INPUT_JPA_DTO_2;
 import static de.cotto.bitbook.backend.transaction.persistence.OutputJpaDtoFixtures.OUTPUT_JPA_DTO_1;

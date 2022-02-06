@@ -1,8 +1,8 @@
 package de.cotto.bitbook.backend.transaction.blockchaininfo;
 
 import de.cotto.bitbook.backend.Provider;
+import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.transaction.deserialization.TransactionDto;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;

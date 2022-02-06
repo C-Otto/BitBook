@@ -1,4 +1,4 @@
-package de.cotto.bitbook.backend.transaction.model;
+package de.cotto.bitbook.backend.model;
 
 import com.google.common.base.Preconditions;
 

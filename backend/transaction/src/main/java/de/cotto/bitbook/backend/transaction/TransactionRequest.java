@@ -1,8 +1,8 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.request.PrioritizedRequest;
 import de.cotto.bitbook.backend.request.RequestPriority;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
 
 public final class TransactionRequest extends PrioritizedRequest<String, Transaction> {
     public TransactionRequest(String transactionHash, RequestPriority priority) {

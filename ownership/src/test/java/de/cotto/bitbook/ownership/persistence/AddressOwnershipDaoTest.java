@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 import static de.cotto.bitbook.ownership.OwnershipStatus.UNKNOWN;
 import static de.cotto.bitbook.ownership.persistence.AddressOwnershipJpaDtoFixtures.FOREIGN_ADDRESS_JPA_DTO_1;

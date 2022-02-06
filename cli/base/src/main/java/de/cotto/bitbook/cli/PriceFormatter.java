@@ -1,7 +1,7 @@
 package de.cotto.bitbook.cli;
 
+import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.price.model.Price;
-import de.cotto.bitbook.backend.transaction.model.Coins;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 

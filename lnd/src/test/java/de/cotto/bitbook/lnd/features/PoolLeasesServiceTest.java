@@ -2,8 +2,8 @@ package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.transaction.TransactionService;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,11 +14,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_1;
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_2;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_1;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_2;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.lnd.model.PoolLeaseFixtures.POOL_LEASE;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 import static de.cotto.bitbook.ownership.OwnershipStatus.UNKNOWN;

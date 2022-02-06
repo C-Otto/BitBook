@@ -1,4 +1,4 @@
-package de.cotto.bitbook.backend.transaction.model;
+package de.cotto.bitbook.backend.model;
 
 public class OutputFixtures {
     public static final Coins OUTPUT_VALUE_1 = Coins.ofSatoshis(Integer.MAX_VALUE + 1L);

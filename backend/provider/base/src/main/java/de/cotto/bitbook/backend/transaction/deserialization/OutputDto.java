@@ -1,7 +1,7 @@
 package de.cotto.bitbook.backend.transaction.deserialization;
 
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Output;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Output;
 
 public class OutputDto extends InputOutputDto {
     public OutputDto() {

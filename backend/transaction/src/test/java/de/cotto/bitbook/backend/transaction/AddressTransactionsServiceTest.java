@@ -1,9 +1,9 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.request.PrioritizedRequestWithResult;
 import de.cotto.bitbook.backend.request.RequestPriority;
-import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,15 +14,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.AddressTransactions.UNKNOWN;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_2;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_2;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_UPDATED;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactions.UNKNOWN;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_2;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_2;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_UPDATED;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;

@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 

@@ -1,9 +1,9 @@
 package de.cotto.bitbook.backend.transaction;
 
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
 
 public class TransactionsRequestKeyFixtures {
     public static final TransactionsRequestKey TRANSACTIONS_REQUEST_KEY =

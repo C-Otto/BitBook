@@ -1,7 +1,7 @@
 package de.cotto.bitbook.backend.transaction.bitaps;
 
+import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.transaction.TransactionsRequestKey;
-import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,12 +10,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_UPDATED;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.transaction.bitaps.BitapsAddressTransactionDtoFixtures.BITAPS_ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.transaction.bitaps.BitapsAddressTransactionDtoFixtures.BITAPS_TRANSACTIONS_UPDATED;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_UPDATED;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 

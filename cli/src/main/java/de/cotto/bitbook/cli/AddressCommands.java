@@ -1,10 +1,10 @@
 package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.price.model.Price;
 import de.cotto.bitbook.backend.transaction.BalanceService;
-import de.cotto.bitbook.backend.transaction.model.Coins;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;

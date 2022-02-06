@@ -1,4 +1,4 @@
-package de.cotto.bitbook.backend.transaction.model;
+package de.cotto.bitbook.backend.model;
 
 public class InputFixtures {
     public static final Coins INPUT_VALUE_1 = Coins.ofSatoshis(22_749);

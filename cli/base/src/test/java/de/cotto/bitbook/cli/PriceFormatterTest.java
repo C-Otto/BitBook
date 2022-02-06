@@ -1,7 +1,7 @@
 package de.cotto.bitbook.cli;
 
+import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.price.model.Price;
-import de.cotto.bitbook.backend.transaction.model.Coins;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

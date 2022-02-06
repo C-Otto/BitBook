@@ -1,9 +1,9 @@
 package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.model.Chain;
+import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.request.PrioritizedRequestWithResult;
 import de.cotto.bitbook.backend.request.ResultFuture;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
@@ -18,8 +18,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;

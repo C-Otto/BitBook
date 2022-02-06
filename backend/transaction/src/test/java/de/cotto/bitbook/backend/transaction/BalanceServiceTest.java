@@ -1,9 +1,9 @@
 package de.cotto.bitbook.backend.transaction;
 
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Input;
-import de.cotto.bitbook.backend.transaction.model.Output;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Input;
+import de.cotto.bitbook.backend.model.Output;
+import de.cotto.bitbook.backend.model.Transaction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.DATE_TIME;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH_2;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;

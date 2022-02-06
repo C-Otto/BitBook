@@ -1,7 +1,7 @@
 package de.cotto.bitbook.backend.transaction.deserialization;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import de.cotto.bitbook.backend.transaction.model.Coins;
+import de.cotto.bitbook.backend.model.Coins;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,6 +1,6 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
-import de.cotto.bitbook.backend.transaction.model.Transaction;
+import de.cotto.bitbook.backend.model.Transaction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,10 +10,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.ZoneOffset;
 import java.util.Optional;
 
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.DATE_TIME;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.transaction.persistence.TransactionJpaDtoFixtures.TRANSACTION_JPA_DTO;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;

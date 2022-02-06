@@ -1,7 +1,7 @@
 package de.cotto.bitbook.cli;
 
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Transaction;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;

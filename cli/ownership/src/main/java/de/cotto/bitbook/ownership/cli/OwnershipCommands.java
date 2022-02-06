@@ -2,12 +2,12 @@ package de.cotto.bitbook.ownership.cli;
 
 import com.google.common.base.Functions;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.price.model.Price;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.BalanceService;
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
 import de.cotto.bitbook.cli.AddressCompletionProvider;
 import de.cotto.bitbook.cli.AddressWithOwnershipCompletionProvider;
 import de.cotto.bitbook.cli.CliAddress;

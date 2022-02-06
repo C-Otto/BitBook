@@ -1,4 +1,4 @@
-package de.cotto.bitbook.backend.transaction.model;
+package de.cotto.bitbook.backend.model;
 
 public class Output extends InputOutput {
     public static final Output EMPTY = new Output(Coins.NONE, "");

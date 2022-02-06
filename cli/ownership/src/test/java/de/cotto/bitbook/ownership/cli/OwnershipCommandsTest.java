@@ -1,11 +1,11 @@
 package de.cotto.bitbook.ownership.cli;
 
 import de.cotto.bitbook.backend.model.AddressWithDescription;
+import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.price.model.Price;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.BalanceService;
-import de.cotto.bitbook.backend.transaction.model.Coins;
 import de.cotto.bitbook.cli.CliAddress;
 import de.cotto.bitbook.cli.PriceFormatter;
 import de.cotto.bitbook.cli.SelectedChain;
@@ -25,14 +25,14 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.model.Chain.BTC;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_2;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_2;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_3;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_3;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;

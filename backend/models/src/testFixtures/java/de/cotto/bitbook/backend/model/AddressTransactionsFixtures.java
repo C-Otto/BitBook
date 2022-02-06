@@ -1,9 +1,9 @@
-package de.cotto.bitbook.backend.transaction.model;
+package de.cotto.bitbook.backend.model;
 
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
 
 public class AddressTransactionsFixtures {
     public static final String ADDRESS = "1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD";

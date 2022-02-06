@@ -1,23 +1,23 @@
 package de.cotto.bitbook.backend.transaction.deserialization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Input;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Input;
 import org.junit.jupiter.api.Test;
 
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_1;
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_2;
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_VALUE_1;
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_VALUE_2;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_1;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_2;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_1;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_2;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.DATE_TIME_EPOCH_SECONDS;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.FEES;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_VALUE_1;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_VALUE_2;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_2;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_VALUE_1;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_VALUE_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME_EPOCH_SECONDS;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.FEES;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 

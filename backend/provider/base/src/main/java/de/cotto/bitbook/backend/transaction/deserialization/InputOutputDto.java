@@ -1,7 +1,7 @@
 package de.cotto.bitbook.backend.transaction.deserialization;
 
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.InputOutput;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.InputOutput;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

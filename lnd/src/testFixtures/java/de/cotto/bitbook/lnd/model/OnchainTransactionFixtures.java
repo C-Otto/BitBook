@@ -1,15 +1,15 @@
 package de.cotto.bitbook.lnd.model;
 
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Transaction;
 
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_VALUE_2;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_1;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_2;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.FEES;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_3;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_VALUE_2;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_VALUE_1;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_VALUE_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.FEES;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_3;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 
 public class OnchainTransactionFixtures {
     public static final OnchainTransaction ONCHAIN_TRANSACTION = new OnchainTransaction(

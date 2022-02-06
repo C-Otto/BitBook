@@ -1,7 +1,7 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
+import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsDao;
-import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;

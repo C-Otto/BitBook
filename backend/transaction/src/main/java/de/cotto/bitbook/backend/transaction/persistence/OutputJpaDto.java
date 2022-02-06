@@ -1,7 +1,7 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Output;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Output;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

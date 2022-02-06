@@ -2,10 +2,10 @@ package de.cotto.bitbook.backend.transaction;
 
 import org.junit.jupiter.api.Test;
 
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
 import static de.cotto.bitbook.backend.transaction.TransactionRequestFixtures.TRANSACTION_REQUEST;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TransactionRequestTest {

@@ -2,9 +2,9 @@ package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.transaction.TransactionService;
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
 import de.cotto.bitbook.lnd.model.OnchainTransaction;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,13 +17,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_1;
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_2;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_1;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_2;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_2;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_2;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_VALUE_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.FUNDING_TRANSACTION;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.FUNDING_TRANSACTION_DETAILS;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.ONCHAIN_TRANSACTION;

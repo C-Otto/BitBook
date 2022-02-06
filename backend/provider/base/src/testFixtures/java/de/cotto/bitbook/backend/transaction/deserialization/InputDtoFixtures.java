@@ -1,9 +1,9 @@
 package de.cotto.bitbook.backend.transaction.deserialization;
 
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_1;
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_2;
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_VALUE_1;
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_VALUE_2;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_VALUE_1;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_VALUE_2;
 
 public class InputDtoFixtures {
     public static final InputDto INPUT_DTO_1;

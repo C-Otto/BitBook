@@ -1,8 +1,8 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.request.RequestPriority;
 import de.cotto.bitbook.backend.request.ResultFuture;
-import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 

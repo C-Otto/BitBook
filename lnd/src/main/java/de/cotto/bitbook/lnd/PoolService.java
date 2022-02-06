@@ -2,7 +2,7 @@ package de.cotto.bitbook.lnd;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.cotto.bitbook.backend.transaction.model.Coins;
+import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.lnd.features.PoolLeasesService;
 import de.cotto.bitbook.lnd.model.PoolLease;
 import org.springframework.stereotype.Component;

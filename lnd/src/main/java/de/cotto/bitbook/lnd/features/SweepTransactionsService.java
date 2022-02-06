@@ -2,9 +2,9 @@ package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Input;
+import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.transaction.TransactionService;
-import de.cotto.bitbook.backend.transaction.model.Input;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.springframework.stereotype.Component;
 

@@ -1,21 +1,21 @@
 package de.cotto.bitbook.lnd.model;
 
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Input;
-import de.cotto.bitbook.backend.transaction.model.Output;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Input;
+import de.cotto.bitbook.backend.model.Output;
+import de.cotto.bitbook.backend.model.Transaction;
 
 import java.util.List;
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_1;
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_2;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_1;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_2;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.DATE_TIME;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH_2;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
 
 public class ClosedChannelFixtures {
     public static final String BITCOIN_GENESIS_BLOCK_HASH

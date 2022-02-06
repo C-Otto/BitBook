@@ -1,8 +1,8 @@
 package de.cotto.bitbook.lnd.model;
 
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Output;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Output;
+import de.cotto.bitbook.backend.model.Transaction;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashSet;

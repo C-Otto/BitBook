@@ -1,7 +1,7 @@
 package de.cotto.bitbook.lnd;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import de.cotto.bitbook.backend.transaction.model.Coins;
+import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.lnd.model.OnchainTransaction;
 import org.springframework.stereotype.Component;
 

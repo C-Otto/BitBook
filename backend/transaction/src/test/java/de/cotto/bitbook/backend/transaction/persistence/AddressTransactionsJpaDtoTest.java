@@ -2,7 +2,7 @@ package de.cotto.bitbook.backend.transaction.persistence;
 
 import org.junit.jupiter.api.Test;
 
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.transaction.persistence.AddressTransactionsJpaDtoFixtures.ADDRESS_TRANSACTIONS_JPA_DTO;
 import static org.assertj.core.api.Assertions.assertThat;
 

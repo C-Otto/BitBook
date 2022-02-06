@@ -1,10 +1,10 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
 import com.google.common.annotations.VisibleForTesting;
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Input;
-import de.cotto.bitbook.backend.transaction.model.Output;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Input;
+import de.cotto.bitbook.backend.model.Output;
+import de.cotto.bitbook.backend.model.Transaction;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

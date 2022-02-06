@@ -1,8 +1,8 @@
 package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.ProviderException;
+import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.request.ResultFuture;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
 import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
@@ -14,10 +14,10 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_HASH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;

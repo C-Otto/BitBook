@@ -1,9 +1,9 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_1;
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_2;
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_VALUE_1;
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_VALUE_2;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_VALUE_1;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_VALUE_2;
 
 public class InputJpaDtoFixtures {
     public static final InputJpaDto INPUT_JPA_DTO_1;

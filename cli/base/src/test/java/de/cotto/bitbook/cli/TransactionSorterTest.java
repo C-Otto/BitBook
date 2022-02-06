@@ -1,8 +1,8 @@
 package de.cotto.bitbook.cli;
 
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
-import de.cotto.bitbook.backend.transaction.model.TransactionFixtures;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionFixtures;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Nested;
@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_2;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_3;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.TRANSACTION_4;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_3;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_4;
 import static de.cotto.bitbook.cli.TransactionSortOrder.BY_COINS_ABSOLUTE_THEN_DATE_THEN_HASH;
 import static de.cotto.bitbook.cli.TransactionSortOrder.BY_COINS_ABSOLUTE_THEN_HASH;
 import static de.cotto.bitbook.cli.TransactionSortOrder.BY_COINS_THEN_DATE_THEN_HASH;

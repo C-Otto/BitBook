@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_1;
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_1;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.transaction.persistence.InputJpaDtoFixtures.INPUT_JPA_DTO_1;
 import static org.assertj.core.api.Assertions.assertThat;
 

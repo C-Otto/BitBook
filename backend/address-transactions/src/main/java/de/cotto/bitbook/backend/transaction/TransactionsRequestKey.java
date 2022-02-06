@@ -1,7 +1,7 @@
 package de.cotto.bitbook.backend.transaction;
 
 import com.google.common.base.Preconditions;
-import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
+import de.cotto.bitbook.backend.model.AddressTransactions;
 
 import java.util.Objects;
 

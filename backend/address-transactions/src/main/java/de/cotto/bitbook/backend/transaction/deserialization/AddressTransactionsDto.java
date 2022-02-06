@@ -1,6 +1,6 @@
 package de.cotto.bitbook.backend.transaction.deserialization;
 
-import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
+import de.cotto.bitbook.backend.model.AddressTransactions;
 
 import java.util.Set;
 

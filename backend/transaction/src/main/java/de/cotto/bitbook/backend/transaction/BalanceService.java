@@ -1,7 +1,7 @@
 package de.cotto.bitbook.backend.transaction;
 
-import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
-import de.cotto.bitbook.backend.transaction.model.Coins;
+import de.cotto.bitbook.backend.model.AddressTransactions;
+import de.cotto.bitbook.backend.model.Coins;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;

@@ -1,12 +1,12 @@
-package de.cotto.bitbook.backend.transaction.model;
+package de.cotto.bitbook.backend.model;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_1;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_1;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_VALUE_1;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_1;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_VALUE_1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 

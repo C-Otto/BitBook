@@ -1,6 +1,6 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 
 public class AddressTransactionsJpaDtoFixtures {
     public static final AddressTransactionsJpaDto ADDRESS_TRANSACTIONS_JPA_DTO;

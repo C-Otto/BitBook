@@ -1,8 +1,8 @@
 package de.cotto.bitbook.backend.transaction.blockstream;
 
+import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.transaction.SimpleAddressTransactionsProvider;
 import de.cotto.bitbook.backend.transaction.TransactionsRequestKey;
-import de.cotto.bitbook.backend.transaction.model.AddressTransactions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

@@ -2,11 +2,11 @@ package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.InputOutput;
+import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.price.model.Price;
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.InputOutput;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;

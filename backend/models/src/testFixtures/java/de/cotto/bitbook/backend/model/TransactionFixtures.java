@@ -1,17 +1,17 @@
-package de.cotto.bitbook.backend.transaction.model;
+package de.cotto.bitbook.backend.model;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.ADDRESS_2;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.TRANSACTION_HASH_3;
-import static de.cotto.bitbook.backend.transaction.model.AddressTransactionsFixtures.TRANSACTION_HASH_4;
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_1;
-import static de.cotto.bitbook.backend.transaction.model.InputFixtures.INPUT_2;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_1;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_2;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_2;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.TRANSACTION_HASH_3;
+import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.TRANSACTION_HASH_4;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_1;
+import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_2;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_1;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_2;
 
 public class TransactionFixtures {
     public static final String TRANSACTION_HASH = "c56c2a4ec7099879c2c4da74f4e5105a5a5d0ed94aa7d64518fa7e4256d42d9e";

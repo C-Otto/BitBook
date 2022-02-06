@@ -2,8 +2,8 @@ package de.cotto.bitbook.backend.transaction.persistence;
 
 import org.junit.jupiter.api.Test;
 
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_1;
-import static de.cotto.bitbook.backend.transaction.model.OutputFixtures.OUTPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_1;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.transaction.persistence.OutputJpaDtoFixtures.OUTPUT_JPA_DTO_1;
 import static org.assertj.core.api.Assertions.assertThat;
 

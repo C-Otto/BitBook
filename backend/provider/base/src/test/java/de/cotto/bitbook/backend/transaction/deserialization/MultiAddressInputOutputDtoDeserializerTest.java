@@ -2,7 +2,7 @@ package de.cotto.bitbook.backend.transaction.deserialization;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import de.cotto.bitbook.backend.transaction.model.Coins;
+import de.cotto.bitbook.backend.model.Coins;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 

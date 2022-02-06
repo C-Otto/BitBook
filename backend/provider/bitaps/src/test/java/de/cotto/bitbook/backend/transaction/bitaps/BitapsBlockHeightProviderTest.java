@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import static de.cotto.bitbook.backend.model.Chain.BCH;
 import static de.cotto.bitbook.backend.model.Chain.BTC;
-import static de.cotto.bitbook.backend.transaction.model.TransactionFixtures.BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.verifyNoInteractions;

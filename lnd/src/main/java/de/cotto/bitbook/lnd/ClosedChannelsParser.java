@@ -1,9 +1,9 @@
 package de.cotto.bitbook.lnd;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.transaction.TransactionService;
-import de.cotto.bitbook.backend.transaction.model.Coins;
-import de.cotto.bitbook.backend.transaction.model.Transaction;
 import de.cotto.bitbook.lnd.model.CloseType;
 import de.cotto.bitbook.lnd.model.ClosedChannel;
 import de.cotto.bitbook.lnd.model.Initiator;
