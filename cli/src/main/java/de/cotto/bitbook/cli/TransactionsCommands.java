@@ -5,6 +5,7 @@ import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
@@ -59,7 +60,7 @@ public class TransactionsCommands {
     public String getTransactionDetails(
             @ShellOption(valueProvider = TransactionHashCompletionProvider.class) CliTransactionHash transactionHash
     ) {
-        if (transactionHash.getTransactionHash().isBlank()) {
+        if (transactionHash.getTransactionHash().isInvalid()) {
             return CliTransactionHash.ERROR_MESSAGE;
         }
         Transaction transaction = transactionService.getTransactionDetails(transactionHash.getTransactionHash());
@@ -75,7 +76,7 @@ public class TransactionsCommands {
             return "Expected base58 or bech32 address";
         }
         String description = addressDescriptionService.getDescription(addressModel);
-        Set<String> hashes = addressTransactionsService.getTransactions(addressModel).getTransactionHashes();
+        Set<TransactionHash> hashes = addressTransactionsService.getTransactions(addressModel).getTransactionHashes();
         String result = """
                 Address: %s %s
                 Description: %s
@@ -96,7 +97,7 @@ public class TransactionsCommands {
             @ShellOption(valueProvider = TransactionHashCompletionProvider.class) CliTransactionHash transactionHash,
             @ShellOption(defaultValue = "") String description
     ) {
-        if (transactionHash.getTransactionHash().isBlank()) {
+        if (transactionHash.getTransactionHash().isInvalid()) {
             return CliTransactionHash.ERROR_MESSAGE;
         }
         transactionDescriptionService.set(transactionHash.getTransactionHash(), description);
@@ -108,7 +109,7 @@ public class TransactionsCommands {
             @ShellOption(valueProvider = TransactionWithDescriptionCompletionProvider.class)
                     CliTransactionHash transactionHash
     ) {
-        if (transactionHash.getTransactionHash().isBlank()) {
+        if (transactionHash.getTransactionHash().isInvalid()) {
             return CliTransactionHash.ERROR_MESSAGE;
         }
         transactionDescriptionService.remove(transactionHash.getTransactionHash());
@@ -122,7 +123,7 @@ public class TransactionsCommands {
         return "OK";
     }
 
-    private String formattedAndSortedHashes(Set<String> hashes, Address address) {
+    private String formattedAndSortedHashes(Set<TransactionHash> hashes, Address address) {
         Set<Transaction> transactions = transactionService.getTransactionDetails(hashes);
         preloadPrices(transactions);
         String details = transactions.parallelStream()

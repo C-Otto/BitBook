@@ -18,9 +18,9 @@ import static java.util.stream.Collectors.toSet;
 public class Transaction {
     private static final LocalDateTime UNKNOWN_DATE_TIME = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC);
     private static final Address COINBASE_ADDRESS = new Address("coinbase");
-    public static final Transaction UNKNOWN = new Transaction("", 0);
+    public static final Transaction UNKNOWN = new Transaction(TransactionHash.NONE, 0);
 
-    private final String hash;
+    private final TransactionHash hash;
     private final int blockHeight;
     private final LocalDateTime time;
     private final Coins fees;
@@ -28,7 +28,7 @@ public class Transaction {
     private final List<Output> outputs;
 
     public Transaction(
-            String hash,
+            TransactionHash hash,
             int blockHeight,
             LocalDateTime time,
             Coins fees,
@@ -44,12 +44,12 @@ public class Transaction {
         validateCoinsSum(hash, fees, inputs, outputs);
     }
 
-    public Transaction(String hash, int blockHeight) {
+    public Transaction(TransactionHash hash, int blockHeight) {
         this(hash, blockHeight, UNKNOWN_DATE_TIME, Coins.NONE, List.of(), List.of());
     }
 
     public static Transaction forCoinbase(
-            String hash,
+            TransactionHash hash,
             int blockHeight,
             LocalDateTime time,
             Coins fees,
@@ -92,7 +92,7 @@ public class Transaction {
         return addresses.stream().map(this::getDifferenceForAddress).reduce(Coins.NONE, Coins::add);
     }
 
-    public String getHash() {
+    public TransactionHash getHash() {
         return hash;
     }
 
@@ -121,7 +121,7 @@ public class Transaction {
     }
 
     public boolean isInvalid() {
-        return hash.isBlank();
+        return hash.isInvalid();
     }
 
     public Set<Address> getAllAddresses() {
@@ -206,7 +206,7 @@ public class Transaction {
         return result;
     }
 
-    private void validateCoinsSum(String hash, Coins fees, List<Input> inputs, List<Output> outputs) {
+    private void validateCoinsSum(TransactionHash hash, Coins fees, List<Input> inputs, List<Output> outputs) {
         Coins sumInputs = inputs.stream().map(InputOutput::getValue).reduce(Coins.NONE, Coins::add);
         Coins sumOutputs = outputs.stream().map(InputOutput::getValue).reduce(Coins.NONE, Coins::add);
         Coins total = sumInputs.subtract(sumOutputs).subtract(fees);

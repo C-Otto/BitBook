@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend;
 
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.model.TransactionWithDescription;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +18,7 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("CPD-START")
 @ExtendWith(MockitoExtension.class)
 class TransactionDescriptionServiceTest {
-    private static final String TRANSACTION_HASH = "foo";
+    private static final TransactionHash TRANSACTION_HASH = new TransactionHash("foo");
 
     @InjectMocks
     private TransactionDescriptionService service;
@@ -76,7 +77,7 @@ class TransactionDescriptionServiceTest {
     @Test
     void getWithDescriptionInfix() {
         String infix = "abc";
-        TransactionWithDescription expected = new TransactionWithDescription("x", "y");
+        TransactionWithDescription expected = new TransactionWithDescription(new TransactionHash("x"), "y");
         when(dao.findWithDescriptionInfix(infix)).thenReturn(Set.of(expected));
         assertThat(service.getWithDescriptionInfix(infix)).containsExactly(expected);
     }

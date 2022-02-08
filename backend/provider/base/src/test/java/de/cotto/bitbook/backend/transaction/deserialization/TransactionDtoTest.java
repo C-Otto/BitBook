@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.transaction.deserialization;
 
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -22,7 +23,7 @@ class TransactionDtoTest {
     @Test
     void toModel_unknown() {
         TestableTransactionDto transactionDto = new TestableTransactionDto(
-                "", 0, LocalDateTime.MIN, 0, List.of(), List.of()
+                TransactionHash.NONE, 0, LocalDateTime.MIN, 0, List.of(), List.of()
         );
         Transaction model = transactionDto.toModel();
         assertThat(model).isEqualTo(Transaction.UNKNOWN);

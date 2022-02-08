@@ -5,6 +5,7 @@ import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Input;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.springframework.stereotype.Component;
@@ -35,7 +36,7 @@ public class SweepTransactionsService {
         this.transactionDescriptionService = transactionDescriptionService;
     }
 
-    public long addFromSweeps(Set<String> hashes) {
+    public long addFromSweeps(Set<TransactionHash> hashes) {
         Set<Transaction> sweepTransactions = transactionService.getTransactionDetails(hashes).stream()
                 .filter(this::isSweepTransaction)
                 .collect(toSet());

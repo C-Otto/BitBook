@@ -5,6 +5,7 @@ import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.lnd.model.OnchainTransaction;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
@@ -38,7 +39,6 @@ import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 import static de.cotto.bitbook.ownership.OwnershipStatus.UNKNOWN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.lenient;
@@ -149,7 +149,7 @@ class OnchainTransactionsServiceTest {
                     OUTPUT_VALUE_2.add(Coins.ofSatoshis(1)),
                     Coins.NONE
             );
-            when(transactionService.getTransactionDetails(anyString())).thenReturn(TRANSACTION);
+            when(transactionService.getTransactionDetails(any(TransactionHash.class))).thenReturn(TRANSACTION);
             assertFailure(onchainTransaction);
         }
 
@@ -161,7 +161,7 @@ class OnchainTransactionsServiceTest {
                     OUTPUT_VALUE_2.add(Coins.ofSatoshis(1)),
                     Coins.NONE
             );
-            when(transactionService.getTransactionDetails(anyString())).thenReturn(Transaction.UNKNOWN);
+            when(transactionService.getTransactionDetails(any(TransactionHash.class))).thenReturn(Transaction.UNKNOWN);
             assertFailure(onchainTransaction);
         }
 
@@ -231,7 +231,7 @@ class OnchainTransactionsServiceTest {
 
         @Test
         void sets_initiator_in_transaction_description() {
-            String transactionHash = OPENING_TRANSACTION.getTransactionHash();
+            TransactionHash transactionHash = OPENING_TRANSACTION.getTransactionHash();
             when(transactionDescriptionService.getDescription(transactionHash))
                     .thenReturn("Opening Channel with 123pubkey456 (unknown)");
 
@@ -243,7 +243,7 @@ class OnchainTransactionsServiceTest {
 
         @Test
         void sets_initiator_in_transaction_description_existing_transaction_does_not_match() {
-            String transactionHash = OPENING_TRANSACTION.getTransactionHash();
+            TransactionHash transactionHash = OPENING_TRANSACTION.getTransactionHash();
             when(transactionDescriptionService.getDescription(transactionHash)).thenReturn("something else");
 
             onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION));
@@ -359,7 +359,7 @@ class OnchainTransactionsServiceTest {
     class Sweep {
         @Test
         void forwards_to_sweep_transaction_service() {
-            when(transactionService.getTransactionDetails(anyString())).thenReturn(Transaction.UNKNOWN);
+            when(transactionService.getTransactionDetails(any(TransactionHash.class))).thenReturn(Transaction.UNKNOWN);
             when(sweepTransactionsService.addFromSweeps(Set.of(TRANSACTION_HASH))).thenReturn(1L);
             OnchainTransaction transaction = new OnchainTransaction(
                     TRANSACTION_HASH,
@@ -384,7 +384,7 @@ class OnchainTransactionsServiceTest {
 
         @Test
         void amount_does_not_match_fee() {
-            when(transactionService.getTransactionDetails(anyString())).thenReturn(Transaction.UNKNOWN);
+            when(transactionService.getTransactionDetails(any(TransactionHash.class))).thenReturn(Transaction.UNKNOWN);
             OnchainTransaction transaction = new OnchainTransaction(
                     TRANSACTION_HASH,
                     "",
@@ -397,7 +397,7 @@ class OnchainTransactionsServiceTest {
 
         @Test
         void amount_zero() {
-            when(transactionService.getTransactionDetails(anyString())).thenReturn(Transaction.UNKNOWN);
+            when(transactionService.getTransactionDetails(any(TransactionHash.class))).thenReturn(Transaction.UNKNOWN);
             OnchainTransaction transaction = new OnchainTransaction(
                     TRANSACTION_HASH,
                     "",

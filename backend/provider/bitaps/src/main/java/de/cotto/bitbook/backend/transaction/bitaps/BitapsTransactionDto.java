@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction.bitaps;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.deserialization.DefaultInputOutputDtoDeserializer;
 import de.cotto.bitbook.backend.transaction.deserialization.InputDto;
 import de.cotto.bitbook.backend.transaction.deserialization.OutputDto;
@@ -15,7 +16,7 @@ import java.util.Set;
 @JsonDeserialize(using = BitapsTransactionDto.Deserializer.class)
 public class BitapsTransactionDto extends TransactionDto {
     public BitapsTransactionDto(
-            String hash,
+            TransactionHash hash,
             int blockHeight,
             LocalDateTime time,
             long fees,
@@ -58,7 +59,7 @@ public class BitapsTransactionDto extends TransactionDto {
 
         @Override
         protected BitapsTransactionDto createDtoInstance(
-                String hash,
+                TransactionHash hash,
                 int blockHeight,
                 LocalDateTime time,
                 long fees,

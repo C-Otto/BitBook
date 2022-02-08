@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction.blockchair;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.deserialization.DefaultInputOutputDtoDeserializer;
 import de.cotto.bitbook.backend.transaction.deserialization.InputDto;
 import de.cotto.bitbook.backend.transaction.deserialization.OutputDto;
@@ -23,7 +24,7 @@ import static java.util.stream.Collectors.toSet;
 @JsonDeserialize(using = BlockchairTransactionDto.Deserializer.class)
 public class BlockchairTransactionDto extends TransactionDto {
     public BlockchairTransactionDto(
-            String hash,
+            TransactionHash hash,
             int blockHeight,
             LocalDateTime time,
             long fees,
@@ -69,7 +70,7 @@ public class BlockchairTransactionDto extends TransactionDto {
 
         @Override
         protected BlockchairTransactionDto createDtoInstance(
-                String hash,
+                TransactionHash hash,
                 int blockHeight,
                 LocalDateTime time,
                 long fees,

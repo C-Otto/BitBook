@@ -10,8 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.transaction.persistence.InputJpaDtoFixtures.INPUT_JPA_DTO_1;
 import static de.cotto.bitbook.backend.transaction.persistence.OutputJpaDtoFixtures.OUTPUT_JPA_DTO_1;
 import static org.assertj.core.api.Assertions.assertThat;

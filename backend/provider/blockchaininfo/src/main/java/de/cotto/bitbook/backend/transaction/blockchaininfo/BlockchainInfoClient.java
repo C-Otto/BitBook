@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.blockchaininfo;
 
+import de.cotto.bitbook.backend.model.TransactionHash;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -16,5 +17,5 @@ public interface BlockchainInfoClient {
     String getBlockHeight();
 
     @GetMapping("/rawtx/{transactionHash}")
-    Optional<BlockchainInfoTransactionDto> getTransaction(@PathVariable String transactionHash);
+    Optional<BlockchainInfoTransactionDto> getTransaction(@PathVariable TransactionHash transactionHash);
 }

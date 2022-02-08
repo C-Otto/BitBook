@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.lnd.model.ClosedChannel;
 import de.cotto.bitbook.lnd.model.Resolution;
@@ -27,8 +28,8 @@ import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.OPENING_TRANSACTI
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.RESOLUTION_AMOUNT;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.SWEEP_TRANSACTION_HASH;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -75,16 +76,16 @@ class ClosedChannelsParserTest {
         );
 
         assertThat(closedChannelsParser.parse(toJsonNode(json))).isEmpty();
-        verify(transactionService, never()).getTransactionDetails(anyString());
+        verify(transactionService, never()).getTransactionDetails(any(TransactionHash.class));
     }
 
     @Test
     void skips_channels_with_unknown_close_transactions() throws IOException {
         String closingTransactionHash = "0000000000000000000000000000000000000000000000000000000000000000";
-        String json = getJsonArrayWithSingleChannel("").replace(TRANSACTION_HASH_2, closingTransactionHash);
+        String json = getJsonArrayWithSingleChannel("").replace(TRANSACTION_HASH_2.toString(), closingTransactionHash);
 
         assertThat(closedChannelsParser.parse(toJsonNode(json))).isEmpty();
-        verify(transactionService, never()).getTransactionDetails(anyString());
+        verify(transactionService, never()).getTransactionDetails(any(TransactionHash.class));
     }
 
     @Test
@@ -115,7 +116,7 @@ class ClosedChannelsParserTest {
         ));
         InOrder inOrder = Mockito.inOrder(transactionService);
         inOrder.verify(transactionService).getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2));
-        inOrder.verify(transactionService, atLeastOnce()).getTransactionDetails(anyString());
+        inOrder.verify(transactionService, atLeastOnce()).getTransactionDetails(any(TransactionHash.class));
     }
 
     @Test

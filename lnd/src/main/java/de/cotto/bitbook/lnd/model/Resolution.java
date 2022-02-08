@@ -1,7 +1,9 @@
 package de.cotto.bitbook.lnd.model;
 
+import de.cotto.bitbook.backend.model.TransactionHash;
+
 public record Resolution(
-        String sweepTransactionHash,
+        TransactionHash sweepTransactionHash,
         String resolutionType,
         String outcome
 ) {

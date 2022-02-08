@@ -1,20 +1,20 @@
 package de.cotto.bitbook.backend.model;
 
-public class TransactionWithDescription extends StringWithDescription<TransactionWithDescription> {
-    public TransactionWithDescription(String transactionHash) {
+public class TransactionWithDescription extends ModelWithDescription<TransactionHash, TransactionWithDescription> {
+    public TransactionWithDescription(TransactionHash transactionHash) {
         this(transactionHash, "");
     }
 
-    public TransactionWithDescription(String transactionHash, String description) {
+    public TransactionWithDescription(TransactionHash transactionHash, String description) {
         super(transactionHash, description);
     }
 
     @Override
     protected String getFormattedString() {
-        return getString();
+        return getModel().toString();
     }
 
-    public String getTransactionHash() {
-        return getString();
+    public TransactionHash getTransactionHash() {
+        return getModel();
     }
 }

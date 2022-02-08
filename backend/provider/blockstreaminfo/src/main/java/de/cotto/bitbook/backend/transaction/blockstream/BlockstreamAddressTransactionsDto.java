@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import de.cotto.bitbook.backend.model.Address;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsDeserializer;
 import de.cotto.bitbook.backend.transaction.deserialization.AddressTransactionsDto;
 
@@ -14,7 +15,7 @@ import java.util.Set;
 
 @JsonDeserialize(using = BlockstreamAddressTransactionsDto.Deserializer.class)
 public class BlockstreamAddressTransactionsDto extends AddressTransactionsDto {
-    protected BlockstreamAddressTransactionsDto(Set<String> transactionHashes) {
+    protected BlockstreamAddressTransactionsDto(Set<TransactionHash> transactionHashes) {
         super(Address.NONE, transactionHashes);
     }
 
@@ -31,14 +32,14 @@ public class BlockstreamAddressTransactionsDto extends AddressTransactionsDto {
                 JsonParser jsonParser,
                 DeserializationContext deserializationContext
         ) throws IOException {
-            Set<String> transactionHashes = parseHashesWithLimit(jsonParser, MAXIMUM_WITHOUT_PAGINATION);
+            Set<TransactionHash> transactionHashes = parseHashesWithLimit(jsonParser, MAXIMUM_WITHOUT_PAGINATION);
             return new BlockstreamAddressTransactionsDto(transactionHashes);
         }
 
         @Override
-        protected Optional<String> getHash(JsonNode transactionReferenceNode) {
+        protected Optional<TransactionHash> getHash(JsonNode transactionReferenceNode) {
             if (transactionReferenceNode.get("status").get("confirmed").booleanValue()) {
-                return Optional.of(transactionReferenceNode.get("txid").textValue());
+                return Optional.of(transactionReferenceNode.get("txid").textValue()).map(TransactionHash::new);
             }
             return Optional.empty();
         }

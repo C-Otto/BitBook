@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction.blockcypher;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.deserialization.InputDto;
 import de.cotto.bitbook.backend.transaction.deserialization.MultiAddressInputOutputDtoDeserializer;
 import de.cotto.bitbook.backend.transaction.deserialization.OutputDto;
@@ -19,7 +20,7 @@ import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 @JsonDeserialize(using = BlockcypherTransactionDto.Deserializer.class)
 public class BlockcypherTransactionDto extends TransactionDto {
     public BlockcypherTransactionDto(
-            String hash,
+            TransactionHash hash,
             int blockHeight,
             LocalDateTime time,
             long fees,
@@ -63,7 +64,7 @@ public class BlockcypherTransactionDto extends TransactionDto {
 
         @Override
         protected BlockcypherTransactionDto createDtoInstance(
-                String hash,
+                TransactionHash hash,
                 int blockHeight,
                 LocalDateTime time,
                 long fees,

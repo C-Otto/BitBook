@@ -1,6 +1,7 @@
 package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.model.TransactionWithDescription;
 import de.cotto.bitbook.backend.transaction.TransactionCompletionDao;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +19,6 @@ import org.springframework.shell.CompletionProposal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
@@ -98,23 +98,26 @@ class TransactionHashCompletionProviderTest {
         verifyNoInteractions(transactionCompletionDao);
     }
 
-    private void mockCompletionForTransaction(Set<String> hashes) {
+    private void mockCompletionForTransaction(Set<TransactionHash> hashes) {
         when(transactionDescriptionService.get(any()))
                 .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
         when(transactionCompletionDao.completeFromTransactionDetails(INPUT)).thenReturn(hashes);
     }
 
-    private void mockCompletionForAdressTransactionHash(Set<String> transactionHash2) {
+    private void mockCompletionForAdressTransactionHash(Set<TransactionHash> transactionHash2) {
         when(transactionDescriptionService.get(any()))
                 .then(invocation -> new TransactionWithDescription(invocation.getArgument(0)));
         when(transactionCompletionDao.completeFromAddressTransactionHashes(INPUT))
                 .thenReturn(transactionHash2);
     }
 
-    private void assertProposalsForHashes(String... transactionHashes) {
+    private void assertProposalsForHashes(TransactionHash... transactionHashes) {
         List<CompletionProposal> proposals = completionProvider.complete(methodParameter, context, hints);
         List<CompletionProposal> completionProposals =
-                Arrays.stream(transactionHashes).map(CompletionProposal::new).collect(Collectors.toList());
+                Arrays.stream(transactionHashes)
+                        .map(TransactionHash::toString)
+                        .map(CompletionProposal::new)
+                        .toList();
         assertThat(proposals).usingRecursiveFieldByFieldElementComparator()
                 .isEqualTo(completionProposals);
     }

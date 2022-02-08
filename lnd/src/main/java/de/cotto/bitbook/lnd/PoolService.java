@@ -3,6 +3,7 @@ package de.cotto.bitbook.lnd;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.lnd.features.PoolLeasesService;
 import de.cotto.bitbook.lnd.model.PoolLease;
 import org.springframework.stereotype.Component;
@@ -38,7 +39,7 @@ public class PoolService extends AbstractJsonService {
                 continue;
             }
             String channelPoint = leaseNode.get("channel_point").textValue();
-            String transactionHash = ChannelPointParser.getTransactionHash(channelPoint);
+            TransactionHash transactionHash = ChannelPointParser.getTransactionHash(channelPoint);
             int outputIndex = ChannelPointParser.getOutputIndex(channelPoint);
             String pubKey = leaseNode.get("channel_node_key").textValue();
             Coins premium = Coins.ofSatoshis(leaseNode.get("premium_sat").longValue());

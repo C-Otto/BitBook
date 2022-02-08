@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.transaction.bitaps;
 
 import de.cotto.bitbook.backend.model.Address;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -14,7 +15,7 @@ import java.util.Optional;
 @CircuitBreaker(name = "bitaps")
 public interface BitapsClient {
     @GetMapping("/btc/v1/blockchain/transaction/{transactionHash}")
-    Optional<BitapsTransactionDto> getTransaction(@PathVariable String transactionHash);
+    Optional<BitapsTransactionDto> getTransaction(@PathVariable TransactionHash transactionHash);
 
     @GetMapping("/btc/v1/blockchain/block/last")
     Optional<BitapsBlockHeightDto> getBlockHeight();

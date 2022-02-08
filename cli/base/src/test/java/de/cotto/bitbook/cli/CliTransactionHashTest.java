@@ -1,5 +1,6 @@
 package de.cotto.bitbook.cli;
 
+import de.cotto.bitbook.backend.model.TransactionHash;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
@@ -7,7 +8,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CliTransactionHashTest {
 
-    private static final String VALID_HASH = "6a79f4d09235e9c1db83260c7b4e9cd683135bd9f646e764337c229c1bb6a4d6";
+    private static final TransactionHash VALID_HASH =
+            new TransactionHash("6a79f4d09235e9c1db83260c7b4e9cd683135bd9f646e764337c229c1bb6a4d6");
 
     @Test
     void errorMessage() {
@@ -29,14 +31,14 @@ class CliTransactionHashTest {
     void getTransactionHash_invalid_character() {
         CliTransactionHash invalid =
                 new CliTransactionHash("6x79f4d09235e9c1db83260c7b4e9cd683135bd9f646e764337c229c1bb6a4d6");
-        assertThat(invalid.getTransactionHash()).isEqualTo("");
+        assertThat(invalid.getTransactionHash()).isEqualTo(TransactionHash.NONE);
     }
 
     @Test
     void getTransactionHash_invalid_tooShort() {
         CliTransactionHash invalid =
                 new CliTransactionHash("6a79f4d09235e9c1db83260c7b4e9cd683135bd9f646e764337c229c1bb6a4d");
-        assertThat(invalid.getTransactionHash()).isEqualTo("");
+        assertThat(invalid.getTransactionHash()).isEqualTo(TransactionHash.NONE);
     }
 
     @Test
@@ -51,11 +53,11 @@ class CliTransactionHashTest {
 
     @Test
     void testToString() {
-        assertThat(new CliTransactionHash(VALID_HASH)).hasToString(VALID_HASH);
+        assertThat(new CliTransactionHash(VALID_HASH)).hasToString(VALID_HASH.toString());
     }
 
     @Test
     void testToString_garbage() {
-        assertThat(new CliTransactionHash("    !" + VALID_HASH + ":\u00a0xxx")).hasToString(VALID_HASH);
+        assertThat(new CliTransactionHash("    !" + VALID_HASH + ":\u00a0xxx")).hasToString(VALID_HASH.toString());
     }
 }

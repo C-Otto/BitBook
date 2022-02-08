@@ -37,7 +37,7 @@ class TransactionDaoImplTest {
 
     @Test
     void getTransaction() {
-        when(transactionRepository.findById(TRANSACTION_HASH)).thenReturn(Optional.of(TRANSACTION_JPA_DTO));
+        when(transactionRepository.findById(TRANSACTION_HASH.toString())).thenReturn(Optional.of(TRANSACTION_JPA_DTO));
 
         Transaction transaction = transactionDao.getTransaction(TRANSACTION_HASH);
 
@@ -47,7 +47,7 @@ class TransactionDaoImplTest {
     @Test
     void saveTransaction() {
         transactionDao.saveTransaction(TRANSACTION);
-        verify(transactionRepository).save(argThat(dto -> TRANSACTION_HASH.equals(dto.getHash())));
+        verify(transactionRepository).save(argThat(dto -> TRANSACTION_HASH.toString().equals(dto.getHash())));
         verify(transactionRepository).save(argThat(dto -> BLOCK_HEIGHT == dto.getBlockHeight()));
         verify(transactionRepository).save(argThat(dto -> DATE_TIME.toEpochSecond(ZoneOffset.UTC) == dto.getTime()));
     }

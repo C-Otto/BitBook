@@ -3,6 +3,7 @@ package de.cotto.bitbook.lnd;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.cotto.bitbook.backend.model.Address;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.lnd.features.ChannelsService;
 import de.cotto.bitbook.lnd.features.ClosedChannelsService;
 import de.cotto.bitbook.lnd.features.OnchainTransactionsService;
@@ -119,7 +120,10 @@ class LndServiceTest {
 
         @Test
         void success() {
-            when(sweepTransactionsService.addFromSweeps(Set.of("a", "b"))).thenReturn(2L);
+            when(sweepTransactionsService.addFromSweeps(Set.of(
+                    new TransactionHash("a"),
+                    new TransactionHash("b")
+            ))).thenReturn(2L);
             String json = "{\"Sweeps\":{\"TransactionIds\": {\"transaction_ids\": [\"a\", \"b\"]}}}";
             assertThat(lndService.addFromSweeps(json)).isEqualTo(2);
         }

@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction.persistence;
 
 import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,10 +13,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.transaction.persistence.AddressTransactionsJpaDtoFixtures.ADDRESS_TRANSACTIONS_JPA_DTO;
+import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
@@ -55,7 +57,7 @@ class AddressTransactionsDaoImplTest {
                 dto -> ADDRESS_TRANSACTIONS.getLastCheckedAtBlockHeight() == dto.getLastCheckedAtBlockheight()
         ));
         verify(repository).save(argThat(
-                dto -> ADDRESS_TRANSACTIONS.getTransactionHashes().equals(dto.getTransactionHashes())
+                dto -> ADDRESS_TRANSACTIONS.getTransactionHashes().equals(hashes(dto))
         ));
     }
 
@@ -71,5 +73,9 @@ class AddressTransactionsDaoImplTest {
         when(repository.findByAddressStartingWith(prefix)).thenReturn(List.of(ADDRESS::toString, ADDRESS_2::toString));
         assertThat(addressTransactionsDao.getAddressesStartingWith(prefix))
                 .containsExactlyInAnyOrder(ADDRESS, ADDRESS_2);
+    }
+
+    private Set<TransactionHash> hashes(AddressTransactionsJpaDto dto) {
+        return dto.getTransactionHashes().stream().map(TransactionHash::new).collect(toSet());
     }
 }

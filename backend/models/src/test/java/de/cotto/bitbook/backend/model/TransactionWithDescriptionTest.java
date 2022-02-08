@@ -11,11 +11,13 @@ class TransactionWithDescriptionTest {
             "abcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaXIIIIIIIIIIIIIIIIIZ";
     private static final String SHORTENED_40 = "abcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaX…";
     private static final TransactionWithDescription TRANSACTION_WITH_DESCRIPTION =
-            create("x", "y");
+            create(new TransactionHash("x"), "y");
+    private static final TransactionHash HASH_Z = new TransactionHash("z");
+    private static final TransactionHash HASH_A = new TransactionHash("a");
 
     @Test
     void getTransactionHash() {
-        assertThat(TRANSACTION_WITH_DESCRIPTION.getTransactionHash()).isEqualTo("x");
+        assertThat(TRANSACTION_WITH_DESCRIPTION.getTransactionHash()).isEqualTo(new TransactionHash("x"));
     }
 
     @Test
@@ -25,27 +27,27 @@ class TransactionWithDescriptionTest {
 
     @Test
     void compareTo_smaller_description() {
-        assertThat(create("z", "a").compareTo(create("a", "z"))).isLessThan(0);
+        assertThat(create(HASH_Z, "a").compareTo(create(HASH_A, "z"))).isLessThan(0);
     }
 
     @Test
     void compareTo_same_description_smaller_hash() {
-        assertThat(create("a", "y").compareTo(create("z", "y"))).isLessThan(0);
+        assertThat(create(HASH_A, "y").compareTo(create(HASH_Z, "y"))).isLessThan(0);
     }
 
     @Test
     void compareTo_same_description_same_hash() {
-        assertThat(TRANSACTION_WITH_DESCRIPTION.compareTo(create("x", "y"))).isEqualTo(0);
+        assertThat(TRANSACTION_WITH_DESCRIPTION.compareTo(create(new TransactionHash("x"), "y"))).isEqualTo(0);
     }
 
     @Test
     void compareTo_same_description_larger_hash() {
-        assertThat(create("z", "y").compareTo(create("a", "y"))).isGreaterThan(0);
+        assertThat(create(HASH_Z, "y").compareTo(create(HASH_A, "y"))).isGreaterThan(0);
     }
 
     @Test
     void compareTo_larger_description() {
-        assertThat(create("a", "z").compareTo(create("z", "a"))).isGreaterThan(0);
+        assertThat(create(HASH_A, "z").compareTo(create(HASH_Z, "a"))).isGreaterThan(0);
     }
 
     @Test
@@ -55,7 +57,7 @@ class TransactionWithDescriptionTest {
 
     @Test
     void testToString() {
-        String transactionHash = TRANSACTION_WITH_DESCRIPTION.getTransactionHash();
+        TransactionHash transactionHash = TRANSACTION_WITH_DESCRIPTION.getTransactionHash();
         String formattedDescription = TRANSACTION_WITH_DESCRIPTION.getDescription();
         assertThat(TRANSACTION_WITH_DESCRIPTION).hasToString(transactionHash + " " + formattedDescription);
     }
@@ -88,13 +90,13 @@ class TransactionWithDescriptionTest {
 
     @Test
     void testToString_without_description() {
-        assertThat(new TransactionWithDescription("x"))
+        assertThat(new TransactionWithDescription(new TransactionHash("x")))
                 .hasToString("x ");
     }
 
     @Test
     void getDescription_without_description() {
-        assertThat(new TransactionWithDescription("x").getDescription()).isEqualTo("");
+        assertThat(new TransactionWithDescription(new TransactionHash("x")).getDescription()).isEqualTo("");
     }
 
     @Test
@@ -111,7 +113,7 @@ class TransactionWithDescriptionTest {
         ).getFormattedDescription()).isEqualTo(SHORTENED_40);
     }
 
-    private static TransactionWithDescription create(String transactionHash, String description) {
+    private static TransactionWithDescription create(TransactionHash transactionHash, String description) {
         return new TransactionWithDescription(transactionHash, description);
     }
 }

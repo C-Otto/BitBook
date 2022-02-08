@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.transaction.deserialization;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.cotto.bitbook.backend.model.TransactionHash;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,7 +52,7 @@ public class TestableTransactionDtoDeserializer extends TransactionDtoDeserializ
 
     @Override
     protected TestableTransactionDto createDtoInstance(
-            String hash,
+            TransactionHash hash,
             int blockHeight,
             LocalDateTime time,
             long fees,

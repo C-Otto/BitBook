@@ -15,9 +15,9 @@ import org.springframework.shell.CompletionProposal;
 import java.util.List;
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.TRANSACTION_HASH_3;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_3;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -61,8 +61,8 @@ class TransactionWithDescriptionCompletionProviderTest {
         List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
 
         assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
-                new CompletionProposal(TRANSACTION_HASH_3).description(description3),
-                new CompletionProposal(TRANSACTION_HASH).description(description1)
+                new CompletionProposal(TRANSACTION_HASH_3.toString()).description(description3),
+                new CompletionProposal(TRANSACTION_HASH.toString()).description(description1)
         );
     }
 }

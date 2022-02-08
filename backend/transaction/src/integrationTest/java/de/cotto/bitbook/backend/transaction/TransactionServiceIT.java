@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.request.PrioritizedRequestWithResult;
 import de.cotto.bitbook.backend.request.ResultFuture;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,12 +16,12 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
@@ -83,7 +84,9 @@ class TransactionServiceIT {
             executor.submit(() -> abortFutureAfterDelay(future));
             return future;
         });
-        Set<String> hashes = IntStream.range(0, max).mapToObj(String::valueOf).collect(Collectors.toSet());
+        Set<TransactionHash> hashes = IntStream.range(0, max).mapToObj(String::valueOf)
+                .map(TransactionHash::new)
+                .collect(toSet());
         AtomicReference<Set<Transaction>> results = new AtomicReference<>();
         await().atMost(10, SECONDS).until(() -> {
             results.set(transactionService.getTransactionDetails(hashes));
@@ -104,7 +107,7 @@ class TransactionServiceIT {
     private void mockResult() {
         when(transactionProvider.getTransaction(any())).then((Answer<ResultFuture<Transaction>>) invocation -> {
             TransactionRequest request = invocation.getArgument(0);
-            PrioritizedRequestWithResult<String, Transaction> resultFuture = request.getWithResultFuture();
+            PrioritizedRequestWithResult<TransactionHash, Transaction> resultFuture = request.getWithResultFuture();
             resultFuture.provideResult(TRANSACTION);
             return resultFuture;
         });

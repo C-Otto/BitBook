@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import de.cotto.bitbook.backend.model.TransactionHash;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -66,7 +67,7 @@ public abstract class TransactionDtoDeserializer<T extends TransactionDto>
     protected abstract boolean isCoinbaseTransaction(JsonNode transactionNode);
 
     protected abstract T createDtoInstance(
-            String hash,
+            TransactionHash hash,
             int blockHeight,
             LocalDateTime time,
             long fees,
@@ -76,7 +77,7 @@ public abstract class TransactionDtoDeserializer<T extends TransactionDto>
 
     private T getTransactionDto(JsonNode transactionNode) {
         JsonNode transactionDetailsNode = getTransactionDetailsNode(transactionNode);
-        String hash = transactionDetailsNode.get(hashProperty).textValue();
+        TransactionHash hash = new TransactionHash(transactionDetailsNode.get(hashProperty).textValue());
         int blockHeight = transactionDetailsNode.get(blockHeightProperty).asInt();
         LocalDateTime parsedTime = parseTime(transactionDetailsNode.get(timeProperty).asText());
         long fees = transactionDetailsNode.get(feesProperty).asLong();

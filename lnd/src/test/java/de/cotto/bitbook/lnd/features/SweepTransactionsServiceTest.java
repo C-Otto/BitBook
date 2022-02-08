@@ -7,6 +7,7 @@ import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 import de.cotto.bitbook.backend.model.Output;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.junit.jupiter.api.BeforeEach;
@@ -88,7 +89,7 @@ class SweepTransactionsServiceTest {
                 List.of(OUTPUT_SWEEP_2)
         );
 
-        private final Set<String> hashes = Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2);
+        private final Set<TransactionHash> hashes = Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2);
 
         @BeforeEach
         void setUp() {
@@ -161,7 +162,7 @@ class SweepTransactionsServiceTest {
         }
     }
 
-    private void assertFailure(Set<String> hashes) {
+    private void assertFailure(Set<TransactionHash> hashes) {
         assertThat(sweepTransactionsService.addFromSweeps(hashes)).isEqualTo(0);
         verifyNoInteractions(addressOwnershipService);
     }

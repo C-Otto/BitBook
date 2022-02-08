@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.request.ResultFuture;
 import org.junit.jupiter.api.BeforeEach;
@@ -209,7 +210,7 @@ class TransactionServiceTest {
 
     @Test
     void request_in_background_uses_lowest_priority() {
-        String anotherHash = "xxx";
+        TransactionHash anotherHash = new TransactionHash("xxx");
         mockResult(TRANSACTION_HASH, TRANSACTION);
         mockResult(anotherHash, Transaction.UNKNOWN);
         transactionService.requestInBackground(Set.of(TRANSACTION_HASH, anotherHash));
@@ -217,13 +218,13 @@ class TransactionServiceTest {
                 .getTransaction(argThat(request -> request.getPriority() == LOWEST));
     }
 
-    private void mockResult(String transactionHash, Transaction transaction) {
+    private void mockResult(TransactionHash transactionHash, Transaction transaction) {
         ResultFuture<Transaction> resultFuture = new ResultFuture<>();
         resultFuture.provideResult(transaction);
         when(prioritizingTransactionProvider.getTransaction(requestFor(transactionHash))).thenReturn(resultFuture);
     }
 
-    private TransactionRequest requestFor(String transactionHash) {
+    private TransactionRequest requestFor(TransactionHash transactionHash) {
         return argThat(request -> request != null && request.getHash().equals(transactionHash));
     }
 }

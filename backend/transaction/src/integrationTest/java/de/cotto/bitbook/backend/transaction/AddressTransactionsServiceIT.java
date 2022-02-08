@@ -11,9 +11,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;

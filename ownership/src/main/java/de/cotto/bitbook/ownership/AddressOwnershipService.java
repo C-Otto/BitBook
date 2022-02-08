@@ -7,6 +7,7 @@ import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.BalanceService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
@@ -107,7 +108,8 @@ public class AddressOwnershipService {
     }
 
     private Set<Transaction> getMyTransactions() {
-        Set<String> hashes = addressTransactionsService.getTransactionsForAddresses(getOwnedAddresses()).stream()
+        Set<TransactionHash> hashes =
+                addressTransactionsService.getTransactionsForAddresses(getOwnedAddresses()).stream()
                 .map(AddressTransactions::getTransactionHashes)
                 .flatMap(Set::stream)
                 .collect(toSet());

@@ -3,6 +3,7 @@ package de.cotto.bitbook.backend.transaction.persistence;
 import com.google.common.annotations.VisibleForTesting;
 import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
+import de.cotto.bitbook.backend.model.TransactionHash;
 
 import javax.annotation.Nullable;
 import javax.persistence.ElementCollection;
@@ -12,6 +13,7 @@ import javax.persistence.Table;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toSet;
 
 @Entity
 @Table(name = "address_transactions")
@@ -33,7 +35,11 @@ public class AddressTransactionsJpaDto {
     public static AddressTransactionsJpaDto fromModel(AddressTransactions addressTransactions) {
         AddressTransactionsJpaDto dto = new AddressTransactionsJpaDto();
         dto.setAddress(addressTransactions.getAddress().toString());
-        dto.setTransactionHashes(addressTransactions.getTransactionHashes());
+        dto.setTransactionHashes(
+                addressTransactions.getTransactionHashes().stream()
+                        .map(TransactionHash::toString)
+                        .collect(toSet())
+        );
         dto.setLastCheckedAtBlockheight(addressTransactions.getLastCheckedAtBlockHeight());
         return dto;
     }
@@ -41,7 +47,7 @@ public class AddressTransactionsJpaDto {
     public AddressTransactions toModel() {
         return new AddressTransactions(
                 new Address(requireNonNull(address)),
-                requireNonNull(transactionHashes),
+                requireNonNull(transactionHashes).stream().map(TransactionHash::new).collect(toSet()),
                 lastCheckedAtBlockheight
         );
     }

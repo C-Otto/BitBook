@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.blockcypher;
 
+import de.cotto.bitbook.backend.model.TransactionHash;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -13,5 +14,5 @@ import java.util.Optional;
 @CircuitBreaker(name = "blockcypher")
 public interface BlockcypherClient {
     @GetMapping("/v1/btc/main/txs/{transactionHash}")
-    Optional<BlockcypherTransactionDto> getTransaction(@PathVariable String transactionHash);
+    Optional<BlockcypherTransactionDto> getTransaction(@PathVariable TransactionHash transactionHash);
 }

@@ -1,10 +1,10 @@
 package de.cotto.bitbook.backend;
 
-import de.cotto.bitbook.backend.model.StringWithDescription;
+import de.cotto.bitbook.backend.model.ModelWithDescription;
 
 import java.util.Set;
 
-public class DescriptionService<K, T extends StringWithDescription<T>> {
+public class DescriptionService<K extends Comparable<K>, T extends ModelWithDescription<K, T>> {
     private static final int MINIMUM_LENGTH_FOR_COMPLETION = 3;
 
     private final DescriptionDao<K, T> dao;

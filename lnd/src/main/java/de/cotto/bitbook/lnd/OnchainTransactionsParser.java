@@ -2,6 +2,7 @@ package de.cotto.bitbook.lnd;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.lnd.model.OnchainTransaction;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ public class OnchainTransactionsParser {
         // default constructor
     }
 
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public Set<OnchainTransaction> parse(JsonNode jsonNode) {
         JsonNode transactions = jsonNode.get("transactions");
         if (transactions == null || !transactions.isArray()) {
@@ -21,7 +23,7 @@ public class OnchainTransactionsParser {
         }
         Set<OnchainTransaction> result = new LinkedHashSet<>();
         for (JsonNode transactionNode : transactions) {
-            String transactionHash = transactionNode.get("tx_hash").textValue();
+            TransactionHash transactionHash = new TransactionHash(transactionNode.get("tx_hash").textValue());
             String label = transactionNode.get("label").textValue();
             Coins amount = Coins.ofSatoshis(Long.parseLong(transactionNode.get("amount").textValue()));
             Coins fees = Coins.ofSatoshis(Long.parseLong(transactionNode.get("total_fees").textValue()));

@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.cotto.bitbook.backend.transaction.deserialization.TestObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
 import static de.cotto.bitbook.backend.transaction.btccom.BtcComAddressTransactionsFixtures.BTCCOM_ADDRESS_DETAILS;

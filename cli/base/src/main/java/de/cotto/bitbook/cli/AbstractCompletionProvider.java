@@ -3,7 +3,7 @@ package de.cotto.bitbook.cli;
 import com.google.common.base.Functions;
 import com.google.common.collect.Streams;
 import de.cotto.bitbook.backend.DescriptionService;
-import de.cotto.bitbook.backend.model.StringWithDescription;
+import de.cotto.bitbook.backend.model.ModelWithDescription;
 import org.springframework.boot.ansi.AnsiColor;
 import org.springframework.boot.ansi.AnsiOutput;
 import org.springframework.core.MethodParameter;
@@ -20,7 +20,8 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
-public abstract class AbstractCompletionProvider<K, T extends StringWithDescription<T>> extends ValueProviderSupport {
+public abstract class AbstractCompletionProvider<K extends Comparable<K>, T extends ModelWithDescription<K, T>>
+        extends ValueProviderSupport {
     private static final int MINIMUM_LENGTH_FOR_COMPLETION = 3;
     protected final DescriptionService<K, T> descriptionService;
 
@@ -80,7 +81,7 @@ public abstract class AbstractCompletionProvider<K, T extends StringWithDescript
 
     private CompletionProposal getCompletionProposal(T stringWithDescription) {
         String description = stringWithDescription.getDescription();
-        CompletionProposal completionProposal = new CompletionProposal(stringWithDescription.getString());
+        CompletionProposal completionProposal = new CompletionProposal(stringWithDescription.getModel().toString());
         if (description.isEmpty()) {
             return completionProposal;
         }
@@ -95,7 +96,7 @@ public abstract class AbstractCompletionProvider<K, T extends StringWithDescript
     private CompletionProposal getCompletionProposalWithDescriptionInValue(T stringWithDescription) {
         // JLine does not show completion proposals that don't contain the text typed in by the user.
         // To work around this, we just include the description in the actual value (and remove it later).
-        String string = stringWithDescription.getString();
+        String string = stringWithDescription.getModel().toString();
         String separator = "\u00a0";
         String description = "(" + stringWithDescription.getDescription() + ")";
         String ansiDescription = AnsiOutput.toString(AnsiColor.BRIGHT_BLACK, description, AnsiColor.DEFAULT);

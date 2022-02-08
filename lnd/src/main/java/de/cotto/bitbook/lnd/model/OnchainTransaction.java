@@ -1,23 +1,24 @@
 package de.cotto.bitbook.lnd.model;
 
 import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.TransactionHash;
 
 import java.util.Objects;
 
 public class OnchainTransaction {
-    private final String transactionHash;
+    private final TransactionHash transactionHash;
     private final String label;
     private final Coins amount;
     private final Coins fees;
 
-    public OnchainTransaction(String transactionHash, String label, Coins amount, Coins fees) {
+    public OnchainTransaction(TransactionHash transactionHash, String label, Coins amount, Coins fees) {
         this.transactionHash = transactionHash;
         this.label = label;
         this.amount = amount;
         this.fees = fees;
     }
 
-    public String getTransactionHash() {
+    public TransactionHash getTransactionHash() {
         return transactionHash;
     }
 

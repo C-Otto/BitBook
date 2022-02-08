@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableList;
 import de.cotto.bitbook.backend.model.Address;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.deserialization.AddressTransactionsDto;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.util.Set;
 
 @JsonDeserialize(using = BlockchairAddressTransactionsDto.Deserializer.class)
 public class BlockchairAddressTransactionsDto extends AddressTransactionsDto {
-    public BlockchairAddressTransactionsDto(Address address, Set<String> transactionHashes) {
+    public BlockchairAddressTransactionsDto(Address address, Set<TransactionHash> transactionHashes) {
         super(address, transactionHashes);
     }
 
@@ -36,12 +37,12 @@ public class BlockchairAddressTransactionsDto extends AddressTransactionsDto {
             return new Address(ImmutableList.copyOf(dataNode.fieldNames()).get(0));
         }
 
-        private Set<String> getTransactionHashes(JsonNode rootNode, Address address) {
+        private Set<TransactionHash> getTransactionHashes(JsonNode rootNode, Address address) {
             JsonNode addressNode = rootNode.get("data").get(address.toString());
             int expectedNumberOfTransactions = addressNode.get("address").get("transaction_count").intValue();
-            Set<String> result = new LinkedHashSet<>();
+            Set<TransactionHash> result = new LinkedHashSet<>();
             for (JsonNode hashNode : addressNode.get("transactions")) {
-                result.add(hashNode.textValue());
+                result.add(new TransactionHash(hashNode.textValue()));
             }
             if (result.size() != expectedNumberOfTransactions) {
                 throw new IllegalStateException();

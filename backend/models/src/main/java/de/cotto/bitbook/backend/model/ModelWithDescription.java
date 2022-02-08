@@ -6,17 +6,18 @@ import javax.annotation.Nonnull;
 import java.util.Comparator;
 import java.util.Objects;
 
-public abstract class StringWithDescription<T extends StringWithDescription<T>> implements Comparable<T>  {
-    private final String string;
+public abstract class ModelWithDescription<M extends Comparable<M>, T extends ModelWithDescription<M, T>>
+        implements Comparable<T>  {
+    private final M model;
     private final String description;
 
-    public StringWithDescription(String string, String description) {
-        this.string = string;
+    public ModelWithDescription(M model, String description) {
+        this.model = model;
         this.description = description;
     }
 
-    public String getString() {
-        return string;
+    public M getModel() {
+        return model;
     }
 
     public String getDescription() {
@@ -40,8 +41,8 @@ public abstract class StringWithDescription<T extends StringWithDescription<T>> 
 
     @Override
     public int compareTo(@Nonnull T other) {
-        return Comparator.<StringWithDescription<T>, String>comparing(StringWithDescription::getDescription)
-                .thenComparing(StringWithDescription::getString)
+        return Comparator.<ModelWithDescription<M, T>, String>comparing(ModelWithDescription::getDescription)
+                .thenComparing(ModelWithDescription::getModel)
                 .compare(this, other);
     }
 
@@ -64,12 +65,12 @@ public abstract class StringWithDescription<T extends StringWithDescription<T>> 
         if (other == null || getClass() != other.getClass()) {
             return false;
         }
-        StringWithDescription<?> that = (StringWithDescription<?>) other;
-        return Objects.equals(string, that.string) && Objects.equals(description, that.description);
+        ModelWithDescription<?, ?> that = (ModelWithDescription<?, ?>) other;
+        return Objects.equals(model, that.model) && Objects.equals(description, that.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(string, description);
+        return Objects.hash(model, description);
     }
 }

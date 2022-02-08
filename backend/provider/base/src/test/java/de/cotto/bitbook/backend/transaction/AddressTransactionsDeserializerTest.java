@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -52,19 +53,23 @@ class AddressTransactionsDeserializerTest {
         return new ObjectMapper().createParser(json);
     }
 
-    private static class TestableAddressTransactionsDeserializer extends AddressTransactionsDeserializer<Set<String>> {
+    private static class TestableAddressTransactionsDeserializer
+            extends AddressTransactionsDeserializer<Set<TransactionHash>> {
         private int limit = 3;
 
         @Override
-        protected Optional<String> getHash(JsonNode transactionReferenceNode) {
+        protected Optional<TransactionHash> getHash(JsonNode transactionReferenceNode) {
             if (transactionReferenceNode.isTextual()) {
-                return Optional.of(transactionReferenceNode.asText());
+                return Optional.of(transactionReferenceNode.asText()).map(TransactionHash::new);
             }
             return Optional.empty();
         }
 
         @Override
-        public Set<String> deserialize(JsonParser jsonParser, @Nullable DeserializationContext deserializationContext)
+        public Set<TransactionHash> deserialize(
+                JsonParser jsonParser,
+                @Nullable DeserializationContext deserializationContext
+        )
                 throws IOException {
             return super.parseHashesWithLimit(jsonParser, limit);
         }

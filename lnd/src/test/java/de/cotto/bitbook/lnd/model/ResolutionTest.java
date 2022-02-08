@@ -1,5 +1,6 @@
 package de.cotto.bitbook.lnd.model;
 
+import de.cotto.bitbook.backend.model.TransactionHash;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +15,7 @@ class ResolutionTest {
     private static final String TIMEOUT = "TIMEOUT";
     private static final String INCOMING_HTLC = "INCOMING_HTLC";
     private static final String OUTGOING_HTLC = "OUTGOING_HTLC";
-    private static final String SWEEP_TRANSACTION_HASH = "bar";
+    private static final TransactionHash SWEEP_TRANSACTION_HASH = new TransactionHash("bar");
     private static final Resolution RESOLUTION_COMMIT_CLAIMED = new Resolution(SWEEP_TRANSACTION_HASH, COMMIT, CLAIMED);
     private static final Resolution RESOLUTION_ANCHOR_CLAIMED = new Resolution(SWEEP_TRANSACTION_HASH, ANCHOR, CLAIMED);
 

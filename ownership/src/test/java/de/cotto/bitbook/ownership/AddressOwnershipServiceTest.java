@@ -8,6 +8,7 @@ import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 import de.cotto.bitbook.backend.model.Output;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.BalanceService;
 import de.cotto.bitbook.backend.transaction.TransactionService;
@@ -25,16 +26,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_2;
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_3;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_2;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.TRANSACTION_HASH_3;
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.TRANSACTION_HASH_4;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS_3;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
@@ -43,6 +42,8 @@ import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_3;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_4;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_3;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_4;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
@@ -371,7 +372,12 @@ class AddressOwnershipServiceTest {
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(ownedAddresses);
             when(addressTransactionsService.getTransactionsForAddresses(ownedAddresses))
                     .thenReturn(Set.of(ADDRESS_TRANSACTIONS, ADDRESS_TRANSACTIONS_2));
-            Set<String> hashes = Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2, TRANSACTION_HASH_3, TRANSACTION_HASH_4);
+            Set<TransactionHash> hashes = Set.of(
+                    TRANSACTION_HASH,
+                    TRANSACTION_HASH_2,
+                    TRANSACTION_HASH_3,
+                    TRANSACTION_HASH_4
+            );
             when(transactionService.getTransactionDetails(hashes)).thenReturn(Set.of(TRANSACTION, TRANSACTION_2));
 
             assertThat(addressOwnershipService.getMyTransactionsWithCoins())

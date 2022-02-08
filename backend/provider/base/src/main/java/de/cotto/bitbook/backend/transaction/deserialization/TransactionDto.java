@@ -4,6 +4,7 @@ import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 import de.cotto.bitbook.backend.model.Output;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 public class TransactionDto {
-    private final String hash;
+    private final TransactionHash hash;
     private final int blockHeight;
     private final LocalDateTime time;
     private final long fees;
@@ -19,7 +20,7 @@ public class TransactionDto {
     private final List<OutputDto> outputs;
 
     public TransactionDto(
-            String hash,
+            TransactionHash hash,
             int blockHeight,
             LocalDateTime time,
             long fees,

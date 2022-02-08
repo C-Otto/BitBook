@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.model.ProviderException;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.request.ResultFuture;
 import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
@@ -28,7 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class PrioritizingTransactionProviderTest {
-    private static final String OTHER_HASH = "xxx";
+    private static final TransactionHash OTHER_HASH = new TransactionHash("xxx");
 
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
 

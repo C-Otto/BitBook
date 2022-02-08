@@ -3,6 +3,7 @@ package de.cotto.bitbook.lnd.model;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +51,7 @@ class ClosedChannelTest {
         Transaction validClosingTransaction = CLOSED_CHANNEL.getClosingTransaction();
         Coins fees = validClosingTransaction.getInputs().stream().map(Input::getValue).reduce(Coins.NONE, Coins::add);
         Transaction closingTransaction = new Transaction(
-                "",
+                TransactionHash.NONE,
                 0,
                 validClosingTransaction.getTime(),
                 fees,

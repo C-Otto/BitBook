@@ -3,6 +3,7 @@ package de.cotto.bitbook.lnd.features;
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.model.Address;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.lnd.model.ClosedChannel;
 import de.cotto.bitbook.lnd.model.Initiator;
 import de.cotto.bitbook.lnd.model.Resolution;
@@ -107,10 +108,10 @@ public class ClosedChannelsService {
     }
 
     private void addFromHtlcSweepTransactions(ClosedChannel closedChannel) {
-        Set<String> sweepTransactionHashes = closedChannel.getResolutions().stream()
+        Set<TransactionHash> sweepTransactionHashes = closedChannel.getResolutions().stream()
                 .filter(Resolution::sweepTransactionClaimsFunds)
                 .map(Resolution::sweepTransactionHash)
-                .filter(sweepTransactionHash -> !sweepTransactionHash.isBlank())
+                .filter(TransactionHash::isValid)
                 .collect(Collectors.toSet());
         sweepTransactionsService.addFromSweeps(sweepTransactionHashes);
     }

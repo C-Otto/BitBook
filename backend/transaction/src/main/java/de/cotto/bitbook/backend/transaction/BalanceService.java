@@ -3,6 +3,7 @@ package de.cotto.bitbook.backend.transaction;
 import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -22,7 +23,7 @@ public class BalanceService {
 
     public Coins getBalance(Address address) {
         AddressTransactions transactions = addressTransactionsService.getTransactions(address);
-        Set<String> transactionHashes = transactions.getTransactionHashes();
+        Set<TransactionHash> transactionHashes = transactions.getTransactionHashes();
         return transactionService.getTransactionDetails(transactionHashes).stream()
                 .map(transactionDetails -> transactionDetails.getDifferenceForAddress(address))
                 .reduce(Coins.NONE, Coins::add);

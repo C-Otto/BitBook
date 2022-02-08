@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction.bitaps;
 
 import de.cotto.bitbook.backend.model.Provider;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.deserialization.TransactionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-public class BitapsTransactionProvider implements Provider<String, Transaction> {
+public class BitapsTransactionProvider implements Provider<TransactionHash, Transaction> {
     private final BitapsClient bitapsClient;
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -24,11 +25,11 @@ public class BitapsTransactionProvider implements Provider<String, Transaction> 
     }
 
     @Override
-    public Optional<Transaction> get(String transactionHash) {
+    public Optional<Transaction> get(TransactionHash transactionHash) {
         return getTransactionFromApi(transactionHash).map(TransactionDto::toModel);
     }
 
-    private Optional<BitapsTransactionDto> getTransactionFromApi(String transactionHash) {
+    private Optional<BitapsTransactionDto> getTransactionFromApi(TransactionHash transactionHash) {
         logger.debug("Contacting Bitaps API for hash {}", transactionHash);
         return bitapsClient.getTransaction(transactionHash);
     }

@@ -2,7 +2,7 @@ package de.cotto.bitbook.backend.model;
 
 import org.junit.jupiter.api.Test;
 
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AddressTest {
@@ -34,5 +34,15 @@ class AddressTest {
     @Test
     void testToString() {
         assertThat(ADDRESS).hasToString("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD");
+    }
+
+    @Test
+    void comparable_smaller() {
+        assertThat(new Address("a").compareTo(new Address("b"))).isNegative();
+    }
+
+    @Test
+    void comparable_larger() {
+        assertThat(new Address("b").compareTo(new Address("a"))).isPositive();
     }
 }

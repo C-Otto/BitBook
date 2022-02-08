@@ -3,6 +3,7 @@ package de.cotto.bitbook.lnd;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.lnd.model.CloseType;
 import de.cotto.bitbook.lnd.model.ClosedChannel;
@@ -15,7 +16,8 @@ import java.util.Set;
 
 @Component
 public class ClosedChannelsParser {
-    private static final String UNKNOWN_HASH = "0000000000000000000000000000000000000000000000000000000000000000";
+    private static final TransactionHash UNKNOWN_HASH =
+            new TransactionHash("0000000000000000000000000000000000000000000000000000000000000000");
 
     private final TransactionService transactionService;
 
@@ -40,7 +42,7 @@ public class ClosedChannelsParser {
     }
 
     private void preloadTransactionHashes(JsonNode channels) {
-        Set<String> allTransactionHashes = new LinkedHashSet<>();
+        Set<TransactionHash> allTransactionHashes = new LinkedHashSet<>();
         for (JsonNode channelNode : channels) {
             allTransactionHashes.addAll(getValidTransactionHashes(channelNode));
         }
@@ -48,8 +50,8 @@ public class ClosedChannelsParser {
     }
 
     private ClosedChannel parseClosedChannel(JsonNode channelNode) {
-        String openingTransactionHash = parseOpeningTransaction(channelNode);
-        String closingTransactionHash = channelNode.get("closing_tx_hash").textValue();
+        TransactionHash openingTransactionHash = parseOpeningTransaction(channelNode);
+        TransactionHash closingTransactionHash = new TransactionHash(channelNode.get("closing_tx_hash").textValue());
         Transaction openingTransaction = transactionService.getTransactionDetails(openingTransactionHash);
         Transaction closingTransaction = transactionService.getTransactionDetails(closingTransactionHash);
         return ClosedChannel.builder()
@@ -67,10 +69,11 @@ public class ClosedChannelsParser {
                 .build();
     }
 
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private Set<Resolution> getResolutions(JsonNode channelNode) {
         Set<Resolution> result = new LinkedHashSet<>();
         for (JsonNode resolutionNode : channelNode.get("resolutions")) {
-            String sweepTransactionHash = resolutionNode.get("sweep_txid").textValue();
+            TransactionHash sweepTransactionHash = new TransactionHash(resolutionNode.get("sweep_txid").textValue());
             String resolutionType = resolutionNode.get("resolution_type").textValue();
             String outcome = resolutionNode.get("outcome").textValue();
             result.add(new Resolution(sweepTransactionHash, resolutionType, outcome));
@@ -78,13 +81,13 @@ public class ClosedChannelsParser {
         return result;
     }
 
-    private Set<String> getValidTransactionHashes(JsonNode channelNode) {
+    private Set<TransactionHash> getValidTransactionHashes(JsonNode channelNode) {
         int closeHeight = channelNode.get("close_height").intValue();
         if (closeHeight == 0) {
             return Set.of();
         }
-        Set<String> hashes = new LinkedHashSet<>();
-        hashes.add(channelNode.get("closing_tx_hash").textValue());
+        Set<TransactionHash> hashes = new LinkedHashSet<>();
+        hashes.add(new TransactionHash(channelNode.get("closing_tx_hash").textValue()));
         hashes.add(parseOpeningTransaction(channelNode));
         if (hashes.contains(UNKNOWN_HASH)) {
             return Set.of();
@@ -92,8 +95,8 @@ public class ClosedChannelsParser {
         return hashes;
     }
 
-    private String parseOpeningTransaction(JsonNode channel) {
+    private TransactionHash parseOpeningTransaction(JsonNode channel) {
         String channelPoint = channel.get("channel_point").textValue();
-        return channelPoint.substring(0, channelPoint.indexOf(':'));
+        return ChannelPointParser.getTransactionHash(channelPoint);
     }
 }

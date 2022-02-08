@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import de.cotto.bitbook.backend.model.Address;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.deserialization.AddressTransactionsDto;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import java.util.Set;
 
 @JsonDeserialize(using = BitapsAddressTransactionsDto.Deserializer.class)
 public class BitapsAddressTransactionsDto extends AddressTransactionsDto {
-    public BitapsAddressTransactionsDto(Set<String> hashes) {
+    public BitapsAddressTransactionsDto(Set<TransactionHash> hashes) {
         super(Address.NONE, hashes);
     }
 
@@ -42,10 +43,10 @@ public class BitapsAddressTransactionsDto extends AddressTransactionsDto {
             }
         }
 
-        private Set<String> getHashes(JsonNode detailsNode) {
-            Set<String> hashes = new LinkedHashSet<>();
+        private Set<TransactionHash> getHashes(JsonNode detailsNode) {
+            Set<TransactionHash> hashes = new LinkedHashSet<>();
             for (JsonNode transactionNode : detailsNode.get("list")) {
-                hashes.add(transactionNode.get("txId").textValue());
+                hashes.add(new TransactionHash(transactionNode.get("txId").textValue()));
             }
             return hashes;
         }

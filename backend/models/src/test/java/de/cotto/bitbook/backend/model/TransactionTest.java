@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_2;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
@@ -21,6 +19,8 @@ import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_VALUE_1;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_VALUE_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.FEES;
@@ -33,7 +33,7 @@ class TransactionTest {
 
     @Test
     void unknown_transaction_is_equal_to_any_transaction_with_empty_hash() {
-        assertThat(Transaction.UNKNOWN).isEqualTo(new Transaction("", BLOCK_HEIGHT));
+        assertThat(Transaction.UNKNOWN).isEqualTo(new Transaction(TransactionHash.NONE, BLOCK_HEIGHT));
     }
 
     @Test
@@ -183,7 +183,7 @@ class TransactionTest {
 
     @Test
     void testToString_unknown() {
-        assertThat(new Transaction("", BLOCK_HEIGHT)).hasToString("Transaction{UNKNOWN}");
+        assertThat(new Transaction(TransactionHash.NONE, BLOCK_HEIGHT)).hasToString("Transaction{UNKNOWN}");
     }
 
     @Test
@@ -198,7 +198,7 @@ class TransactionTest {
 
     @Test
     void testEquals_both_unknown() {
-        assertThat(new Transaction("", BLOCK_HEIGHT)).isEqualTo(Transaction.UNKNOWN);
+        assertThat(new Transaction(TransactionHash.NONE, BLOCK_HEIGHT)).isEqualTo(Transaction.UNKNOWN);
     }
 
     @Test

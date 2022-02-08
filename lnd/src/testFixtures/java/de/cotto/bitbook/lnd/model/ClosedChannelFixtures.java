@@ -5,6 +5,7 @@ import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 import de.cotto.bitbook.backend.model.Output;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 
 import java.util.List;
 import java.util.Set;
@@ -73,7 +74,7 @@ public class ClosedChannelFixtures {
             ))
             .build();
 
-    public static final String SWEEP_TRANSACTION_HASH = "sweep_transaction_hash";
+    public static final TransactionHash SWEEP_TRANSACTION_HASH = new TransactionHash("sweep_transaction_hash");
     public static final Coins RESOLUTION_AMOUNT = Coins.ofSatoshis(987_654_321L);
     @SuppressWarnings("CPD-START")
     public static final ClosedChannel WITH_RESOLUTION = ClosedChannel.builder()
@@ -117,6 +118,6 @@ public class ClosedChannelFixtures {
             .withSettledBalance(SETTLED_BALANCE)
             .withOpenInitiator(OPEN_INITIATOR)
             .withCloseType(CloseType.COOPERATIVE_REMOTE)
-            .withResolutions(Set.of(new Resolution(" ", "resolutionType", "outcome")))
+            .withResolutions(Set.of(new Resolution(new TransactionHash(" "), "resolutionType", "outcome")))
             .build();
 }

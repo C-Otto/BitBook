@@ -10,12 +10,12 @@ public class AddressTransactions {
 
     public static final AddressTransactions UNKNOWN = new AddressTransactions(Address.NONE, Collections.emptySet(), 0);
     private final Address address;
-    private final Set<String> transactionHashes;
+    private final Set<TransactionHash> transactionHashes;
     private final int lastCheckedAtBlockHeight;
 
     public AddressTransactions(
             Address address,
-            Set<String> transactionHashes,
+            Set<TransactionHash> transactionHashes,
             int lastCheckedAtBlockHeight
     ) {
         this.address = address;
@@ -27,7 +27,7 @@ public class AddressTransactions {
         return address;
     }
 
-    public Set<String> getTransactionHashes() {
+    public Set<TransactionHash> getTransactionHashes() {
         return Collections.unmodifiableSet(transactionHashes);
     }
 
@@ -40,7 +40,7 @@ public class AddressTransactions {
     }
 
     public AddressTransactions getCombined(AddressTransactions update) {
-        Set<String> combinedTransactionHashes = new HashSet<>();
+        Set<TransactionHash> combinedTransactionHashes = new HashSet<>();
         combinedTransactionHashes.addAll(transactionHashes);
         combinedTransactionHashes.addAll(update.transactionHashes);
         int newLastCheckedAtBlockHeight = Math.max(lastCheckedAtBlockHeight, update.lastCheckedAtBlockHeight);

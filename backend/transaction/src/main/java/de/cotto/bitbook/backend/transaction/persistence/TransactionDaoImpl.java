@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.TransactionDao;
 import org.springframework.stereotype.Component;
 
@@ -16,8 +17,8 @@ public class TransactionDaoImpl implements TransactionDao {
     }
 
     @Override
-    public Transaction getTransaction(String transactionHash) {
-        return transactionRepository.findById(transactionHash)
+    public Transaction getTransaction(TransactionHash transactionHash) {
+        return transactionRepository.findById(transactionHash.toString())
                 .map(TransactionJpaDto::toModel)
                 .orElse(Transaction.UNKNOWN);
     }

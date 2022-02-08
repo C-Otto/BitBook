@@ -18,8 +18,8 @@ import org.springframework.shell.CompletionProposal;
 import java.util.List;
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS_2;
 import static de.cotto.bitbook.ownership.OwnershipStatus.FOREIGN;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 import static de.cotto.bitbook.ownership.OwnershipStatus.UNKNOWN;

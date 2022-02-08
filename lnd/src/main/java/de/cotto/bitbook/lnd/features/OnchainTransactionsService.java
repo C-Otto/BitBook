@@ -7,6 +7,7 @@ import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.InputOutput;
 import de.cotto.bitbook.backend.model.Output;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.lnd.model.OnchainTransaction;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
@@ -88,7 +89,7 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
         if (nonNegativeAmount || notOpenChannelLabel) {
             return 0;
         }
-        String transactionHash = onchainTransaction.getTransactionHash();
+        TransactionHash transactionHash = onchainTransaction.getTransactionHash();
         Transaction transaction = transactionService.getTransactionDetails(transactionHash);
         if (hasUnownedInput(transaction) || hasMismatchedInputDescription(transaction)) {
             return 0;
@@ -127,7 +128,7 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
         return !absoluteAmountWithoutFees.equals(channelOpenOutput.getValue());
     }
 
-    private void setInitiatorInTransactionDescription(String transactionHash) {
+    private void setInitiatorInTransactionDescription(TransactionHash transactionHash) {
         String expectedPrefix = "Opening Channel with ";
         String existingDescription = transactionDescriptionService.getDescription(transactionHash);
         if (existingDescription.startsWith(expectedPrefix) && existingDescription.endsWith(" (unknown)")) {

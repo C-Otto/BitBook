@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.persistence;
 
 import de.cotto.bitbook.backend.TransactionWithDescriptionDao;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.model.TransactionWithDescription;
 import org.springframework.stereotype.Component;
 
@@ -19,8 +20,8 @@ public class TransactionWithDescriptionDaoImpl implements TransactionWithDescrip
     }
 
     @Override
-    public TransactionWithDescription get(String transactionHash) {
-        return repository.findById(transactionHash)
+    public TransactionWithDescription get(TransactionHash transactionHash) {
+        return repository.findById(transactionHash.toString())
                 .map(TransactionWithDescriptionJpaDto::toModel)
                 .orElseGet(() -> new TransactionWithDescription(transactionHash));
     }
@@ -31,8 +32,8 @@ public class TransactionWithDescriptionDaoImpl implements TransactionWithDescrip
     }
 
     @Override
-    public void remove(String transactionHash) {
-        repository.deleteById(transactionHash);
+    public void remove(TransactionHash transactionHash) {
+        repository.deleteById(transactionHash.toString());
     }
 
     @Override

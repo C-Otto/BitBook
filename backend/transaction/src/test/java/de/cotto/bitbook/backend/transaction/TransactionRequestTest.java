@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.TransactionHash;
 import org.junit.jupiter.api.Test;
 
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
@@ -43,7 +44,7 @@ class TransactionRequestTest {
 
     @Test
     void testEquals_different_hash() {
-        assertThat(TRANSACTION_REQUEST).isNotEqualTo(new TransactionRequest("xxx", STANDARD));
+        assertThat(TRANSACTION_REQUEST).isNotEqualTo(new TransactionRequest(new TransactionHash("xxx"), STANDARD));
     }
 
     @Test

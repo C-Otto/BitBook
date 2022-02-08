@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.lnd.model.OnchainTransaction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,8 +37,8 @@ class OnchainTransactionsParserTest {
                       "{\"tx_hash\": \"b\", \"total_fees\": \"0\", \"amount\": \"111\", \"label\": \"xxx\"}" +
                       "]}";
         assertThat(onchainTransactionsParser.parse(toJsonNode(json))).containsExactlyInAnyOrder(
-                new OnchainTransaction("a", "", Coins.ofSatoshis(900), Coins.ofSatoshis(12)),
-                new OnchainTransaction("b", "xxx", Coins.ofSatoshis(111), Coins.NONE)
+                new OnchainTransaction(new TransactionHash("a"), "", Coins.ofSatoshis(900), Coins.ofSatoshis(12)),
+                new OnchainTransaction(new TransactionHash("b"), "xxx", Coins.ofSatoshis(111), Coins.NONE)
         );
     }
 

@@ -17,7 +17,7 @@ public class TransactionJpaDtoFixtures {
 
     static {
         TRANSACTION_JPA_DTO = new TransactionJpaDto();
-        TRANSACTION_JPA_DTO.setHash(TRANSACTION_HASH);
+        TRANSACTION_JPA_DTO.setHash(TRANSACTION_HASH.toString());
         TRANSACTION_JPA_DTO.setBlockHeight(BLOCK_HEIGHT);
         TRANSACTION_JPA_DTO.setTime(DATE_TIME.toEpochSecond(ZoneOffset.UTC));
         TRANSACTION_JPA_DTO.setFees(FEES.getSatoshis());

@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.persistence;
 
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.model.TransactionWithDescription;
 
 import javax.annotation.Nonnull;
@@ -29,7 +30,7 @@ public class TransactionWithDescriptionJpaDto {
     }
 
     public static TransactionWithDescriptionJpaDto fromModel(TransactionWithDescription model) {
-        return new TransactionWithDescriptionJpaDto(model.getTransactionHash(), model.getDescription());
+        return new TransactionWithDescriptionJpaDto(model.getTransactionHash().toString(), model.getDescription());
     }
 
     public TransactionWithDescription toModel() {
@@ -39,8 +40,8 @@ public class TransactionWithDescriptionJpaDto {
         return new TransactionWithDescription(getTransactionHash(), getDescription());
     }
 
-    public String getTransactionHash() {
-        return Objects.requireNonNull(transactionHash);
+    public TransactionHash getTransactionHash() {
+        return new TransactionHash(Objects.requireNonNull(transactionHash));
     }
 
     public String getDescription() {

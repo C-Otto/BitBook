@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction.blockchaininfo;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.deserialization.DefaultInputOutputDtoDeserializer;
 import de.cotto.bitbook.backend.transaction.deserialization.InputDto;
 import de.cotto.bitbook.backend.transaction.deserialization.OutputDto;
@@ -14,7 +15,7 @@ import java.util.List;
 @JsonDeserialize(using = BlockchainInfoTransactionDto.Deserializer.class)
 public class BlockchainInfoTransactionDto extends TransactionDto {
     public BlockchainInfoTransactionDto(
-            String hash,
+            TransactionHash hash,
             int blockHeight,
             LocalDateTime time,
             long fees,
@@ -58,7 +59,7 @@ public class BlockchainInfoTransactionDto extends TransactionDto {
 
         @Override
         protected BlockchainInfoTransactionDto createDtoInstance(
-                String hash,
+                TransactionHash hash,
                 int blockHeight,
                 LocalDateTime time,
                 long fees,

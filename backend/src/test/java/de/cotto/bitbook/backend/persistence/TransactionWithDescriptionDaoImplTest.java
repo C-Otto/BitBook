@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.persistence;
 
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.model.TransactionWithDescription;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,24 +27,24 @@ class TransactionWithDescriptionDaoImplTest {
 
     @Test
     void get() {
-        String transactionHash = "xxx";
+        TransactionHash transactionHash = new TransactionHash("xxx");
         String description = "description";
-        when(repository.findById(transactionHash)).thenReturn(
-                Optional.of(new TransactionWithDescriptionJpaDto(transactionHash, description))
+        when(repository.findById(transactionHash.toString())).thenReturn(
+                Optional.of(new TransactionWithDescriptionJpaDto(transactionHash.toString(), description))
         );
         assertThat(dao.get(transactionHash)).isEqualTo(new TransactionWithDescription(transactionHash, description));
     }
 
     @Test
     void get_not_found() {
-        String transactionHash = "xxx";
-        when(repository.findById(transactionHash)).thenReturn(Optional.empty());
+        TransactionHash transactionHash = new TransactionHash("xxx");
+        when(repository.findById(transactionHash.toString())).thenReturn(Optional.empty());
         assertThat(dao.get(transactionHash)).isEqualTo(new TransactionWithDescription(transactionHash));
     }
 
     @Test
     void save() {
-        String transactionHash = "xxx";
+        TransactionHash transactionHash = new TransactionHash("xxx");
         String description = "description";
         dao.save(new TransactionWithDescription(transactionHash, description));
         verify(repository).save(argThat(dto -> dto.getTransactionHash().equals(transactionHash)));
@@ -52,7 +53,7 @@ class TransactionWithDescriptionDaoImplTest {
 
     @Test
     void remove() {
-        dao.remove("a");
+        dao.remove(new TransactionHash("a"));
         verify(repository).deleteById("a");
     }
 
@@ -62,6 +63,6 @@ class TransactionWithDescriptionDaoImplTest {
         when(repository.findByDescriptionContaining(infix))
                 .thenReturn(Set.of(new TransactionWithDescriptionJpaDto("x", "y")));
         assertThat(dao.findWithDescriptionInfix(infix))
-                .containsExactly(new TransactionWithDescription("x", "y"));
+                .containsExactly(new TransactionWithDescription(new TransactionHash("x"), "y"));
     }
 }

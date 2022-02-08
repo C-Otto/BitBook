@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction.deserialization;
 
 import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
+import de.cotto.bitbook.backend.model.TransactionHash;
 
 import java.util.Set;
 
@@ -9,9 +10,9 @@ import static java.util.Objects.requireNonNull;
 
 public class AddressTransactionsDto {
     private final Address address;
-    private final Set<String> transactionHashes;
+    private final Set<TransactionHash> transactionHashes;
 
-    protected AddressTransactionsDto(Address address, Set<String> transactionHashes) {
+    protected AddressTransactionsDto(Address address, Set<TransactionHash> transactionHashes) {
         this.address = address;
         this.transactionHashes = transactionHashes;
     }
@@ -29,7 +30,7 @@ public class AddressTransactionsDto {
         return address;
     }
 
-    public Set<String> getTransactionHashes() {
+    public Set<TransactionHash> getTransactionHashes() {
         return transactionHashes;
     }
 

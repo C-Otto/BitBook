@@ -23,18 +23,18 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.TRANSACTION_HASH_3;
 import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_3;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
@@ -120,7 +120,7 @@ class TransactionsCommandsTest {
 
         assertThat(details)
                 .startsWith("Address: " + ADDRESS + " ?\nDescription: \nTransaction hashes (2):")
-                .contains(TRANSACTION_HASH_2)
+                .contains(TRANSACTION_HASH_2.toString())
                 .endsWith("\n[Details for at least one transaction could not be downloaded]");
     }
 
@@ -135,7 +135,7 @@ class TransactionsCommandsTest {
 
         assertThat(details)
                 .startsWith("Address: " + ADDRESS + " ?\nDescription: \nTransaction hashes (2):")
-                .contains(TRANSACTION_HASH)
+                .contains(TRANSACTION_HASH.toString())
                 .endsWith("\n[Details for at least one transaction could not be downloaded]");
     }
 

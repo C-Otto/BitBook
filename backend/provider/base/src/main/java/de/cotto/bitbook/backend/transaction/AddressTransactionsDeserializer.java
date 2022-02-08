@@ -3,6 +3,7 @@ package de.cotto.bitbook.backend.transaction;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import de.cotto.bitbook.backend.model.TransactionHash;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
@@ -14,23 +15,23 @@ public abstract class AddressTransactionsDeserializer<T> extends JsonDeserialize
         super();
     }
 
-    protected Set<String> parseHashesWithLimit(JsonParser jsonParser, int limit) throws IOException {
+    protected Set<TransactionHash> parseHashesWithLimit(JsonParser jsonParser, int limit) throws IOException {
         JsonNode rootNode = jsonParser.getCodec().readTree(jsonParser);
 
-        Set<String> transactionHashes = getTransactionHashes(rootNode);
+        Set<TransactionHash> transactionHashes = getTransactionHashes(rootNode);
         if (transactionHashes.size() >= limit) {
             throw new IllegalStateException();
         }
         return transactionHashes;
     }
 
-    protected Set<String> getTransactionHashes(JsonNode rootNode) {
-        Set<String> result = new LinkedHashSet<>();
+    protected Set<TransactionHash> getTransactionHashes(JsonNode rootNode) {
+        Set<TransactionHash> result = new LinkedHashSet<>();
         for (JsonNode transactionReferenceNode : rootNode) {
             getHash(transactionReferenceNode).ifPresent(result::add);
         }
         return result;
     }
 
-    protected abstract Optional<String> getHash(JsonNode transactionReferenceNode);
+    protected abstract Optional<TransactionHash> getHash(JsonNode transactionReferenceNode);
 }

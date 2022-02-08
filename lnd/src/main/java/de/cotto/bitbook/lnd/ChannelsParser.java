@@ -2,6 +2,7 @@ package de.cotto.bitbook.lnd;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.lnd.model.Channel;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,7 @@ public class ChannelsParser {
     }
 
     private void preloadTransactionDetails(JsonNode channels) {
-        Set<String> hashes = new LinkedHashSet<>();
+        Set<TransactionHash> hashes = new LinkedHashSet<>();
         for (JsonNode channelNode : channels) {
             hashes.add(getOpeningTransactionHash(channelNode));
         }
@@ -52,13 +53,13 @@ public class ChannelsParser {
                 getOutputIndex(channelNode)));
     }
 
-    private String getOpeningTransactionHash(JsonNode channelNode) {
+    private TransactionHash getOpeningTransactionHash(JsonNode channelNode) {
         String channelPoint = channelNode.get("channel_point").textValue();
-        return channelPoint.substring(0, channelPoint.indexOf(':'));
+        return ChannelPointParser.getTransactionHash(channelPoint);
     }
 
     private int getOutputIndex(JsonNode channelNode) {
         String channelPoint = channelNode.get("channel_point").textValue();
-        return Integer.parseInt(channelPoint.substring(channelPoint.indexOf(':') + 1));
+        return ChannelPointParser.getOutputIndex(channelPoint);
     }
 }

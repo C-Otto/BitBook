@@ -8,11 +8,11 @@ import de.cotto.bitbook.backend.model.Transaction;
 
 import java.util.List;
 
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.TRANSACTION_HASH_3;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_3;
 
 public class ChannelFixtures {
     public static final Coins CHANNEL_CAPACITY = Coins.ofSatoshis(555);

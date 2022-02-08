@@ -7,14 +7,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static de.cotto.bitbook.backend.model.AddressTransactions.UNKNOWN;
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_UPDATED;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.TRANSACTION_HASH_3;
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.TRANSACTION_HASH_4;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_3;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_4;
 import static java.util.Collections.emptySet;
 import static nl.jqno.equalsverifier.Warning.NULL_FIELDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +44,7 @@ class AddressTransactionsTest {
     @Test
     void testToString_many_transactions() {
         AddressTransactions addressTransactions =
-                new AddressTransactions(ADDRESS, manyStrings(10), LAST_CHECKED_AT_BLOCK_HEIGHT);
+                new AddressTransactions(ADDRESS, manyHashes(10), LAST_CHECKED_AT_BLOCK_HEIGHT);
         assertThat(addressTransactions).hasToString(
                 "AddressTransactions{" +
                 "address='" + ADDRESS + "'" +
@@ -56,7 +56,7 @@ class AddressTransactionsTest {
     @Test
     void testToString_too_many_transactions() {
         AddressTransactions addressTransactions =
-                new AddressTransactions(ADDRESS, manyStrings(11), LAST_CHECKED_AT_BLOCK_HEIGHT);
+                new AddressTransactions(ADDRESS, manyHashes(11), LAST_CHECKED_AT_BLOCK_HEIGHT);
         assertThat(addressTransactions).hasToString(
                 "AddressTransactions{" +
                 "address='" + ADDRESS + "'" +
@@ -79,7 +79,7 @@ class AddressTransactionsTest {
 
     @Test
     void transactionHashes_is_copy_of_original_set() {
-        Set<String> transactionHashes = new LinkedHashSet<>();
+        Set<TransactionHash> transactionHashes = new LinkedHashSet<>();
         transactionHashes.add(TRANSACTION_HASH);
         AddressTransactions addressTransactions = new AddressTransactions(ADDRESS, transactionHashes, 456);
         transactionHashes.clear();
@@ -108,7 +108,7 @@ class AddressTransactionsTest {
 
     @Test
     void getCombined() {
-        Set<String> transactionHashes = Set.of(TRANSACTION_HASH_3, TRANSACTION_HASH_4);
+        Set<TransactionHash> transactionHashes = Set.of(TRANSACTION_HASH_3, TRANSACTION_HASH_4);
         AddressTransactions update = new AddressTransactions(
                 ADDRESS,
                 transactionHashes,
@@ -123,10 +123,10 @@ class AddressTransactionsTest {
         assertThat(ADDRESS_TRANSACTIONS.getCombined(update)).isEqualTo(ADDRESS_TRANSACTIONS);
     }
 
-    private Set<String> manyStrings(int howMany) {
-        Set<String> result = new LinkedHashSet<>();
+    private Set<TransactionHash> manyHashes(int howMany) {
+        Set<TransactionHash> result = new LinkedHashSet<>();
         for (int i = 0; i < howMany; i++) {
-            result.add(String.valueOf(i));
+            result.add(new TransactionHash(String.valueOf(i)));
         }
         return result;
     }

@@ -26,9 +26,9 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.model.Chain.BTC;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_3;

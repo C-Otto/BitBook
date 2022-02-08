@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import de.cotto.bitbook.backend.model.Address;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.deserialization.AddressTransactionsDto;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import java.util.Set;
 
 @JsonDeserialize(using = BtcComAddressTransactionsDto.Deserializer.class)
 public class BtcComAddressTransactionsDto extends AddressTransactionsDto {
-    public BtcComAddressTransactionsDto(Set<String> transactionHashes) {
+    public BtcComAddressTransactionsDto(Set<TransactionHash> transactionHashes) {
         super(Address.NONE, transactionHashes);
     }
 
@@ -33,11 +34,11 @@ public class BtcComAddressTransactionsDto extends AddressTransactionsDto {
             return new BtcComAddressTransactionsDto(getTransactionHashes(rootNode));
         }
 
-        private Set<String> getTransactionHashes(JsonNode rootNode) {
+        private Set<TransactionHash> getTransactionHashes(JsonNode rootNode) {
             int expectedNumberOfTransactions = rootNode.get("data").get("total_count").intValue();
-            Set<String> result = new LinkedHashSet<>();
+            Set<TransactionHash> result = new LinkedHashSet<>();
             for (JsonNode transactionNode : rootNode.get("data").get("list")) {
-                result.add(transactionNode.get("hash").textValue());
+                result.add(new TransactionHash(transactionNode.get("hash").textValue()));
             }
             if (result.size() != expectedNumberOfTransactions) {
                 throw new IllegalStateException();

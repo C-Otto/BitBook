@@ -3,6 +3,7 @@ package de.cotto.bitbook.lnd;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.cotto.bitbook.backend.model.Address;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.lnd.features.ChannelsService;
 import de.cotto.bitbook.lnd.features.ClosedChannelsService;
 import de.cotto.bitbook.lnd.features.OnchainTransactionsService;
@@ -50,7 +51,7 @@ public class LndService extends AbstractJsonService {
     }
 
     public long addFromSweeps(String json) {
-        Set<String> hashes = parse(json, this::parseSweepTransactionHashes);
+        Set<TransactionHash> hashes = parse(json, this::parseSweepTransactionHashes);
         return sweepTransactionsService.addFromSweeps(hashes);
     }
 
@@ -74,7 +75,7 @@ public class LndService extends AbstractJsonService {
         return onchainTransactionsService.addFromOnchainTransactions(onchainTransactions);
     }
 
-    private Set<String> parseSweepTransactionHashes(JsonNode rootNode) {
+    private Set<TransactionHash> parseSweepTransactionHashes(JsonNode rootNode) {
         JsonNode sweeps = rootNode.get("Sweeps");
         if (sweeps == null) {
             return Set.of();
@@ -87,9 +88,9 @@ public class LndService extends AbstractJsonService {
         if (hashesArray == null) {
             return Set.of();
         }
-        Set<String> hashes = new LinkedHashSet<>();
+        Set<TransactionHash> hashes = new LinkedHashSet<>();
         for (JsonNode hash : hashesArray) {
-            hashes.add(hash.textValue());
+            hashes.add(new TransactionHash(hash.textValue()));
         }
         return hashes;
     }

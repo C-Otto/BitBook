@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction.btccom;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.deserialization.InputDto;
 import de.cotto.bitbook.backend.transaction.deserialization.MultiAddressInputOutputDtoDeserializer;
 import de.cotto.bitbook.backend.transaction.deserialization.OutputDto;
@@ -15,7 +16,7 @@ import java.util.Set;
 @JsonDeserialize(using = BtcComTransactionDto.Deserializer.class)
 public class BtcComTransactionDto extends TransactionDto {
     public BtcComTransactionDto(
-            String hash,
+            TransactionHash hash,
             int blockHeight,
             LocalDateTime time,
             long fees,
@@ -49,7 +50,7 @@ public class BtcComTransactionDto extends TransactionDto {
 
         @Override
         protected BtcComTransactionDto createDtoInstance(
-                String hash,
+                TransactionHash hash,
                 int blockHeight,
                 LocalDateTime time,
                 long fees,

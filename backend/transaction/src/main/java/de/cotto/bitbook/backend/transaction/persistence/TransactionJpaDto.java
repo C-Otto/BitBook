@@ -5,6 +5,7 @@ import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 import de.cotto.bitbook.backend.model.Output;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -47,7 +48,7 @@ class TransactionJpaDto {
 
     protected static TransactionJpaDto fromModel(Transaction transaction) {
         TransactionJpaDto dto = new TransactionJpaDto();
-        dto.setHash(transaction.getHash());
+        dto.setHash(transaction.getHash().toString());
         dto.setBlockHeight(transaction.getBlockHeight());
         dto.setTime(transaction.getTime().toEpochSecond(ZoneOffset.UTC));
         dto.setFees(transaction.getFees().getSatoshis());
@@ -67,7 +68,7 @@ class TransactionJpaDto {
                 .map(OutputJpaDto::toModel)
                 .collect(toList());
         return new Transaction(
-                hash,
+                new TransactionHash(hash),
                 blockHeight,
                 LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC),
                 Coins.ofSatoshis(fees),

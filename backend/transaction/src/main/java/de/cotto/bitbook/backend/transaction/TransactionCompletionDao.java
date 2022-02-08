@@ -1,9 +1,11 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.TransactionHash;
+
 import java.util.Set;
 
 public interface TransactionCompletionDao {
-    Set<String> completeFromTransactionDetails(String hashPrefix);
+    Set<TransactionHash> completeFromTransactionDetails(String hashPrefix);
 
-    Set<String> completeFromAddressTransactionHashes(String hashPrefix);
+    Set<TransactionHash> completeFromAddressTransactionHashes(String hashPrefix);
 }

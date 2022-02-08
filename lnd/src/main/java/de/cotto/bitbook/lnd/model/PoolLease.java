@@ -1,11 +1,12 @@
 package de.cotto.bitbook.lnd.model;
 
 import de.cotto.bitbook.backend.model.Coins;
+import de.cotto.bitbook.backend.model.TransactionHash;
 
 import java.util.Objects;
 
 public class PoolLease {
-    private final String transactionHash;
+    private final TransactionHash transactionHash;
     private final int outputIndex;
     private final String pubkey;
     private final Coins premium;
@@ -13,7 +14,7 @@ public class PoolLease {
     private final Coins chainFee;
 
     public PoolLease(
-            String transactionHash,
+            TransactionHash transactionHash,
             int outputIndex,
             String pubkey,
             Coins premium,
@@ -28,7 +29,7 @@ public class PoolLease {
         this.chainFee = chainFee;
     }
 
-    public String getTransactionHash() {
+    public TransactionHash getTransactionHash() {
         return transactionHash;
     }
 

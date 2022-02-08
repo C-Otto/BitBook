@@ -1,21 +1,21 @@
 package de.cotto.bitbook.backend.model;
 
-public class AddressWithDescription extends StringWithDescription<AddressWithDescription> {
+public class AddressWithDescription extends ModelWithDescription<Address, AddressWithDescription> {
     public AddressWithDescription(Address address) {
         this(address, "");
     }
 
     public AddressWithDescription(Address address, String description) {
-        super(address.toString(), description);
+        super(address, description);
     }
 
     @Override
     protected String getFormattedString() {
-        return padOrShorten(getString(), 45);
+        return padOrShorten(getModel().toString(), 45);
     }
 
     public Address getAddress() {
-        return new Address(getString());
+        return getModel();
     }
 
     public String getFormattedAddress() {

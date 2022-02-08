@@ -9,6 +9,7 @@ import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 import de.cotto.bitbook.backend.model.Output;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,10 +23,12 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
+import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
@@ -45,26 +48,30 @@ class TransactionUpdateHeuristicsTest {
 
     private static final Address ADDRESS = ADDRESS_TRANSACTIONS.getAddress();
 
-    private static final Set<String> FEW_TRANSACTION_HASHES =
-            Set.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
+    private static final Set<TransactionHash> FEW_TRANSACTION_HASHES =
+            Stream.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+                    .map(TransactionHash::new)
+                    .collect(toSet());
     private static final AddressTransactions FEW_TRANSACTIONS =
             new AddressTransactions(ADDRESS, FEW_TRANSACTION_HASHES, LAST_CHECKED_AT_BLOCK_HEIGHT);
 
-    private static final Set<String> MANY_TRANSACTION_HASHES =
-            Set.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11");
+    private static final Set<TransactionHash> MANY_TRANSACTION_HASHES =
+            Stream.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11")
+                    .map(TransactionHash::new)
+                    .collect(toSet());
     private static final AddressTransactions MANY_TRANSACTIONS =
             new AddressTransactions(ADDRESS, MANY_TRANSACTION_HASHES, LAST_CHECKED_AT_BLOCK_HEIGHT);
 
     private static final AddressTransactions WITH_RECENT_TRANSACTIONS =
-            new AddressTransactions(ADDRESS, Set.of("recent"), LAST_CHECKED_AT_BLOCK_HEIGHT);
+            new AddressTransactions(ADDRESS, Set.of(new TransactionHash("recent")), LAST_CHECKED_AT_BLOCK_HEIGHT);
     private static final AddressTransactions WITH_OLD_TRANSACTIONS =
-            new AddressTransactions(ADDRESS, Set.of("old"), LAST_CHECKED_AT_BLOCK_HEIGHT);
+            new AddressTransactions(ADDRESS, Set.of(new TransactionHash("old")), LAST_CHECKED_AT_BLOCK_HEIGHT);
 
     private static final AddressTransactions ONE_HASH =
-            new AddressTransactions(ADDRESS, Set.of("foo"), LAST_CHECKED_AT_BLOCK_HEIGHT);
+            new AddressTransactions(ADDRESS, Set.of(new TransactionHash("foo")), LAST_CHECKED_AT_BLOCK_HEIGHT);
     private static final AddressTransactions TWO_HASHES = ADDRESS_TRANSACTIONS;
 
-    private static final String SWEEP_TX_HASH = "sweep-tx";
+    private static final TransactionHash SWEEP_TX_HASH = new TransactionHash("sweep-tx");
     private static final AddressTransactions WITH_SWEEP_TRANSACTION =
             new AddressTransactions(ADDRESS, Set.of(SWEEP_TX_HASH), LAST_CHECKED_AT_BLOCK_HEIGHT);
 
@@ -89,7 +96,7 @@ class TransactionUpdateHeuristicsTest {
     @BeforeEach
     void setUp() {
         lenient().when(transactionDao.getTransaction(any())).thenReturn(Transaction.UNKNOWN);
-        lenient().when(transactionDao.getTransaction("recent")).thenReturn(new Transaction(
+        lenient().when(transactionDao.getTransaction(new TransactionHash("recent"))).thenReturn(new Transaction(
                 TRANSACTION.getHash(),
                 TRANSACTION.getBlockHeight(),
                 LocalDateTime.now(ZoneOffset.UTC).minusDays(6).minusHours(12),
@@ -97,7 +104,7 @@ class TransactionUpdateHeuristicsTest {
                 List.of(),
                 List.of()
         ));
-        lenient().when(transactionDao.getTransaction("old")).thenReturn(new Transaction(
+        lenient().when(transactionDao.getTransaction(new TransactionHash("old"))).thenReturn(new Transaction(
                 TRANSACTION.getHash(),
                 TRANSACTION.getBlockHeight(),
                 LocalDateTime.now(ZoneOffset.UTC).minusDays(7).minusHours(12),

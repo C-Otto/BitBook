@@ -10,10 +10,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_UPDATED;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.transaction.blockstream.BlockstreamAddressTransactionsFixtures.BLOCKSTREAM_ADDRESS_DETAILS;
 import static de.cotto.bitbook.backend.transaction.blockstream.BlockstreamAddressTransactionsFixtures.BLOCKSTREAM_ADDRESS_UPDATED;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_3;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS_3;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
 import static org.assertj.core.api.Assertions.assertThat;
