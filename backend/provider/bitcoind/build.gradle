@@ -4,9 +4,11 @@ plugins {
 
 dependencies {
     implementation project(':backend')
+    implementation project(':backend:models')
     implementation project(':backend:provider:base')
     implementation project(':backend:blockheight')
-    testFixturesApi testFixtures(project(':backend:provider:base'))
+    testImplementation testFixtures(project(':backend:models'))
+    testFixturesImplementation testFixtures(project(':backend:provider:base'))
 }
 
 jacocoTestCoverageVerification {

@@ -8,7 +8,7 @@ ext {
 
 dependencies {
     api platform("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
-    api implementation(project(':backend:models'))
+    implementation project(':backend:models')
     api 'org.springframework.cloud:spring-cloud-starter-openfeign'
     api 'io.github.resilience4j:resilience4j-spring-boot2:1.7.1'
     api 'com.fasterxml.jackson.core:jackson-databind'

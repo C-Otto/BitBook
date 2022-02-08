@@ -3,9 +3,10 @@ plugins {
 }
 
 dependencies {
+    implementation project(':backend')
+    implementation project(':backend:models')
     implementation project(':backend:price')
     implementation project(':backend:transaction')
-    implementation project(':backend')
     implementation project(':cli:base')
     runtimeOnly project(':backend:provider:all')
     runtimeOnly project(':cli:lnd')

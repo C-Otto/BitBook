@@ -4,6 +4,8 @@ plugins {
 
 dependencies {
     implementation project(':backend')
+    implementation project(':backend:models')
     implementation project(':backend:request')
+    implementation project(':backend:request:models')
     integrationTestImplementation project(':backend:models')
 }
