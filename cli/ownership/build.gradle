@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
+    implementation project(':backend')
+    implementation project(':backend:transaction')
     implementation project(':backend:price')
     implementation project(':ownership')
     implementation project(':cli:base')
