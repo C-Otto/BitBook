@@ -5,12 +5,12 @@ plugins {
 dependencies {
     implementation project(':backend:price')
     implementation project(':backend:transaction')
-    implementation project(':backend:provider:all')
     implementation project(':backend')
-    implementation project(':cli:ownership')
-    implementation project(':cli:lnd')
     implementation project(':cli:base')
-    implementation 'org.flywaydb:flyway-core'
+    runtimeOnly project(':backend:provider:all')
+    runtimeOnly project(':cli:lnd')
+    runtimeOnly project(':cli:ownership')
+    runtimeOnly 'org.flywaydb:flyway-core'
     integrationTestImplementation project(':cli:ownership')
     testImplementation testFixtures(project(':backend:models'))
     integrationTestImplementation 'org.springframework.boot:spring-boot-starter-data-jpa'

@@ -3,8 +3,8 @@ plugins {
 }
 
 dependencies {
-    api project(':backend')
     api project(':backend:models')
+    implementation project(':backend')
     implementation project(':backend:address-transactions')
     implementation project(':backend:blockheight')
     implementation project(':backend:price')
@@ -14,4 +14,5 @@ dependencies {
     integrationTestImplementation testFixtures(project(':backend:address-transactions'))
     testFixturesImplementation testFixtures(project(':backend:address-transactions'))
     testFixturesImplementation project(':backend:request:models')
+    testFixturesImplementation 'javax.persistence:javax.persistence-api'
 }

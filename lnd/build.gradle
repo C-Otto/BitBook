@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    implementation project(':backend')
     implementation project(':backend:transaction')
     implementation project(':ownership')
     testImplementation testFixtures(project(':backend:models'))

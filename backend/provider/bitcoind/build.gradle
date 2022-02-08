@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    implementation project(':backend')
     implementation project(':backend:provider:base')
     implementation project(':backend:blockheight')
     testFixturesApi testFixtures(project(':backend:provider:base'))

@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
-    api project(':backend')
+    implementation project(':backend')
     implementation project(':backend:request')
+    integrationTestImplementation project(':backend:models')
 }

@@ -8,5 +8,6 @@ dependencies {
     testFixturesImplementation 'javax.persistence:javax.persistence-api'
     testImplementation testFixtures(project(':backend:transaction'))
     testImplementation testFixtures(project(':backend:models'))
+    integrationTestImplementation project(':backend')
     integrationTestImplementation project(':backend:transaction')
 }
