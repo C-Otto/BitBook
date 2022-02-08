@@ -9,7 +9,6 @@ dependencies {
     implementation 'org.apache.commons:commons-collections4:4.4'
     testImplementation 'uk.org.lidalia:slf4j-test:1.2.0'
     testImplementation testFixtures(project(':backend:models'))
-    integrationTestImplementation project(':backend')
     integrationTestImplementation project(':backend:models')
     integrationTestImplementation project(':backend:request:models')
     configurations.getByName('testRuntimeOnly').exclude group: 'ch.qos.logback', module: 'logback-classic'

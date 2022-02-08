@@ -3,7 +3,6 @@ plugins {
 }
 
 dependencies {
-    implementation project(':backend')
     implementation project(':backend:models')
     api 'com.fasterxml.jackson.core:jackson-databind'
     testImplementation testFixtures(project(':backend:models'))

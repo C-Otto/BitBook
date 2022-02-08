@@ -3,7 +3,6 @@ plugins {
 }
 
 dependencies {
-    implementation project(':backend')
     implementation project(':backend:models')
     implementation project(':backend:transaction')
     implementation project(':backend:price')
