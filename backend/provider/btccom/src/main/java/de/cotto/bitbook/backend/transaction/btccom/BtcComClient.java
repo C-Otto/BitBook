@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.btccom;
 
+import de.cotto.bitbook.backend.model.Address;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -16,5 +17,5 @@ public interface BtcComClient {
     Optional<BtcComTransactionDto> getTransaction(@PathVariable String transactionHash);
 
     @GetMapping("/v3/address/{address}/tx")
-    Optional<BtcComAddressTransactionsDto> getAddressDetails(@PathVariable String address);
+    Optional<BtcComAddressTransactionsDto> getAddressDetails(@PathVariable Address address);
 }

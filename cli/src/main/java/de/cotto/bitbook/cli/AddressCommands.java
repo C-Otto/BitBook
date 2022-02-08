@@ -1,6 +1,7 @@
 package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.price.model.Price;
@@ -36,11 +37,11 @@ public class AddressCommands {
     public String getBalanceForAddress(
             @ShellOption(valueProvider = AddressCompletionProvider.class) CliAddress address
     ) {
-        String addressString = address.getAddress();
-        if (addressString.isEmpty()) {
+        Address addressModel = address.getAddress();
+        if (addressModel.isInvalid()) {
             return CliAddress.ERROR_MESSAGE;
         }
-        Coins balance = balanceService.getBalance(addressString);
+        Coins balance = balanceService.getBalance(addressModel);
         Price price = priceService.getCurrentPrice(selectedChain.getChain());
         return "%s [%s]".formatted(balance, priceFormatter.format(balance, price));
     }
@@ -51,11 +52,11 @@ public class AddressCommands {
             @ShellOption(valueProvider = AddressCompletionProvider.class) CliAddress address,
             @ShellOption(defaultValue = "") String description
     ) {
-        String addressString = address.getAddress();
-        if (addressString.isEmpty()) {
+        Address addressModel = address.getAddress();
+        if (addressModel.isInvalid()) {
             return CliAddress.ERROR_MESSAGE;
         }
-        addressDescriptionService.set(addressString, description);
+        addressDescriptionService.set(addressModel, description);
         return "OK";
     }
 
@@ -63,11 +64,11 @@ public class AddressCommands {
     public String removeAddressDescription(
             @ShellOption(valueProvider = AddressWithDescriptionCompletionProvider.class) CliAddress address
     ) {
-        String addressString = address.getAddress();
-        if (addressString.isEmpty()) {
+        Address addressModel = address.getAddress();
+        if (addressModel.isInvalid()) {
             return CliAddress.ERROR_MESSAGE;
         }
-        addressDescriptionService.remove(addressString);
+        addressDescriptionService.remove(addressModel);
         return "OK";
     }
 }

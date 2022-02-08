@@ -1,6 +1,7 @@
 package de.cotto.bitbook.ownership;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.model.Coins;
@@ -75,17 +76,17 @@ class AddressOwnershipServiceTest {
 
     @Test
     void getOwnedAddresses() {
-        Set<String> addresses = Set.of(ADDRESS, ADDRESS_2);
+        Set<Address> addresses = Set.of(ADDRESS, ADDRESS_2);
         when(ownedAddressesDao.getOwnedAddresses()).thenReturn(addresses);
 
-        Set<String> ownedAddresses = addressOwnershipService.getOwnedAddresses();
+        Set<Address> ownedAddresses = addressOwnershipService.getOwnedAddresses();
 
         assertThat(ownedAddresses).isEqualTo(addresses);
     }
 
     @Test
     void getOwnedAddressesWithDescription() {
-        Set<String> addresses = Set.of(ADDRESS, ADDRESS_2);
+        Set<Address> addresses = Set.of(ADDRESS, ADDRESS_2);
         AddressWithDescription addressWithDescription1 = new AddressWithDescription(ADDRESS, "x1");
         AddressWithDescription addressWithDescription2 = new AddressWithDescription(ADDRESS_2);
         when(ownedAddressesDao.getOwnedAddresses()).thenReturn(addresses);
@@ -101,7 +102,7 @@ class AddressOwnershipServiceTest {
     class GetNeighbourTransactions {
         @Test
         void counts_transactions_only_once() {
-            Set<String> addresses = Set.of(INPUT_ADDRESS_1, ADDRESS_2);
+            Set<Address> addresses = Set.of(INPUT_ADDRESS_1, ADDRESS_2);
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(addresses);
             mockTransactionHashes(Set.of(INPUT_ADDRESS_1, ADDRESS_2), TRANSACTION);
 
@@ -112,8 +113,8 @@ class AddressOwnershipServiceTest {
 
         @Test
         void ignores_fee_owned_to_foreign() {
-            String ownedAddress = ADDRESS;
-            String foreignAddress = ADDRESS_2;
+            Address ownedAddress = ADDRESS;
+            Address foreignAddress = ADDRESS_2;
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(Set.of(ownedAddress));
             when(ownedAddressesDao.getForeignAddresses()).thenReturn(Set.of(foreignAddress));
             Transaction transactionWithFee = sendOneSatoshiTo(ownedAddress, foreignAddress);
@@ -126,8 +127,8 @@ class AddressOwnershipServiceTest {
 
         @Test
         void ignores_fee_foreign_to_owned() {
-            String foreignAddress = ADDRESS;
-            String ownedAddress = ADDRESS_2;
+            Address foreignAddress = ADDRESS;
+            Address ownedAddress = ADDRESS_2;
             when(ownedAddressesDao.getForeignAddresses()).thenReturn(Set.of(foreignAddress));
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(Set.of(ownedAddress));
             Transaction transactionWithFee = sendOneSatoshiWithFeeTo(foreignAddress, ownedAddress);
@@ -140,8 +141,8 @@ class AddressOwnershipServiceTest {
 
         @Test
         void ignores_owned_to_foreign() {
-            String ownedAddress = ADDRESS;
-            String foreignAddress = ADDRESS_2;
+            Address ownedAddress = ADDRESS;
+            Address foreignAddress = ADDRESS_2;
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(Set.of(ownedAddress));
             when(ownedAddressesDao.getForeignAddresses()).thenReturn(Set.of(foreignAddress));
             Transaction transactionToForeignAddress = getTransaction(
@@ -157,8 +158,8 @@ class AddressOwnershipServiceTest {
 
         @Test
         void foreign_to_owned_ignores_unknown_output_sibling() {
-            String foreignAddress = ADDRESS;
-            String ownedAddress = ADDRESS_2;
+            Address foreignAddress = ADDRESS;
+            Address ownedAddress = ADDRESS_2;
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(Set.of(ownedAddress));
             when(ownedAddressesDao.getForeignAddresses()).thenReturn(Set.of(foreignAddress));
             Transaction transaction = createTransactionSplittingInput(foreignAddress, ownedAddress, ADDRESS_3);
@@ -172,8 +173,8 @@ class AddressOwnershipServiceTest {
 
         @Test
         void owned_to_foreign_includes_unknown_output_sibling() {
-            String ownedAddress = ADDRESS;
-            String foreignAddress = ADDRESS_2;
+            Address ownedAddress = ADDRESS;
+            Address foreignAddress = ADDRESS_2;
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(Set.of(ownedAddress));
             when(ownedAddressesDao.getForeignAddresses()).thenReturn(Set.of(foreignAddress));
             Transaction transaction = createTransactionSplittingInput(ownedAddress, foreignAddress, ADDRESS_3);
@@ -186,9 +187,9 @@ class AddressOwnershipServiceTest {
 
         @Test
         void owned_to_owned_includes_unknown_output_sibling() {
-            String ownedAddress = ADDRESS;
-            String ownedAddress2 = ADDRESS_2;
-            Set<String> ownedAddresses = Set.of(ownedAddress, ownedAddress2);
+            Address ownedAddress = ADDRESS;
+            Address ownedAddress2 = ADDRESS_2;
+            Set<Address> ownedAddresses = Set.of(ownedAddress, ownedAddress2);
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(ownedAddresses);
             Transaction transaction = createTransactionSplittingInput(ownedAddress, ownedAddress2, ADDRESS_3);
             when(addressTransactionsService.getTransactionsForAddresses(ownedAddresses)).thenReturn(Set.of(
@@ -213,7 +214,7 @@ class AddressOwnershipServiceTest {
 
         @Test
         void unknown_to_owned() {
-            String ownedAddress = ADDRESS_2;
+            Address ownedAddress = ADDRESS_2;
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(Set.of(ownedAddress));
             Transaction transaction = getTransaction(
                     new Input(Coins.ofSatoshis(1), ADDRESS),
@@ -228,7 +229,7 @@ class AddressOwnershipServiceTest {
 
         @Test
         void returns_aggregated_coin_difference_per_transaction() {
-            Set<String> addresses = Set.of(INPUT_ADDRESS_1, INPUT_ADDRESS_2);
+            Set<Address> addresses = Set.of(INPUT_ADDRESS_1, INPUT_ADDRESS_2);
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(addresses);
             when(addressTransactionsService.getTransactionsForAddresses(addresses))
                     .thenReturn(Set.of(ADDRESS_TRANSACTIONS, ADDRESS_TRANSACTIONS_2));
@@ -245,7 +246,7 @@ class AddressOwnershipServiceTest {
         }
     }
 
-    private Transaction sendOneSatoshiWithFeeTo(String sourceAddress, String targetAddress) {
+    private Transaction sendOneSatoshiWithFeeTo(Address sourceAddress, Address targetAddress) {
         return new Transaction(
                 TRANSACTION_HASH,
                 BLOCK_HEIGHT,
@@ -256,7 +257,7 @@ class AddressOwnershipServiceTest {
         );
     }
 
-    private Transaction sendOneSatoshiTo(String sourceAddress, String targetAddress) {
+    private Transaction sendOneSatoshiTo(Address sourceAddress, Address targetAddress) {
         return new Transaction(
                 TRANSACTION_HASH,
                 BLOCK_HEIGHT,
@@ -323,9 +324,11 @@ class AddressOwnershipServiceTest {
 
     @Test
     void getBalance() {
-        when(ownedAddressesDao.getOwnedAddresses()).thenReturn(Set.of("abc", "def"));
-        when(balanceService.getBalance("abc")).thenReturn(Coins.ofSatoshis(100));
-        when(balanceService.getBalance("def")).thenReturn(Coins.ofSatoshis(23));
+        Address address1 = new Address("abc");
+        Address address2 = new Address("def");
+        when(ownedAddressesDao.getOwnedAddresses()).thenReturn(Set.of(address1, address2));
+        when(balanceService.getBalance(address1)).thenReturn(Coins.ofSatoshis(100));
+        when(balanceService.getBalance(address2)).thenReturn(Coins.ofSatoshis(23));
 
         Coins balance = addressOwnershipService.getBalance();
 
@@ -334,7 +337,7 @@ class AddressOwnershipServiceTest {
 
     @Test
     void getBalance_preloads_address_transactions() {
-        Set<String> addresses = Set.of(ADDRESS, ADDRESS_2);
+        Set<Address> addresses = Set.of(ADDRESS, ADDRESS_2);
         when(ownedAddressesDao.getOwnedAddresses()).thenReturn(addresses);
         when(balanceService.getBalance(any())).thenReturn(Coins.ofSatoshis(1));
 
@@ -354,7 +357,7 @@ class AddressOwnershipServiceTest {
     @Nested
     class GetMyTransactionsWithCoins {
 
-        private String ownedAddress;
+        private Address ownedAddress;
 
         @BeforeEach
         void setUp() {
@@ -364,7 +367,7 @@ class AddressOwnershipServiceTest {
 
         @Test
         void returns_transactions() {
-            Set<String> ownedAddresses = Set.of(ownedAddress, ADDRESS_2);
+            Set<Address> ownedAddresses = Set.of(ownedAddress, ADDRESS_2);
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(ownedAddresses);
             when(addressTransactionsService.getTransactionsForAddresses(ownedAddresses))
                     .thenReturn(Set.of(ADDRESS_TRANSACTIONS, ADDRESS_TRANSACTIONS_2));
@@ -377,8 +380,8 @@ class AddressOwnershipServiceTest {
 
         @Test
         void counts_fee() {
-            String ownedAddress2 = ADDRESS_2;
-            Set<String> ownedAddresses = Set.of(ownedAddress, ownedAddress2);
+            Address ownedAddress2 = ADDRESS_2;
+            Set<Address> ownedAddresses = Set.of(ownedAddress, ownedAddress2);
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(ownedAddresses);
             Transaction transactionWithFee = sendOneSatoshiWithFeeTo(ownedAddress, ownedAddress2);
             mockTransactionHashes(ownedAddresses, transactionWithFee);
@@ -441,10 +444,10 @@ class AddressOwnershipServiceTest {
 
         @Test
         void owned_to_other_address_with_change() {
-            String ownedAddress2 = ADDRESS_3;
-            Set<String> ownedAddresses = Set.of(this.ownedAddress, ownedAddress2);
+            Address ownedAddress2 = ADDRESS_3;
+            Set<Address> ownedAddresses = Set.of(ownedAddress, ownedAddress2);
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(ownedAddresses);
-            Transaction transaction = createTransactionSplittingInput(this.ownedAddress, ADDRESS_2, ownedAddress2);
+            Transaction transaction = createTransactionSplittingInput(ownedAddress, ADDRESS_2, ownedAddress2);
             mockTransactionHashes(ownedAddresses, transaction);
 
             assertThat(addressOwnershipService.getMyTransactionsWithCoins()).containsOnly(
@@ -453,14 +456,14 @@ class AddressOwnershipServiceTest {
         }
     }
 
-    private void mockTransactionHashes(String address, Transaction transaction) {
+    private void mockTransactionHashes(Address address, Transaction transaction) {
         mockTransactionHashes(Set.of(address), transaction);
     }
 
-    private void mockTransactionHashes(Set<String> addresses, Transaction transaction) {
+    private void mockTransactionHashes(Set<Address> addresses, Transaction transaction) {
         when(addressTransactionsService.getTransactionsForAddresses(addresses)).thenReturn(
                 Set.of(new AddressTransactions(
-                        "x",
+                        new Address("x"),
                         Set.of(TRANSACTION_HASH),
                         LAST_CHECKED_AT_BLOCK_HEIGHT
                 )));
@@ -468,7 +471,7 @@ class AddressOwnershipServiceTest {
     }
 
     @SuppressWarnings("SameParameterValue")
-    private Transaction createTransactionSplittingInput(String source, String target1, String target2) {
+    private Transaction createTransactionSplittingInput(Address source, Address target1, Address target2) {
         return getTransaction(
                 new Input(Coins.ofSatoshis(2), source),
                 new Output(Coins.ofSatoshis(1), target1),

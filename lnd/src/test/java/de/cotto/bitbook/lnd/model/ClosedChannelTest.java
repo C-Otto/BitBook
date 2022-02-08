@@ -68,7 +68,7 @@ class ClosedChannelTest {
 
     @Test
     void getChannelAddress() {
-        assertThat(CLOSED_CHANNEL.getChannelAddress()).contains(CHANNEL_ADDRESS);
+        assertThat(CLOSED_CHANNEL.getChannelAddress()).isEqualTo(CHANNEL_ADDRESS);
     }
 
     @Test

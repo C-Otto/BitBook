@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.toSet;
 
 public class Transaction {
     private static final LocalDateTime UNKNOWN_DATE_TIME = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC);
-    private static final String COINBASE_ADDRESS = "coinbase";
+    private static final Address COINBASE_ADDRESS = new Address("coinbase");
     public static final Transaction UNKNOWN = new Transaction("", 0);
 
     private final String hash;
@@ -62,7 +62,7 @@ public class Transaction {
         return new Transaction(hash, blockHeight, time, fees, List.of(coinbaseInput), outputs);
     }
 
-    public List<InputOutput> getIncomingToAndOutgoingFromAddress(String address) {
+    public List<InputOutput> getIncomingToAndOutgoingFromAddress(Address address) {
         if (getIncomingCoins(address).getSatoshis() > 0) {
             return new ArrayList<>(inputs);
         }
@@ -72,23 +72,23 @@ public class Transaction {
         return List.of();
     }
 
-    public Coins getIncomingCoins(String address) {
+    public Coins getIncomingCoins(Address address) {
         return outputs.stream().filter(input -> input.getAddress().equals(address))
                 .map(InputOutput::getValue)
                 .reduce(Coins.NONE, Coins::add);
     }
 
-    public Coins getOutgoingCoins(String address) {
+    public Coins getOutgoingCoins(Address address) {
         return inputs.stream().filter(input -> input.getAddress().equals(address))
                 .map(InputOutput::getValue)
                 .reduce(Coins.NONE, Coins::add);
     }
 
-    public Coins getDifferenceForAddress(String address) {
+    public Coins getDifferenceForAddress(Address address) {
         return getIncomingCoins(address).subtract(getOutgoingCoins(address));
     }
 
-    public Coins getDifferenceForAddresses(Set<String> addresses) {
+    public Coins getDifferenceForAddresses(Set<Address> addresses) {
         return addresses.stream().map(this::getDifferenceForAddress).reduce(Coins.NONE, Coins::add);
     }
 
@@ -124,15 +124,15 @@ public class Transaction {
         return hash.isBlank();
     }
 
-    public Set<String> getAllAddresses() {
+    public Set<Address> getAllAddresses() {
         return Sets.union(getInputAddresses(), getOutputAddresses());
     }
 
-    public Set<String> getInputAddresses() {
+    public Set<Address> getInputAddresses() {
         return inputs.stream().map(InputOutput::getAddress).collect(toSet());
     }
 
-    public Set<String> getOutputAddresses() {
+    public Set<Address> getOutputAddresses() {
         return outputs.stream().map(InputOutput::getAddress).collect(toSet());
     }
 

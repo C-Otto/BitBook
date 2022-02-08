@@ -1,5 +1,6 @@
 package de.cotto.bitbook.ownership.cli;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.price.PriceService;
@@ -44,7 +45,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OwnershipCommandsTest {
-    private static final String INVALID_ADDRESS = "-";
+    private static final Address INVALID_ADDRESS = new Address("-");
     private static final String ANYTHING = ".*";
 
     @InjectMocks
@@ -92,8 +93,8 @@ class OwnershipCommandsTest {
 
     @Test
     void getOwnedAddresses_with_balance() {
-        String address1 = "abc";
-        String address2 = "def";
+        Address address1 = new Address("abc");
+        Address address2 = new Address("def");
         when(balanceService.getBalance(address1)).thenReturn(Coins.ofSatoshis(123));
         when(balanceService.getBalance(address2)).thenReturn(Coins.ofSatoshis(234));
         when(addressOwnershipService.getOwnedAddressesWithDescription()).thenReturn(Set.of(
@@ -123,9 +124,9 @@ class OwnershipCommandsTest {
 
     @Test
     void getOwnedAddresses_sorted_by_value() {
-        AddressWithDescription address1 = new AddressWithDescription("xxx", "b-DESCRIPTION");
-        AddressWithDescription address2 = new AddressWithDescription("yyy", "a-DESCRIPTION");
-        AddressWithDescription address3 = new AddressWithDescription("zzz", "c-DESCRIPTION");
+        AddressWithDescription address1 = new AddressWithDescription(new Address("xxx"), "b-DESCRIPTION");
+        AddressWithDescription address2 = new AddressWithDescription(new Address("yyy"), "a-DESCRIPTION");
+        AddressWithDescription address3 = new AddressWithDescription(new Address("zzz"), "c-DESCRIPTION");
         when(balanceService.getBalance(address1.getAddress())).thenReturn(Coins.ofSatoshis(123));
         when(balanceService.getBalance(address2.getAddress())).thenReturn(Coins.ofSatoshis(100));
         when(balanceService.getBalance(address3.getAddress())).thenReturn(Coins.ofSatoshis(1000));
@@ -211,7 +212,8 @@ class OwnershipCommandsTest {
     @Test
     void markAddressAsOwned() {
         String description = "description";
-        assertThat(ownershipCommands.markAddressAsOwned(new CliAddress(ADDRESS), description)).isEqualTo("OK");
+        assertThat(ownershipCommands.markAddressAsOwned(new CliAddress(ADDRESS), description))
+                .isEqualTo("OK");
         verify(addressOwnershipService).setAddressAsOwned(ADDRESS, description);
     }
 
@@ -225,7 +227,8 @@ class OwnershipCommandsTest {
     @Test
     void markAddressAsForeign() {
         String description = "description";
-        assertThat(ownershipCommands.markAddressAsForeign(new CliAddress(ADDRESS), description)).isEqualTo("OK");
+        assertThat(ownershipCommands.markAddressAsForeign(new CliAddress(ADDRESS), description))
+                .isEqualTo("OK");
         verify(addressOwnershipService).setAddressAsForeign(ADDRESS, description);
     }
 

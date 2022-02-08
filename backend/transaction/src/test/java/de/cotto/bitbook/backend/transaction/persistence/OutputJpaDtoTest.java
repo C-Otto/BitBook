@@ -20,6 +20,6 @@ class OutputJpaDtoTest {
 
     @Test
     void getAddress() {
-        assertThat(OUTPUT_JPA_DTO_1.getAddress()).isEqualTo(OUTPUT_ADDRESS_1);
+        assertThat(OUTPUT_JPA_DTO_1.getAddress()).isEqualTo(OUTPUT_ADDRESS_1.toString());
     }
 }

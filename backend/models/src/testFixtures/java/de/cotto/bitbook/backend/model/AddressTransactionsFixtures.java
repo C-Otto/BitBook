@@ -6,9 +6,10 @@ import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HAS
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
 
 public class AddressTransactionsFixtures {
-    public static final String ADDRESS = "1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD";
-    public static final String ADDRESS_2 = "191sNkKTG8pzUsNgZYKo7DH2odg39XDAGo";
-    public static final String ADDRESS_3 = "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej";
+    public static final Address ADDRESS = new Address("1DEP8i3QJCsomS4BSMY2RpU1upv62aGvhD");
+    public static final Address ADDRESS_2 = new Address("191sNkKTG8pzUsNgZYKo7DH2odg39XDAGo");
+    public static final Address ADDRESS_3 =
+            new Address("bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej");
     public static final String TRANSACTION_HASH_3 = "0003";
     public static final String TRANSACTION_HASH_4 = "0004";
     public static final Set<String> TRANSACTION_HASHES = Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2);

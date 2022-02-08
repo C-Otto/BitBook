@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableList;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.transaction.deserialization.AddressTransactionsDto;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import java.util.Set;
 
 @JsonDeserialize(using = BlockchairAddressTransactionsDto.Deserializer.class)
 public class BlockchairAddressTransactionsDto extends AddressTransactionsDto {
-    public BlockchairAddressTransactionsDto(String address, Set<String> transactionHashes) {
+    public BlockchairAddressTransactionsDto(Address address, Set<String> transactionHashes) {
         super(address, transactionHashes);
     }
 
@@ -26,17 +27,17 @@ public class BlockchairAddressTransactionsDto extends AddressTransactionsDto {
         ) throws IOException {
             JsonNode rootNode = jsonParser.getCodec().readTree(jsonParser);
 
-            String address = getAddress(rootNode);
+            Address address = getAddress(rootNode);
             return new BlockchairAddressTransactionsDto(address, getTransactionHashes(rootNode, address));
         }
 
-        private String getAddress(JsonNode rootNode) {
+        private Address getAddress(JsonNode rootNode) {
             JsonNode dataNode = rootNode.get("data");
-            return ImmutableList.copyOf(dataNode.fieldNames()).get(0);
+            return new Address(ImmutableList.copyOf(dataNode.fieldNames()).get(0));
         }
 
-        private Set<String> getTransactionHashes(JsonNode rootNode, String address) {
-            JsonNode addressNode = rootNode.get("data").get(address);
+        private Set<String> getTransactionHashes(JsonNode rootNode, Address address) {
+            JsonNode addressNode = rootNode.get("data").get(address.toString());
             int expectedNumberOfTransactions = addressNode.get("address").get("transaction_count").intValue();
             Set<String> result = new LinkedHashSet<>();
             for (JsonNode hashNode : addressNode.get("transactions")) {

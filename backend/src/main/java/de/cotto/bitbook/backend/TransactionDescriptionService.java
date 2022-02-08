@@ -4,7 +4,7 @@ import de.cotto.bitbook.backend.model.TransactionWithDescription;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TransactionDescriptionService extends DescriptionService<TransactionWithDescription> {
+public class TransactionDescriptionService extends DescriptionService<String, TransactionWithDescription> {
     public TransactionDescriptionService(TransactionWithDescriptionDao dao) {
         super(dao);
     }

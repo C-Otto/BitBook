@@ -20,11 +20,11 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
-public abstract class AbstractCompletionProvider<T extends StringWithDescription<T>> extends ValueProviderSupport {
+public abstract class AbstractCompletionProvider<K, T extends StringWithDescription<T>> extends ValueProviderSupport {
     private static final int MINIMUM_LENGTH_FOR_COMPLETION = 3;
-    protected final DescriptionService<T> descriptionService;
+    protected final DescriptionService<K, T> descriptionService;
 
-    public AbstractCompletionProvider(DescriptionService<T> descriptionService) {
+    public AbstractCompletionProvider(DescriptionService<K, T> descriptionService) {
         super();
         this.descriptionService = descriptionService;
     }
@@ -53,7 +53,7 @@ public abstract class AbstractCompletionProvider<T extends StringWithDescription
         return input.length() < minimumLengthForCompletion;
     }
 
-    protected abstract Set<Function<String, Set<String>>> getStringCompleters();
+    protected abstract Set<Function<String, Set<K>>> getStringCompleters();
 
     protected String getStringToComplete(String string) {
         return string.trim().replaceAll("…", "");
@@ -65,12 +65,12 @@ public abstract class AbstractCompletionProvider<T extends StringWithDescription
         return Streams.concat(completedInput, completedDescription);
     }
 
-    protected Stream<Set<String>> completeUsingStringCompleters(String input) {
+    protected Stream<Set<K>> completeUsingStringCompleters(String input) {
         return getStringCompleters().stream().map(completer -> completer.apply(input));
     }
 
-    protected Stream<CompletionProposal> toProposals(Set<String> strings) {
-        return strings.stream()
+    protected Stream<CompletionProposal> toProposals(Set<K> keys) {
+        return keys.stream()
                 .map(descriptionService::get)
                 .filter(this::shouldConsider)
                 .map(this::getCompletionProposal);

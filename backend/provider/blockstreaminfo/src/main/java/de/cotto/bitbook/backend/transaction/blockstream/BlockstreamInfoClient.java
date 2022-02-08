@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.blockstream;
 
+import de.cotto.bitbook.backend.model.Address;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -13,5 +14,5 @@ import java.util.Optional;
 @CircuitBreaker(name = "blockstreaminfo")
 public interface BlockstreamInfoClient {
     @GetMapping("/address/{address}/txs")
-    Optional<BlockstreamAddressTransactionsDto> getAddressDetails(@PathVariable String address);
+    Optional<BlockstreamAddressTransactionsDto> getAddressDetails(@PathVariable Address address);
 }

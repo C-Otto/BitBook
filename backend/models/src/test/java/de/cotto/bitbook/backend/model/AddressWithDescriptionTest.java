@@ -12,11 +12,11 @@ class AddressWithDescriptionTest {
     private static final String SHORTENED_45 = "abcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaXaaaaX…";
     private static final String SHORTENED_40 = "abcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaX…";
     private static final AddressWithDescription ADDRESS_WITH_DESCRIPTION =
-            create("x", "y");
+            create(new Address("x"), "y");
 
     @Test
     void getAddress() {
-        assertThat(ADDRESS_WITH_DESCRIPTION.getAddress()).isEqualTo("x");
+        assertThat(ADDRESS_WITH_DESCRIPTION.getAddress()).isEqualTo(new Address("x"));
     }
 
     @Test
@@ -26,27 +26,27 @@ class AddressWithDescriptionTest {
 
     @Test
     void compareTo_smaller_description() {
-        assertThat(create("z", "a").compareTo(create("a", "z"))).isLessThan(0);
+        assertThat(create(new Address("z"), "a").compareTo(create(new Address("a"), "z"))).isLessThan(0);
     }
 
     @Test
     void compareTo_same_description_smaller_address() {
-        assertThat(create("a", "y").compareTo(create("z", "y"))).isLessThan(0);
+        assertThat(create(new Address("a"), "y").compareTo(create(new Address("z"), "y"))).isLessThan(0);
     }
 
     @Test
     void compareTo_same_description_same_address() {
-        assertThat(ADDRESS_WITH_DESCRIPTION.compareTo(create("x", "y"))).isEqualTo(0);
+        assertThat(ADDRESS_WITH_DESCRIPTION.compareTo(create(new Address("x"), "y"))).isEqualTo(0);
     }
 
     @Test
     void compareTo_same_description_larger_address() {
-        assertThat(create("z", "y").compareTo(create("a", "y"))).isGreaterThan(0);
+        assertThat(create(new Address("z"), "y").compareTo(create(new Address("a"), "y"))).isGreaterThan(0);
     }
 
     @Test
     void compareTo_larger_description() {
-        assertThat(create("a", "z").compareTo(create("z", "a"))).isGreaterThan(0);
+        assertThat(create(new Address("a"), "z").compareTo(create(new Address("z"), "a"))).isGreaterThan(0);
     }
 
     @Test
@@ -56,7 +56,7 @@ class AddressWithDescriptionTest {
 
     @Test
     void testToString() {
-        String formattedAddress = StringUtils.leftPad(ADDRESS_WITH_DESCRIPTION.getAddress(), 45);
+        String formattedAddress = StringUtils.leftPad(ADDRESS_WITH_DESCRIPTION.getAddress().toString(), 45);
         String formattedDescription = ADDRESS_WITH_DESCRIPTION.getDescription();
         assertThat(ADDRESS_WITH_DESCRIPTION).hasToString(formattedAddress + " " + formattedDescription);
     }
@@ -64,7 +64,7 @@ class AddressWithDescriptionTest {
     @Test
     void testToString_long_address() {
         AddressWithDescription addressWithDescription = new AddressWithDescription(
-                TOO_LONG,
+                new Address(TOO_LONG),
                 ADDRESS_WITH_DESCRIPTION.getDescription()
         );
         assertThat(addressWithDescription).hasToString(
@@ -77,7 +77,7 @@ class AddressWithDescriptionTest {
     @Test
     void testToString_max_length() {
         AddressWithDescription addressWithDescription = new AddressWithDescription(
-                "abcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaXaaaaXZ",
+                new Address("abcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaXaaaaXZ"),
                 ADDRESS_WITH_DESCRIPTION.getDescription()
         );
         assertThat(addressWithDescription).hasToString(
@@ -94,7 +94,7 @@ class AddressWithDescriptionTest {
                 TOO_LONG
         );
         assertThat(addressWithDescription).hasToString(
-                StringUtils.leftPad(addressWithDescription.getAddress(), 45) +
+                StringUtils.leftPad(addressWithDescription.getAddress().toString(), 45) +
                 " " +
                 SHORTENED_40
         );
@@ -102,26 +102,26 @@ class AddressWithDescriptionTest {
 
     @Test
     void testToString_without_description() {
-        assertThat(new AddressWithDescription("x")).hasToString(
+        assertThat(new AddressWithDescription(new Address("x"))).hasToString(
                 StringUtils.leftPad("x", 45) + " "
         );
     }
 
     @Test
     void getDescription_without_description() {
-        assertThat(new AddressWithDescription("x").getDescription()).isEqualTo("");
+        assertThat(new AddressWithDescription(new Address("x")).getDescription()).isEqualTo("");
     }
 
     @Test
     void getFormattedAddress() {
         assertThat(ADDRESS_WITH_DESCRIPTION.getFormattedAddress())
-                .isEqualTo(StringUtils.leftPad(ADDRESS_WITH_DESCRIPTION.getAddress(), 45));
+                .isEqualTo(StringUtils.leftPad(ADDRESS_WITH_DESCRIPTION.getAddress().toString(), 45));
     }
 
     @Test
     void getFormattedAddress_long() {
         assertThat(new AddressWithDescription(
-                TOO_LONG,
+                new Address(TOO_LONG),
                 ADDRESS_WITH_DESCRIPTION.getDescription()
         ).getFormattedAddress()).isEqualTo(SHORTENED_45);
     }
@@ -149,7 +149,7 @@ class AddressWithDescriptionTest {
         );
     }
 
-    private static AddressWithDescription create(String address, String description) {
+    private static AddressWithDescription create(Address address, String description) {
         return new AddressWithDescription(address, description);
     }
 }

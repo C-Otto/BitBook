@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +18,7 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("CPD-START")
 @ExtendWith(MockitoExtension.class)
 class AddressDescriptionServiceTest {
-    private static final String ADDRESS = "foo";
+    private static final Address ADDRESS = new Address("foo");
 
     @InjectMocks
     private AddressDescriptionService service;
@@ -76,7 +77,7 @@ class AddressDescriptionServiceTest {
     @Test
     void getWithDescriptionInfix() {
         String infix = "abc";
-        AddressWithDescription expected = new AddressWithDescription("x", "y");
+        AddressWithDescription expected = new AddressWithDescription(new Address("x"), "y");
         when(addressWithDescriptionDao.findWithDescriptionInfix(infix)).thenReturn(Set.of(expected));
         assertThat(service.getWithDescriptionInfix(infix)).containsExactly(expected);
     }

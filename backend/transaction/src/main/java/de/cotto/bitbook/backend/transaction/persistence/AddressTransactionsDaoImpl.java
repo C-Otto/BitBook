@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsDao;
 import org.springframework.stereotype.Component;
@@ -27,16 +28,17 @@ public class AddressTransactionsDaoImpl implements AddressTransactionsDao {
     }
 
     @Override
-    public AddressTransactions getAddressTransactions(String address) {
-        return addressTransactionsRepository.findById(address)
+    public AddressTransactions getAddressTransactions(Address address) {
+        return addressTransactionsRepository.findById(address.toString())
                 .map(AddressTransactionsJpaDto::toModel)
                 .orElse(AddressTransactions.UNKNOWN);
     }
 
     @Override
-    public Set<String> getAddressesStartingWith(String addressPrefix) {
+    public Set<Address> getAddressesStartingWith(String addressPrefix) {
         return addressTransactionsRepository.findByAddressStartingWith(addressPrefix).stream()
                 .map(AddressView::getAddress)
+                .map(Address::new)
                 .collect(toSet());
     }
 }

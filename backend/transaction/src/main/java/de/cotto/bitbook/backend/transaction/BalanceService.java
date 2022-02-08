@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.Coins;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,7 @@ public class BalanceService {
         this.transactionService = transactionService;
     }
 
-    public Coins getBalance(String address) {
+    public Coins getBalance(Address address) {
         AddressTransactions transactions = addressTransactionsService.getTransactions(address);
         Set<String> transactionHashes = transactions.getTransactionHashes();
         return transactionService.getTransactionDetails(transactionHashes).stream()

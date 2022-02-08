@@ -10,5 +10,6 @@ dependencies {
     testImplementation testFixtures(project(':backend:models'))
     testImplementation testFixtures(project(':backend:transaction'))
     integrationTestImplementation project(':backend')
+    integrationTestImplementation project(':backend:models')
     integrationTestImplementation project(':backend:transaction')
 }

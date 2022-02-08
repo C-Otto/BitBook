@@ -2,6 +2,7 @@ package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 import de.cotto.bitbook.backend.model.Output;
@@ -64,10 +65,10 @@ class SweepTransactionsServiceTest {
 
     @Nested
     class Success {
-        private static final Input INPUT_SWEEP_1 = new Input(Coins.ofSatoshis(200), "input-address1");
-        private static final Input INPUT_SWEEP_2 = new Input(Coins.ofSatoshis(2), "input-address2");
-        private static final Output OUTPUT_SWEEP_1 = new Output(Coins.ofSatoshis(199), "output-address1");
-        private static final Output OUTPUT_SWEEP_2 = new Output(Coins.ofSatoshis(2), "output-address2");
+        private static final Input INPUT_SWEEP_1 = new Input(Coins.ofSatoshis(200), new Address("input-address1"));
+        private static final Input INPUT_SWEEP_2 = new Input(Coins.ofSatoshis(2), new Address("input-address2"));
+        private static final Output OUTPUT_SWEEP_1 = new Output(Coins.ofSatoshis(199), new Address("output-address1"));
+        private static final Output OUTPUT_SWEEP_2 = new Output(Coins.ofSatoshis(2), new Address("output-address2"));
 
         private static final Transaction SWEEP_TRANSACTION = new Transaction(
                 TRANSACTION_HASH,

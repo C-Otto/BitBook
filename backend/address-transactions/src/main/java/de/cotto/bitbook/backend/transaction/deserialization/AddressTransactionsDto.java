@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.deserialization;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 
 import java.util.Set;
@@ -7,15 +8,15 @@ import java.util.Set;
 import static java.util.Objects.requireNonNull;
 
 public class AddressTransactionsDto {
-    private final String address;
+    private final Address address;
     private final Set<String> transactionHashes;
 
-    protected AddressTransactionsDto(String address, Set<String> transactionHashes) {
+    protected AddressTransactionsDto(Address address, Set<String> transactionHashes) {
         this.address = address;
         this.transactionHashes = transactionHashes;
     }
 
-    public AddressTransactions toModel(int lastCheckedAtBlockheight, String expectedAddress) {
+    public AddressTransactions toModel(int lastCheckedAtBlockheight, Address expectedAddress) {
         validateAddress(expectedAddress);
         return new AddressTransactions(
                 requireNonNull(expectedAddress),
@@ -24,7 +25,7 @@ public class AddressTransactionsDto {
         );
     }
 
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 
@@ -32,7 +33,7 @@ public class AddressTransactionsDto {
         return transactionHashes;
     }
 
-    protected void validateAddress(String expectedAddress) {
+    protected void validateAddress(Address expectedAddress) {
         if (!expectedAddress.equals(address)) {
             throw new IllegalStateException();
         }

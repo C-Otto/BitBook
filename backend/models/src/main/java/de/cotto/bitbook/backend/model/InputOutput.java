@@ -4,9 +4,9 @@ import com.google.common.base.Preconditions;
 
 public class InputOutput {
     protected final Coins value;
-    protected final String address;
+    protected final Address address;
 
-    protected InputOutput(Coins value, String targetAddress) {
+    protected InputOutput(Coins value, Address targetAddress) {
         Preconditions.checkArgument(value.getSatoshis() >= 0);
         this.value = value;
         this.address = targetAddress;
@@ -45,7 +45,7 @@ public class InputOutput {
         return result;
     }
 
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 

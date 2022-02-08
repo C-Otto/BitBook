@@ -1,6 +1,7 @@
 package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.transaction.AddressCompletionDao;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
@@ -23,7 +24,7 @@ public class AddressWithOwnershipCompletionProvider extends AbstractAddressCompl
 
     @Override
     protected boolean shouldConsider(AddressWithDescription addressWithDescription) {
-        String address = addressWithDescription.getAddress();
+        Address address = addressWithDescription.getAddress();
         return addressOwnershipService.getOwnershipStatus(address) != OwnershipStatus.UNKNOWN;
     }
 }

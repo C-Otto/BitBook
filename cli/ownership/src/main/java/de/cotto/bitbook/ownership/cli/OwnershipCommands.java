@@ -1,6 +1,7 @@
 package de.cotto.bitbook.ownership.cli;
 
 import com.google.common.base.Functions;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Transaction;
@@ -109,11 +110,11 @@ public class OwnershipCommands {
             @ShellOption(valueProvider = AddressCompletionProvider.class) CliAddress address,
             @ShellOption(defaultValue = "") String description
     ) {
-        String addressString = address.getAddress();
-        if (addressString.isEmpty()) {
+        Address addressModel = address.getAddress();
+        if (addressModel.isInvalid()) {
             return CliAddress.ERROR_MESSAGE;
         }
-        addressOwnershipService.setAddressAsOwned(addressString, description);
+        addressOwnershipService.setAddressAsOwned(addressModel, description);
         return "OK";
     }
 
@@ -122,11 +123,11 @@ public class OwnershipCommands {
             @ShellOption(valueProvider = AddressCompletionProvider.class) CliAddress address,
             @ShellOption(defaultValue = "") String description
     ) {
-        String addressString = address.getAddress();
-        if (addressString.isEmpty()) {
+        Address addressModel = address.getAddress();
+        if (addressModel.isInvalid()) {
             return CliAddress.ERROR_MESSAGE;
         }
-        addressOwnershipService.setAddressAsForeign(addressString, description);
+        addressOwnershipService.setAddressAsForeign(addressModel, description);
         return "OK";
     }
 
@@ -134,16 +135,16 @@ public class OwnershipCommands {
     public String resetOwnership(
             @ShellOption(valueProvider = AddressWithOwnershipCompletionProvider.class) CliAddress address
     ) {
-        String addressString = address.getAddress();
-        if (addressString.isEmpty()) {
+        Address addressModel = address.getAddress();
+        if (addressModel.isInvalid()) {
             return CliAddress.ERROR_MESSAGE;
         }
-        addressOwnershipService.resetOwnership(addressString);
+        addressOwnershipService.resetOwnership(addressModel);
         return "OK";
     }
 
     private void preloadAddressTransactions(Set<AddressWithDescription> addressesWithDescription) {
-        Set<String> ownedAddresses = addressesWithDescription.stream()
+        Set<Address> ownedAddresses = addressesWithDescription.stream()
                 .map(AddressWithDescription::getAddress)
                 .collect(toSet());
         addressTransactionsService.getTransactionsForAddresses(ownedAddresses);

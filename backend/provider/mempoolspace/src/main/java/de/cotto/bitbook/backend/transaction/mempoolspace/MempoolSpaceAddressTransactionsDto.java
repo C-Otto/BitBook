@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsDeserializer;
 import de.cotto.bitbook.backend.transaction.deserialization.AddressTransactionsDto;
 
@@ -14,11 +15,11 @@ import java.util.Set;
 @JsonDeserialize(using = MempoolSpaceAddressTransactionsDto.Deserializer.class)
 public class MempoolSpaceAddressTransactionsDto extends AddressTransactionsDto {
     protected MempoolSpaceAddressTransactionsDto(Set<String> transactionHashes) {
-        super("", transactionHashes);
+        super(Address.NONE, transactionHashes);
     }
 
     @Override
-    protected void validateAddress(String expectedAddress) {
+    protected void validateAddress(Address expectedAddress) {
         // the mempool.space response does not contain any address, so we cannot validate the DTO
     }
 

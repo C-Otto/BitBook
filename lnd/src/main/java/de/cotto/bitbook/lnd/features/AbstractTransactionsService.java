@@ -2,6 +2,7 @@ package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 
@@ -24,7 +25,7 @@ public class AbstractTransactionsService {
         this.transactionService = transactionService;
     }
 
-    protected void setAddressAsOwnedWithDescription(String address) {
+    protected void setAddressAsOwnedWithDescription(Address address) {
         addressOwnershipService.setAddressAsOwned(address);
         addressDescriptionService.set(address, DEFAULT_DESCRIPTION);
     }

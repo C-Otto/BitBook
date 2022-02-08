@@ -2,6 +2,7 @@ package de.cotto.bitbook.lnd;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.lnd.features.ChannelsService;
 import de.cotto.bitbook.lnd.features.ClosedChannelsService;
 import de.cotto.bitbook.lnd.features.OnchainTransactionsService;
@@ -54,7 +55,7 @@ public class LndService extends AbstractJsonService {
     }
 
     public long addFromUnspentOutputs(String json) {
-        Set<String> addresses = parse(json, this::parseAddressesFromUnspentOutputs);
+        Set<Address> addresses = parse(json, this::parseAddressesFromUnspentOutputs);
         return unspentOutputsService.addFromUnspentOutputs(addresses);
     }
 
@@ -93,17 +94,17 @@ public class LndService extends AbstractJsonService {
         return hashes;
     }
 
-    private Set<String> parseAddressesFromUnspentOutputs(JsonNode rootNode) {
+    private Set<Address> parseAddressesFromUnspentOutputs(JsonNode rootNode) {
         JsonNode utxos = rootNode.get("utxos");
         if (utxos == null) {
             return Set.of();
         }
-        Set<String> addresses = new LinkedHashSet<>();
+        Set<Address> addresses = new LinkedHashSet<>();
         for (JsonNode utxo : utxos) {
             if (utxo.get("confirmations").intValue() == 0) {
                 continue;
             }
-            addresses.add(utxo.get("address").textValue());
+            addresses.add(new Address(utxo.get("address").textValue()));
         }
         return addresses;
     }

@@ -2,6 +2,7 @@ package de.cotto.bitbook.lnd;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.lnd.features.ChannelsService;
 import de.cotto.bitbook.lnd.features.ClosedChannelsService;
 import de.cotto.bitbook.lnd.features.OnchainTransactionsService;
@@ -164,7 +165,9 @@ class LndServiceTest {
 
         @Test
         void success() {
-            when(unspentOutputsService.addFromUnspentOutputs(Set.of("bc1qngw83", "bc1aaaaaa"))).thenReturn(2L);
+            when(unspentOutputsService.addFromUnspentOutputs(
+                    Set.of(new Address("bc1qngw83"), new Address("bc1aaaaaa"))
+            )).thenReturn(2L);
             String json = "{\"utxos\":[" +
                           "{\"address\":\"bc1qngw83\",\"confirmations\":123}, " +
                           "{\"address\":\"bc1aaaaaa\",\"confirmations\":597}" +

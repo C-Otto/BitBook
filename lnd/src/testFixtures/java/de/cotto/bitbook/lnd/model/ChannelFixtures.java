@@ -1,5 +1,6 @@
 package de.cotto.bitbook.lnd.model;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 import de.cotto.bitbook.backend.model.Output;
@@ -15,7 +16,7 @@ import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
 
 public class ChannelFixtures {
     public static final Coins CHANNEL_CAPACITY = Coins.ofSatoshis(555);
-    public static final String CHANNEL_ADDRESS = "bc1somechannel";
+    public static final Address CHANNEL_ADDRESS = new Address("bc1somechannel");
 
     public static final Transaction OPENING_TRANSACTION = new Transaction(
             TRANSACTION_HASH_3,

@@ -1,6 +1,7 @@
 package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.transaction.AddressCompletionDao;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
@@ -50,7 +51,7 @@ class AddressWithOwnershipCompletionProviderTest {
     @Test
     void complete_address_only_with_known_ownership() {
         String input = "abc";
-        String address3 = "foobar";
+        Address address3 = new Address("foobar");
         when(addressDescriptionService.get(any()))
                 .then(invocation -> new AddressWithDescription(invocation.getArgument(0)));
         when(context.currentWordUpToCursor()).thenReturn(input);
@@ -63,12 +64,12 @@ class AddressWithOwnershipCompletionProviderTest {
         List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
 
         assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
-                new CompletionProposal(ADDRESS_2),
-                new CompletionProposal(address3)
+                new CompletionProposal(ADDRESS_2.toString()),
+                new CompletionProposal(address3.toString())
         );
     }
 
-    private void mockOwnership(String address, OwnershipStatus ownershipStatus) {
+    private void mockOwnership(Address address, OwnershipStatus ownershipStatus) {
         when(addressOwnershipService.getOwnershipStatus(address)).thenReturn(ownershipStatus);
     }
 }

@@ -2,6 +2,7 @@ package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.InputOutput;
 import de.cotto.bitbook.backend.model.Output;
@@ -72,7 +73,7 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
         Transaction transaction =
                 transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
         Coins amount = onchainTransaction.getAmount();
-        String address = transaction.getOutputWithValue(amount).map(InputOutput::getAddress).orElse(null);
+        Address address = transaction.getOutputWithValue(amount).map(InputOutput::getAddress).orElse(null);
         if (address == null) {
             return 0;
         }

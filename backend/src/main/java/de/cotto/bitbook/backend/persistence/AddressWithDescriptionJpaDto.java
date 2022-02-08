@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.persistence;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 
 import javax.annotation.Nonnull;
@@ -29,14 +30,14 @@ public class AddressWithDescriptionJpaDto {
     }
 
     public static AddressWithDescriptionJpaDto fromModel(AddressWithDescription model) {
-        return new AddressWithDescriptionJpaDto(model.getAddress(), model.getDescription());
+        return new AddressWithDescriptionJpaDto(model.getAddress().toString(), model.getDescription());
     }
 
     public AddressWithDescription toModel() {
         if (description == null) {
-            return new AddressWithDescription(getAddress());
+            return new AddressWithDescription(new Address(getAddress()));
         }
-        return new AddressWithDescription(getAddress(), getDescription());
+        return new AddressWithDescription(new Address(getAddress()), getDescription());
     }
 
     public String getAddress() {

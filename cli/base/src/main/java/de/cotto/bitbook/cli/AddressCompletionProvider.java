@@ -1,6 +1,7 @@
 package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.transaction.AddressCompletionDao;
 import org.springframework.stereotype.Component;
@@ -25,8 +26,8 @@ public class AddressCompletionProvider extends AbstractAddressCompletionProvider
     }
 
     @SuppressWarnings("PMD.AvoidLiteralsInIfCondition")
-    public Optional<String> completeIfUnique(String addressPrefix) {
-        Set<String> proposals = completeUsingStringCompleters(getStringToComplete(addressPrefix))
+    public Optional<Address> completeIfUnique(String addressPrefix) {
+        Set<Address> proposals = completeUsingStringCompleters(getStringToComplete(addressPrefix))
                 .flatMap(Set::stream)
                 .collect(Collectors.toSet());
         if (proposals.size() == 1) {

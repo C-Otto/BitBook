@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.persistence;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -20,7 +21,7 @@ class AddressWithDescriptionJpaDtoTest {
     @Test
     void toModel() {
         assertThat(new AddressWithDescriptionJpaDto("x", "y").toModel())
-                .isEqualTo(new AddressWithDescription("x", "y"));
+                .isEqualTo(new AddressWithDescription(new Address("x"), "y"));
     }
 
     @Test
@@ -28,12 +29,12 @@ class AddressWithDescriptionJpaDtoTest {
         AddressWithDescriptionJpaDto dto = new AddressWithDescriptionJpaDto();
         ReflectionTestUtils.setField(dto, "address", "x");
         assertThat(dto.toModel())
-                .isEqualTo(new AddressWithDescription("x", ""));
+                .isEqualTo(new AddressWithDescription(new Address("x"), ""));
     }
 
     @Test
     void fromModel() {
-        assertThat(AddressWithDescriptionJpaDto.fromModel(new AddressWithDescription("x", "y")))
+        assertThat(AddressWithDescriptionJpaDto.fromModel(new AddressWithDescription(new Address("x"), "y")))
                 .usingRecursiveComparison()
                 .isEqualTo(new AddressWithDescriptionJpaDto("x", "y"));
     }

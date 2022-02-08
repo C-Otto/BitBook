@@ -1,5 +1,6 @@
 package de.cotto.bitbook.ownership.persistence;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.ownership.AddressOwnershipDao;
 import de.cotto.bitbook.ownership.OwnershipStatus;
 import org.springframework.stereotype.Component;
@@ -19,41 +20,42 @@ public class AddressOwnershipDaoImpl implements AddressOwnershipDao {
     }
 
     @Override
-    public Set<String> getOwnedAddresses() {
+    public Set<Address> getOwnedAddresses() {
         return getAddressesWithStatus(OwnershipStatus.OWNED);
     }
 
     @Override
-    public Set<String> getForeignAddresses() {
+    public Set<Address> getForeignAddresses() {
         return getAddressesWithStatus(OwnershipStatus.FOREIGN);
     }
 
     @Override
-    public void setAddressAsOwned(String address) {
-        addressOwnershipRepository.save(new AddressOwnershipJpaDto(address, OwnershipStatus.OWNED));
+    public void setAddressAsOwned(Address address) {
+        addressOwnershipRepository.save(new AddressOwnershipJpaDto(address.toString(), OwnershipStatus.OWNED));
     }
 
     @Override
-    public void setAddressAsForeign(String address) {
-        addressOwnershipRepository.save(new AddressOwnershipJpaDto(address, OwnershipStatus.FOREIGN));
+    public void setAddressAsForeign(Address address) {
+        addressOwnershipRepository.save(new AddressOwnershipJpaDto(address.toString(), OwnershipStatus.FOREIGN));
     }
 
     @Override
-    public void remove(String address) {
-        addressOwnershipRepository.deleteById(address);
+    public void remove(Address address) {
+        addressOwnershipRepository.deleteById(address.toString());
     }
 
     @Override
-    public OwnershipStatus getOwnershipStatus(String address) {
-        return addressOwnershipRepository.findByAddress(address)
+    public OwnershipStatus getOwnershipStatus(Address address) {
+        return addressOwnershipRepository.findByAddress(address.toString())
                 .map(AddressOwnershipJpaDto::getOwnershipStatus)
                 .orElse(OwnershipStatus.UNKNOWN);
     }
 
-    private Set<String> getAddressesWithStatus(OwnershipStatus foreign) {
+    private Set<Address> getAddressesWithStatus(OwnershipStatus foreign) {
         return addressOwnershipRepository.findAll().stream()
                 .filter(dto -> dto.getOwnershipStatus().equals(foreign))
                 .map(AddressOwnershipJpaDto::getAddress)
+                .map(Address::new)
                 .collect(toSet());
     }
 }

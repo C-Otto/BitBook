@@ -1,12 +1,12 @@
 package de.cotto.bitbook.backend.model;
 
 public class AddressWithDescription extends StringWithDescription<AddressWithDescription> {
-    public AddressWithDescription(String address) {
+    public AddressWithDescription(Address address) {
         this(address, "");
     }
 
-    public AddressWithDescription(String address, String description) {
-        super(address, description);
+    public AddressWithDescription(Address address, String description) {
+        super(address.toString(), description);
     }
 
     @Override
@@ -14,8 +14,8 @@ public class AddressWithDescription extends StringWithDescription<AddressWithDes
         return padOrShorten(getString(), 45);
     }
 
-    public String getAddress() {
-        return getString();
+    public Address getAddress() {
+        return new Address(getString());
     }
 
     public String getFormattedAddress() {

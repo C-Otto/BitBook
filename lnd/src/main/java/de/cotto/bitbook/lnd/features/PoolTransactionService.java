@@ -2,6 +2,7 @@ package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.InputOutput;
 import de.cotto.bitbook.backend.model.Output;
@@ -50,7 +51,7 @@ public class PoolTransactionService extends AbstractTransactionsService {
         }
         Transaction transaction = transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
         Coins poolAmount = onchainTransaction.getAbsoluteAmountWithoutFees();
-        String poolAddress = transaction.getOutputWithValue(poolAmount).map(InputOutput::getAddress).orElse(null);
+        Address poolAddress = transaction.getOutputWithValue(poolAmount).map(InputOutput::getAddress).orElse(null);
         if (poolAddress == null) {
             return 0;
         }
@@ -58,7 +59,7 @@ public class PoolTransactionService extends AbstractTransactionsService {
         return 1;
     }
 
-    private void setForPoolAccountCreation(Transaction transaction, String poolAddress, String label) {
+    private void setForPoolAccountCreation(Transaction transaction, Address poolAddress, String label) {
         addForPoolCreationOrDeposit(transaction, poolAddress, label, "Creating pool account ");
     }
 
@@ -78,7 +79,7 @@ public class PoolTransactionService extends AbstractTransactionsService {
                 .map(InputOutput::getValue)
                 .reduce(Coins.NONE, Coins::add);
         Coins expectedAmount = subtractedAmount.add(otherInputs).subtract(transaction.getFees());
-        String poolAddress = transaction.getOutputWithValue(expectedAmount).map(InputOutput::getAddress).orElse(null);
+        Address poolAddress = transaction.getOutputWithValue(expectedAmount).map(InputOutput::getAddress).orElse(null);
         if (poolAddress == null) {
             return 0;
         }
@@ -86,13 +87,13 @@ public class PoolTransactionService extends AbstractTransactionsService {
         return 1;
     }
 
-    private void setForPoolAccountDeposit(Transaction transaction, String poolAddress, String label) {
+    private void setForPoolAccountDeposit(Transaction transaction, Address poolAddress, String label) {
         addForPoolCreationOrDeposit(transaction, poolAddress, label, "Deposit into pool account ");
     }
 
     private void addForPoolCreationOrDeposit(
             Transaction transaction,
-            String poolAddress,
+            Address poolAddress,
             String label,
             String descriptionPrefix
     ) {

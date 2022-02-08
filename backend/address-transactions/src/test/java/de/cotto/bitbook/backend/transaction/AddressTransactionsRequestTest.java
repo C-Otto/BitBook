@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.Address;
 import org.junit.jupiter.api.Test;
 
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
@@ -44,9 +45,8 @@ class AddressTransactionsRequestTest {
 
     @Test
     void testEquals_different_address() {
-        assertThat(ADDRESS_TRANSACTIONS_REQUEST).isNotEqualTo(
-                AddressTransactionsRequest.create(new TransactionsRequestKey("xxx", BLOCK_HEIGHT), STANDARD)
-        );
+        TransactionsRequestKey key = new TransactionsRequestKey(new Address("xxx"), BLOCK_HEIGHT);
+        assertThat(ADDRESS_TRANSACTIONS_REQUEST).isNotEqualTo(AddressTransactionsRequest.create(key, STANDARD));
     }
 
     @Test

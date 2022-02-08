@@ -12,10 +12,10 @@ public class InputDtoFixtures {
     static {
         INPUT_DTO_1 = new InputDto();
         INPUT_DTO_1.setValue(INPUT_VALUE_1);
-        INPUT_DTO_1.setAddress(INPUT_ADDRESS_1);
+        INPUT_DTO_1.setAddress(INPUT_ADDRESS_1.toString());
 
         INPUT_DTO_2 = new InputDto();
         INPUT_DTO_2.setValue(INPUT_VALUE_2);
-        INPUT_DTO_2.setAddress(INPUT_ADDRESS_2);
+        INPUT_DTO_2.setAddress(INPUT_ADDRESS_2.toString());
     }
 }

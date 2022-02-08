@@ -2,6 +2,7 @@ package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.lnd.model.Channel;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.springframework.stereotype.Component;
@@ -58,7 +59,7 @@ public class ChannelsService {
     }
 
     private void setChannelOwnership(Channel channel) {
-        String channelAddress = channel.getChannelAddress();
+        Address channelAddress = channel.getChannelAddress();
         if (channel.isInitiator()) {
             addressOwnershipService.setAddressAsOwned(channelAddress);
         }

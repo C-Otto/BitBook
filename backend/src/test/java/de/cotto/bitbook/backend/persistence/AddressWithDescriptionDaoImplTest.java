@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.persistence;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,33 +27,33 @@ class AddressWithDescriptionDaoImplTest {
 
     @Test
     void get() {
-        String address = "xxx";
+        Address address = new Address("xxx");
         String description = "description";
-        when(repository.findById(address)).thenReturn(
-                Optional.of(new AddressWithDescriptionJpaDto(address, description))
+        when(repository.findById(address.toString())).thenReturn(
+                Optional.of(new AddressWithDescriptionJpaDto(address.toString(), description))
         );
         assertThat(dao.get(address)).isEqualTo(new AddressWithDescription(address, description));
     }
 
     @Test
     void get_not_found() {
-        String address = "xxx";
-        when(repository.findById(address)).thenReturn(Optional.empty());
+        Address address = new Address("xxx");
+        when(repository.findById(address.toString())).thenReturn(Optional.empty());
         assertThat(dao.get(address)).isEqualTo(new AddressWithDescription(address));
     }
 
     @Test
     void save() {
-        String address = "xxx";
+        Address address = new Address("xxx");
         String description = "description";
         dao.save(new AddressWithDescription(address, description));
-        verify(repository).save(argThat(dto -> dto.getAddress().equals(address)));
+        verify(repository).save(argThat(dto -> dto.getAddress().equals(address.toString())));
         verify(repository).save(argThat(dto -> dto.getDescription().equals(description)));
     }
 
     @Test
     void remove() {
-        dao.remove("a");
+        dao.remove(new Address("a"));
         verify(repository).deleteById("a");
     }
 
@@ -62,6 +63,6 @@ class AddressWithDescriptionDaoImplTest {
         when(repository.findByDescriptionContaining(infix))
                 .thenReturn(Set.of(new AddressWithDescriptionJpaDto("x", "y")));
         assertThat(dao.findWithDescriptionInfix(infix))
-                .containsExactly(new AddressWithDescription("x", "y"));
+                .containsExactly(new AddressWithDescription(new Address("x"), "y"));
     }
 }

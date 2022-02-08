@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.request.RequestPriority;
 import de.cotto.bitbook.backend.request.ResultFuture;
@@ -36,11 +37,11 @@ public class AddressTransactionsService {
     }
 
     @Async
-    public void requestTransactionsInBackground(String address) {
+    public void requestTransactionsInBackground(Address address) {
         ResultFuture.getOrElse(getTransactions(address, RequestPriority.LOWEST), AddressTransactions.UNKNOWN);
     }
 
-    public Set<AddressTransactions> getTransactionsForAddresses(Set<String> addresses) {
+    public Set<AddressTransactions> getTransactionsForAddresses(Set<Address> addresses) {
         Set<Future<AddressTransactions>> futures = addresses.stream()
                 .map(address -> getTransactions(address, RequestPriority.STANDARD))
                 .collect(toSet());
@@ -49,11 +50,11 @@ public class AddressTransactionsService {
                 .collect(toSet());
     }
 
-    public AddressTransactions getTransactions(String address) {
+    public AddressTransactions getTransactions(Address address) {
         return ResultFuture.getOrElse(getTransactions(address, RequestPriority.STANDARD), AddressTransactions.UNKNOWN);
     }
 
-    private Future<AddressTransactions> getTransactions(String address, RequestPriority requestPriority) {
+    private Future<AddressTransactions> getTransactions(Address address, RequestPriority requestPriority) {
         int currentBlockHeight = blockHeightService.getBlockHeight(BTC);
         AddressTransactions persistedAddressTransactions = addressTransactionsDao.getAddressTransactions(address);
         if (isValid(persistedAddressTransactions)) {

@@ -3,6 +3,7 @@ package de.cotto.bitbook.cli;
 import com.google.common.base.Functions;
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.price.PriceService;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
@@ -69,22 +70,22 @@ public class TransactionsCommands {
     public String getAddressTransactions(
             @ShellOption(valueProvider = AddressCompletionProvider.class) CliAddress address
     ) {
-        String addressString = address.getAddress();
-        if (addressString.isEmpty()) {
+        Address addressModel = address.getAddress();
+        if (addressModel.isInvalid()) {
             return "Expected base58 or bech32 address";
         }
-        String description = addressDescriptionService.getDescription(addressString);
-        Set<String> hashes = addressTransactionsService.getTransactions(addressString).getTransactionHashes();
+        String description = addressDescriptionService.getDescription(addressModel);
+        Set<String> hashes = addressTransactionsService.getTransactions(addressModel).getTransactionHashes();
         String result = """
                 Address: %s %s
                 Description: %s
                 Transaction hashes (%d):
                 %s""".formatted(
-                addressString,
-                addressFormatter.getFormattedOwnershipStatus(addressString),
+                addressModel,
+                addressFormatter.getFormattedOwnershipStatus(addressModel),
                 description,
                 hashes.size(),
-                formattedAndSortedHashes(hashes, addressString)
+                formattedAndSortedHashes(hashes, addressModel)
         );
         return StringUtils.stripEnd(result, "\n");
     }
@@ -121,17 +122,17 @@ public class TransactionsCommands {
         return "OK";
     }
 
-    private String formattedAndSortedHashes(Set<String> hashes, String addressString) {
+    private String formattedAndSortedHashes(Set<String> hashes, Address address) {
         Set<Transaction> transactions = transactionService.getTransactionDetails(hashes);
         preloadPrices(transactions);
         String details = transactions.parallelStream()
                 .filter(Transaction::isValid)
                 .collect(toMap(
                         Functions.identity(),
-                        transaction -> transaction.getDifferenceForAddress(addressString).absolute()))
+                        transaction -> transaction.getDifferenceForAddress(address).absolute()))
                 .entrySet().stream()
                 .sorted(transactionSorter.getComparator())
-                .map(entry -> transactionFormatter.formatSingleLineForAddress(entry.getKey(), addressString))
+                .map(entry -> transactionFormatter.formatSingleLineForAddress(entry.getKey(), address))
                 .collect(Collectors.joining("\n"));
         if (transactions.size() != hashes.size() || transactions.contains(Transaction.UNKNOWN)) {
             return details + "\n[Details for at least one transaction could not be downloaded]";

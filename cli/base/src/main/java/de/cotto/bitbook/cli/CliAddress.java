@@ -1,5 +1,7 @@
 package de.cotto.bitbook.cli;
 
+import de.cotto.bitbook.backend.model.Address;
+
 import java.util.regex.Pattern;
 
 public class CliAddress extends CliString {
@@ -11,11 +13,15 @@ public class CliAddress extends CliString {
     private static final String BASE_58 = "[1-9A-HJ-NP-Za-km-z]{20,35}";
     private static final Pattern PATTERN = Pattern.compile(BECH_32 + "|" + BASE_58);
 
+    public CliAddress(Address address) {
+        this(address.toString());
+    }
+
     public CliAddress(String address) {
         super(address, PATTERN, INVALID_CHARACTERS_REGEX);
     }
 
-    public String getAddress() {
-        return toString();
+    public Address getAddress() {
+        return new Address(toString());
     }
 }

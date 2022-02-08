@@ -1,6 +1,7 @@
 package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.transaction.AddressCompletionDao;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ class AddressWithDescriptionCompletionProviderTest {
     void complete_address_only_with_description() {
         String input = "abc";
         String description1 = "my foo bar";
-        String address3 = "foobar";
+        Address address3 = new Address("foobar");
         String description3 = "blub";
         AddressWithDescription addressWithDescription1 = new AddressWithDescription(ADDRESS, description1);
         AddressWithDescription addressWithDescription2 = new AddressWithDescription(ADDRESS_2);
@@ -58,8 +59,8 @@ class AddressWithDescriptionCompletionProviderTest {
         List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
 
         assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
-                new CompletionProposal(ADDRESS).description(description1),
-                new CompletionProposal(address3).description(description3)
+                new CompletionProposal(ADDRESS.toString()).description(description1),
+                new CompletionProposal(address3.toString()).description(description3)
         );
     }
 }

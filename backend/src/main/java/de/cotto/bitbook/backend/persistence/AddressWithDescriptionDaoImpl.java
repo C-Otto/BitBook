@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.persistence;
 
 import de.cotto.bitbook.backend.AddressWithDescriptionDao;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import org.springframework.stereotype.Component;
 
@@ -19,8 +20,8 @@ public class AddressWithDescriptionDaoImpl implements AddressWithDescriptionDao 
     }
 
     @Override
-    public AddressWithDescription get(String address) {
-        return repository.findById(address)
+    public AddressWithDescription get(Address address) {
+        return repository.findById(address.toString())
                 .map(AddressWithDescriptionJpaDto::toModel)
                 .orElseGet(() -> new AddressWithDescription(address));
     }
@@ -31,8 +32,8 @@ public class AddressWithDescriptionDaoImpl implements AddressWithDescriptionDao 
     }
 
     @Override
-    public void remove(String address) {
-        repository.deleteById(address);
+    public void remove(Address address) {
+        repository.deleteById(address.toString());
     }
 
     @Override

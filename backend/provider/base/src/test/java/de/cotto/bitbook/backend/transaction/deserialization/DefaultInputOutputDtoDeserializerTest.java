@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction.deserialization;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 import org.junit.jupiter.api.Nested;
@@ -167,8 +168,8 @@ class DefaultInputOutputDtoDeserializerTest {
             assertThat(get(json))
                 .map(InputDto::toModel)
                 .containsExactly(
-                    new Input(Coins.ofSatoshis(1), "xxx"),
-                    new Input(Coins.ofSatoshis(2), "yyy")
+                    new Input(Coins.ofSatoshis(1), new Address("xxx")),
+                    new Input(Coins.ofSatoshis(2), new Address("yyy"))
                 );
         }
 

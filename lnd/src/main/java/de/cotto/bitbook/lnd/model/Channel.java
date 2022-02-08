@@ -1,6 +1,7 @@
 package de.cotto.bitbook.lnd.model;
 
 import com.google.common.base.Preconditions;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Transaction;
 
 import java.util.Objects;
@@ -31,7 +32,7 @@ public class Channel {
         return openingTransaction;
     }
 
-    public String getChannelAddress() {
+    public Address getChannelAddress() {
         return openingTransaction.getOutputs().get(outputIndex).getAddress();
     }
 

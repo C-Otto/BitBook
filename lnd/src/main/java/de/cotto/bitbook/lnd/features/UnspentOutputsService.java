@@ -1,6 +1,7 @@
 package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +22,7 @@ public class UnspentOutputsService {
         this.addressDescriptionService = addressDescriptionService;
     }
 
-    public long addFromUnspentOutputs(Set<String> addresses) {
+    public long addFromUnspentOutputs(Set<Address> addresses) {
         addresses.forEach(addressOwnershipService::setAddressAsOwned);
         addresses.forEach(address -> addressDescriptionService.set(address, DEFAULT_ADDRESS_DESCRIPTION));
         return addresses.size();

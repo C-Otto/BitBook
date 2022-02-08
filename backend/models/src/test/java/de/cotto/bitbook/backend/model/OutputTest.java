@@ -13,13 +13,13 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 class OutputTest {
     @Test
     void empty() {
-        assertThat(Output.EMPTY).isEqualTo(new Output(Coins.NONE, ""));
+        assertThat(Output.EMPTY).isEqualTo(new Output(Coins.NONE, Address.NONE));
     }
 
     @Test
     void noNegativeAmount() {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-            assertThat(Output.EMPTY).isEqualTo(new Output(Coins.ofSatoshis(-1), ""))
+            assertThat(Output.EMPTY).isEqualTo(new Output(Coins.ofSatoshis(-1), Address.NONE))
         );
     }
 

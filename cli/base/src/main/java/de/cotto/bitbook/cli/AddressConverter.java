@@ -1,5 +1,6 @@
 package de.cotto.bitbook.cli;
 
+import de.cotto.bitbook.backend.model.Address;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,7 @@ public class AddressConverter implements Converter<String, CliAddress> {
     @Override
     public CliAddress convert(@Nonnull String address) {
         if (address.endsWith(ELLIPSIS)) {
-            Optional<String> completed = addressCompletionProvider.completeIfUnique(address);
+            Optional<Address> completed = addressCompletionProvider.completeIfUnique(address);
             if (completed.isPresent()) {
                 return new CliAddress(completed.get());
             }

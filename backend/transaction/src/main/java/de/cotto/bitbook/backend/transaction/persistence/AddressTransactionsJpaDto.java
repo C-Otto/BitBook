@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
 import com.google.common.annotations.VisibleForTesting;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 
 import javax.annotation.Nullable;
@@ -31,7 +32,7 @@ public class AddressTransactionsJpaDto {
 
     public static AddressTransactionsJpaDto fromModel(AddressTransactions addressTransactions) {
         AddressTransactionsJpaDto dto = new AddressTransactionsJpaDto();
-        dto.setAddress(addressTransactions.getAddress());
+        dto.setAddress(addressTransactions.getAddress().toString());
         dto.setTransactionHashes(addressTransactions.getTransactionHashes());
         dto.setLastCheckedAtBlockheight(addressTransactions.getLastCheckedAtBlockHeight());
         return dto;
@@ -39,7 +40,7 @@ public class AddressTransactionsJpaDto {
 
     public AddressTransactions toModel() {
         return new AddressTransactions(
-                requireNonNull(address),
+                new Address(requireNonNull(address)),
                 requireNonNull(transactionHashes),
                 lastCheckedAtBlockheight
         );

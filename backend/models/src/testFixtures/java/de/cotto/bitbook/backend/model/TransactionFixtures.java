@@ -34,7 +34,7 @@ public class TransactionFixtures {
             BLOCK_HEIGHT,
             DATE_TIME.plusDays(12),
             Coins.NONE,
-            List.of(new Input(Coins.ofSatoshis(2_147_484_882L), "abc")),
+            List.of(new Input(Coins.ofSatoshis(2_147_484_882L), new Address("abc"))),
             List.of(OUTPUT_1, OUTPUT_2)
     );
 

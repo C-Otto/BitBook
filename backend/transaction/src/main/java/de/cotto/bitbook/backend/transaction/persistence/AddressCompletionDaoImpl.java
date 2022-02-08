@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
 import com.google.common.collect.Sets;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.transaction.AddressCompletionDao;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsDao;
 import org.springframework.stereotype.Component;
@@ -28,16 +29,16 @@ public class AddressCompletionDaoImpl implements AddressCompletionDao {
     }
 
     @Override
-    public Set<String> completeFromAddressTransactions(String prefix) {
+    public Set<Address> completeFromAddressTransactions(String prefix) {
         return addressTransactionsDao.getAddressesStartingWith(prefix);
     }
 
     @Override
-    public Set<String> completeFromInputsAndOutputs(String prefix) {
+    public Set<Address> completeFromInputsAndOutputs(String prefix) {
         return Sets.union(
                 inputRepository.findBySourceAddressStartingWith(prefix),
                 outputRepository.findByTargetAddressStartingWith(prefix)
-        ).stream().map(InputOutputJpaDto::getAddress).collect(toSet());
+        ).stream().map(InputOutputJpaDto::getAddress).map(Address::new).collect(toSet());
     }
 
 }

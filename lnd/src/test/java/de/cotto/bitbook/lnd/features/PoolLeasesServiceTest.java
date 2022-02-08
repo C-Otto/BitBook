@@ -2,6 +2,7 @@ package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
@@ -48,8 +49,8 @@ class PoolLeasesServiceTest {
     @Mock
     private TransactionService transactionService;
 
-    private String channelAddress;
-    private String changeAddress;
+    private Address channelAddress;
+    private Address changeAddress;
 
     @BeforeEach
     void setUp() {

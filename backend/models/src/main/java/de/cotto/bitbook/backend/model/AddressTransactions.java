@@ -8,13 +8,13 @@ import java.util.Set;
 public class AddressTransactions {
     private static final int MAX_SHOWN_TRANSACTION_HASHES = 10;
 
-    public static final AddressTransactions UNKNOWN = new AddressTransactions("", Collections.emptySet(), 0);
-    private final String address;
+    public static final AddressTransactions UNKNOWN = new AddressTransactions(Address.NONE, Collections.emptySet(), 0);
+    private final Address address;
     private final Set<String> transactionHashes;
     private final int lastCheckedAtBlockHeight;
 
     public AddressTransactions(
-            String address,
+            Address address,
             Set<String> transactionHashes,
             int lastCheckedAtBlockHeight
     ) {
@@ -23,7 +23,7 @@ public class AddressTransactions {
         this.lastCheckedAtBlockHeight = lastCheckedAtBlockHeight;
     }
 
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 
@@ -36,7 +36,7 @@ public class AddressTransactions {
     }
 
     public boolean isValid() {
-        return !address.isEmpty();
+        return address.isValid();
     }
 
     public AddressTransactions getCombined(AddressTransactions update) {

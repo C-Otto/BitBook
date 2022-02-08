@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.model.Coins;
@@ -42,7 +43,7 @@ class TransactionUpdateHeuristicsTest {
     private static final int LIMITED_USE_AGE_LIMIT = 7 * 24 * ONE_HOUR;
     @SuppressWarnings("CPD-END")
 
-    private static final String ADDRESS = ADDRESS_TRANSACTIONS.getAddress();
+    private static final Address ADDRESS = ADDRESS_TRANSACTIONS.getAddress();
 
     private static final Set<String> FEW_TRANSACTION_HASHES =
             Set.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
@@ -203,7 +204,7 @@ class TransactionUpdateHeuristicsTest {
     void single_use_input_of_sweep_transaction_recent() {
         mockAge(LIMITED_USE_AGE_LIMIT);
         mockBalance();
-        mockSweepTransaction(ADDRESS, "output");
+        mockSweepTransaction(ADDRESS, new Address("output"));
         assertThat(transactionUpdateHeuristics.isRecentEnough(WITH_SWEEP_TRANSACTION)).isTrue();
     }
 
@@ -211,7 +212,7 @@ class TransactionUpdateHeuristicsTest {
     void wrong_description_for_sweep_transaction() {
         mockAge(LIMITED_USE_AGE_LIMIT);
         mockBalance();
-        mockSweepTransaction(ADDRESS, "output");
+        mockSweepTransaction(ADDRESS, new Address("output"));
         when(transactionDescriptionService.getDescription(SWEEP_TX_HASH)).thenReturn("xlnd sweep transaction");
         assertThat(transactionUpdateHeuristics.isRecentEnough(WITH_SWEEP_TRANSACTION)).isFalse();
     }
@@ -220,7 +221,7 @@ class TransactionUpdateHeuristicsTest {
     void single_use_output_of_sweep_transaction_recent() {
         mockAge(LIMITED_USE_AGE_LIMIT);
         mockBalance();
-        mockSweepTransaction("input", ADDRESS);
+        mockSweepTransaction(new Address("input"), ADDRESS);
         assertThat(transactionUpdateHeuristics.isRecentEnough(WITH_SWEEP_TRANSACTION)).isFalse();
     }
 
@@ -228,7 +229,7 @@ class TransactionUpdateHeuristicsTest {
     void single_use_too_old() {
         mockAge(LIMITED_USE_AGE_LIMIT + 1);
         mockBalance();
-        mockSweepTransaction(ADDRESS, "output");
+        mockSweepTransaction(ADDRESS, new Address("output"));
         assertThat(transactionUpdateHeuristics.isRecentEnough(WITH_SWEEP_TRANSACTION)).isFalse();
     }
 
@@ -269,7 +270,7 @@ class TransactionUpdateHeuristicsTest {
     }
 
     private void mockBalance() {
-        List<Input> inputs = List.of(new Input(Coins.ofSatoshis(1), "xxx"));
+        List<Input> inputs = List.of(new Input(Coins.ofSatoshis(1), new Address("xxx")));
         List<Output> outputs = List.of(new Output(Coins.ofSatoshis(1), ADDRESS));
         Transaction transaction = new Transaction(
                 TRANSACTION.getHash(),
@@ -288,7 +289,7 @@ class TransactionUpdateHeuristicsTest {
                 .thenReturn(Set.of());
     }
 
-    private void mockSweepTransaction(String inputAddress, String outputAddress) {
+    private void mockSweepTransaction(Address inputAddress, Address outputAddress) {
         when(transactionDescriptionService.getDescription(SWEEP_TX_HASH)).thenReturn("lnd sweep transaction");
         when(transactionDao.getTransaction(SWEEP_TX_HASH)).thenReturn(new Transaction(
                 TRANSACTION.getHash(),

@@ -1,17 +1,19 @@
 package de.cotto.bitbook.ownership;
 
+import de.cotto.bitbook.backend.model.Address;
+
 import java.util.Set;
 
 public interface AddressOwnershipDao {
-    Set<String> getOwnedAddresses();
+    Set<Address> getOwnedAddresses();
 
-    Set<String> getForeignAddresses();
+    Set<Address> getForeignAddresses();
 
-    void setAddressAsOwned(String address);
+    void setAddressAsOwned(Address address);
 
-    void setAddressAsForeign(String address);
+    void setAddressAsForeign(Address address);
 
-    void remove(String address);
+    void remove(Address address);
 
-    OwnershipStatus getOwnershipStatus(String address);
+    OwnershipStatus getOwnershipStatus(Address address);
 }

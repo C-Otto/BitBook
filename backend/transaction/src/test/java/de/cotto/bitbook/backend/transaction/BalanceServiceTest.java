@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 import de.cotto.bitbook.backend.model.Output;
@@ -38,7 +39,7 @@ class BalanceServiceTest {
     @Test
     void getBalance_two_incoming_transactions() {
         Transaction transaction1 = getTransaction(124, 1, Map.of(123, ADDRESS));
-        Transaction transaction2 = getTransaction(456, 0, Map.of(400, ADDRESS, 56, "z"));
+        Transaction transaction2 = getTransaction(456, 0, Map.of(400, ADDRESS, 56, new Address("z")));
 
         when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
                 .thenReturn(Set.of(transaction1, transaction2));
@@ -49,11 +50,11 @@ class BalanceServiceTest {
         assertThat(balance).isEqualTo(Coins.ofSatoshis(123 + 400));
     }
 
-    private Transaction getTransaction(int inputAmount, int fee, Map<Integer, String> outputsToAddresses) {
+    private Transaction getTransaction(int inputAmount, int fee, Map<Integer, Address> outputsToAddresses) {
         List<Output> outputs = outputsToAddresses.entrySet().stream()
                 .map(entry -> new Output(Coins.ofSatoshis(entry.getKey()), entry.getValue()))
                 .collect(toList());
-        List<Input> inputs = List.of(new Input(Coins.ofSatoshis(inputAmount), "z"));
+        List<Input> inputs = List.of(new Input(Coins.ofSatoshis(inputAmount), new Address("z")));
         return new Transaction("x", BLOCK_HEIGHT, DATE_TIME, Coins.ofSatoshis(fee), inputs, outputs);
     }
 }

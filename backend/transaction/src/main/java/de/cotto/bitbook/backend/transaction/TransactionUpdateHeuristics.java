@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.model.Coins;
@@ -83,7 +84,7 @@ public class TransactionUpdateHeuristics {
     }
 
     private boolean hasEmptyBalance(AddressTransactions addressTransactions) {
-        String address = addressTransactions.getAddress();
+        Address address = addressTransactions.getAddress();
         Coins balance = transactionService.getTransactionDetails(addressTransactions.getTransactionHashes()).stream()
                 .map(transactionDetails -> transactionDetails.getDifferenceForAddress(address))
                 .reduce(Coins.NONE, Coins::add);

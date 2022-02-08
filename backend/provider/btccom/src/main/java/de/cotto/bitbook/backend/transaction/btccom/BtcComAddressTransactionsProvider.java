@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.btccom;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.transaction.SimpleAddressTransactionsProvider;
 import de.cotto.bitbook.backend.transaction.TransactionsRequestKey;
@@ -26,7 +27,7 @@ public class BtcComAddressTransactionsProvider extends SimpleAddressTransactions
 
     @Override
     protected Optional<AddressTransactions> getFromApi(TransactionsRequestKey transactionsRequestKey) {
-        String address = transactionsRequestKey.getAddress();
+        Address address = transactionsRequestKey.getAddress();
         logger.debug("Contacting btc.com API for transactions for address {}", address);
         return btcComClient.getAddressDetails(address)
                 .map(dto -> dto.toModel(transactionsRequestKey.getBlockHeight(), address));

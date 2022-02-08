@@ -2,6 +2,7 @@ package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.transaction.TransactionService;
@@ -176,7 +177,7 @@ class OnchainTransactionsServiceTest {
         void setUp() {
             when(transactionService.getTransactionDetails(OPENING_TRANSACTION.getTransactionHash()))
                     .thenReturn(OPENING_TRANSACTION_DETAILS);
-            String unknownOutputAddress = OUTPUT_ADDRESS_1;
+            Address unknownOutputAddress = OUTPUT_ADDRESS_1;
 
             when(addressOwnershipService.getOwnershipStatus(unknownOutputAddress)).thenReturn(UNKNOWN);
             when(addressDescriptionService.getDescription(unknownOutputAddress)).thenReturn("");

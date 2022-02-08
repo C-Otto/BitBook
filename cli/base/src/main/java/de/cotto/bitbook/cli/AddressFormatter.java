@@ -1,5 +1,6 @@
 package de.cotto.bitbook.cli;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import de.cotto.bitbook.ownership.OwnershipStatus;
 import org.springframework.boot.ansi.AnsiColor;
@@ -14,7 +15,7 @@ public class AddressFormatter {
         this.addressOwnershipService = addressOwnershipService;
     }
 
-    public String getFormattedOwnershipStatus(String address) {
+    public String getFormattedOwnershipStatus(Address address) {
         OwnershipStatus ownershipStatus = addressOwnershipService.getOwnershipStatus(address);
         return AnsiOutput.toString(getColor(ownershipStatus), getCharacter(ownershipStatus), AnsiColor.DEFAULT);
     }

@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Output;
 import de.cotto.bitbook.backend.model.Transaction;
@@ -45,7 +46,7 @@ class TransactionJpaDtoTest {
                 BLOCK_HEIGHT,
                 DATE_TIME,
                 FEES,
-                List.of(OUTPUT_1, OUTPUT_2, new Output(Coins.NONE, "xxx"))
+                List.of(OUTPUT_1, OUTPUT_2, new Output(Coins.NONE, new Address("xxx")))
         );
         assertThat(TransactionJpaDto.fromModel(coinbaseTransaction).toModel()).isEqualTo(coinbaseTransaction);
     }

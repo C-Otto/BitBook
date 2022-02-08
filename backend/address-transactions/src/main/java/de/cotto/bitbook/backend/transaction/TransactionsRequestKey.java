@@ -1,16 +1,17 @@
 package de.cotto.bitbook.backend.transaction;
 
 import com.google.common.base.Preconditions;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 
 import java.util.Objects;
 
 public class TransactionsRequestKey {
-    private final String address;
+    private final Address address;
     private final int blockHeight;
     private final AddressTransactions addressTransactions;
 
-    public TransactionsRequestKey(String address, int blockHeight) {
+    public TransactionsRequestKey(Address address, int blockHeight) {
         this.address = address;
         this.blockHeight = blockHeight;
         this.addressTransactions = AddressTransactions.UNKNOWN;
@@ -22,7 +23,7 @@ public class TransactionsRequestKey {
         this.addressTransactions = addressTransactions;
     }
 
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 

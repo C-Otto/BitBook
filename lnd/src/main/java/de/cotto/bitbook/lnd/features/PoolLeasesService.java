@@ -2,6 +2,7 @@ package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.InputOutput;
 import de.cotto.bitbook.backend.model.Output;
@@ -58,7 +59,7 @@ public class PoolLeasesService {
     }
 
     private void setChannelAddressDescriptionAndOwnership(PoolLease poolLease) {
-        String channelAddress = getChannelAddress(poolLease);
+        Address channelAddress = getChannelAddress(poolLease);
         addressDescriptionService.set(channelAddress, "Lightning Channel with " + poolLease.getPubKey());
         addressOwnershipService.setAddressAsOwned(channelAddress);
     }
@@ -76,7 +77,7 @@ public class PoolLeasesService {
         });
     }
 
-    private String getChannelAddress(PoolLease poolLease) {
+    private Address getChannelAddress(PoolLease poolLease) {
         Transaction transaction = transactionService.getTransactionDetails(poolLease.getTransactionHash());
         return getChannelOutput(poolLease, transaction).getAddress();
     }
@@ -85,7 +86,7 @@ public class PoolLeasesService {
         return transaction.getOutputs().get(poolLease.getOutputIndex());
     }
 
-    private Optional<String> getChangeAddress(PoolLease poolLease) {
+    private Optional<Address> getChangeAddress(PoolLease poolLease) {
         Transaction transaction = transactionService.getTransactionDetails(poolLease.getTransactionHash());
         Coins ownedInputs = transaction.getInputs().stream()
                 .filter(input -> OWNED.equals(addressOwnershipService.getOwnershipStatus(input.getAddress())))

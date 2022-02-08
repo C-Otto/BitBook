@@ -2,6 +2,7 @@ package de.cotto.bitbook.ownership;
 
 import com.google.common.base.Functions;
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.model.Coins;
@@ -39,7 +40,7 @@ public class AddressOwnershipService {
         this.transactionService = transactionService;
     }
 
-    public Set<String> getOwnedAddresses() {
+    public Set<Address> getOwnedAddresses() {
         return addressOwnershipDao.getOwnedAddresses();
     }
 
@@ -48,8 +49,8 @@ public class AddressOwnershipService {
     }
 
     public Map<Transaction, Coins> getNeighbourTransactions() {
-        Set<String> ownedAddresses = getOwnedAddresses();
-        Set<String> foreignAddresses = addressOwnershipDao.getForeignAddresses();
+        Set<Address> ownedAddresses = getOwnedAddresses();
+        Set<Address> foreignAddresses = addressOwnershipDao.getForeignAddresses();
         Set<Transaction> myTransactions = getMyTransactions();
 
         Map<Transaction, Coins> differencesOwned = getDifferences(myTransactions, ownedAddresses);
@@ -66,38 +67,38 @@ public class AddressOwnershipService {
         }
     }
 
-    public void setAddressAsOwned(String address) {
+    public void setAddressAsOwned(Address address) {
         addressOwnershipDao.setAddressAsOwned(address);
         addressTransactionsService.requestTransactionsInBackground(address);
     }
 
-    public void setAddressAsOwned(String address, String description) {
+    public void setAddressAsOwned(Address address, String description) {
         setAddressAsOwned(address);
         addressDescriptionService.set(address, description);
     }
 
-    public void setAddressAsForeign(String address) {
+    public void setAddressAsForeign(Address address) {
         addressOwnershipDao.setAddressAsForeign(address);
     }
 
-    public void setAddressAsForeign(String address, String description) {
+    public void setAddressAsForeign(Address address, String description) {
         setAddressAsForeign(address);
         addressDescriptionService.set(address, description);
     }
 
-    public void resetOwnership(String address) {
+    public void resetOwnership(Address address) {
         addressOwnershipDao.remove(address);
     }
 
     public Coins getBalance() {
-        Set<String> ownedAddresses = getOwnedAddresses();
+        Set<Address> ownedAddresses = getOwnedAddresses();
         addressTransactionsService.getTransactionsForAddresses(ownedAddresses);
         return ownedAddresses.parallelStream()
                 .map(balanceService::getBalance)
                 .reduce(Coins.NONE, Coins::add);
     }
 
-    public OwnershipStatus getOwnershipStatus(String address) {
+    public OwnershipStatus getOwnershipStatus(Address address) {
         return addressOwnershipDao.getOwnershipStatus(address);
     }
 
@@ -115,7 +116,7 @@ public class AddressOwnershipService {
 
     private Map<Transaction, Coins> getDifferences(
             Set<Transaction> transactions,
-            Set<String> addresses
+            Set<Address> addresses
     ) {
         return transactions.stream().collect(toMap(
                 Functions.identity(),

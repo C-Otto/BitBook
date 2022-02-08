@@ -1,5 +1,6 @@
 package de.cotto.bitbook.lnd.model;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Output;
 import de.cotto.bitbook.backend.model.Transaction;
@@ -63,7 +64,7 @@ public class ClosedChannel {
         return openInitiator;
     }
 
-    public String getChannelAddress() {
+    public Address getChannelAddress() {
         return closingTransaction.getInputs().get(0).getAddress();
     }
 
@@ -98,7 +99,7 @@ public class ClosedChannel {
         return new ClosedChannelBuilder();
     }
 
-    public Optional<String> getSettlementAddress() {
+    public Optional<Address> getSettlementAddress() {
         return closingTransaction.getOutputWithValue(settledBalance).map(Output::getAddress);
     }
 

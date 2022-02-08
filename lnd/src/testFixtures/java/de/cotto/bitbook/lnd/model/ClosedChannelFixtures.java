@@ -1,5 +1,6 @@
 package de.cotto.bitbook.lnd.model;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 import de.cotto.bitbook.backend.model.Output;
@@ -22,8 +23,8 @@ public class ClosedChannelFixtures {
             = "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f";
 
     public static final Coins CHANNEL_CAPACITY = Coins.ofSatoshis(500);
-    public static final String CHANNEL_ADDRESS = "bc1channel";
-    public static final String SETTLEMENT_ADDRESS = OUTPUT_ADDRESS_1;
+    public static final Address CHANNEL_ADDRESS = new Address("bc1channel");
+    public static final Address SETTLEMENT_ADDRESS = OUTPUT_ADDRESS_1;
     private static final Coins SETTLED_BALANCE = Coins.ofSatoshis(400);
 
     public static final Transaction OPENING_TRANSACTION = new Transaction(

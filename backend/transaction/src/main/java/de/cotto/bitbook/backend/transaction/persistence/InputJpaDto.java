@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 
@@ -32,13 +33,13 @@ public class InputJpaDto implements InputOutputJpaDto {
 
     public static InputJpaDto fromModel(Input output) {
         InputJpaDto dto = new InputJpaDto();
-        dto.setSourceAddress(output.getAddress());
+        dto.setSourceAddress(output.getAddress().toString());
         dto.setValue(output.getValue().getSatoshis());
         return dto;
     }
 
     public Input toModel() {
-        return new Input(Coins.ofSatoshis(value), requireNonNull(sourceAddress));
+        return new Input(Coins.ofSatoshis(value), new Address(requireNonNull(sourceAddress)));
     }
 
     public void setValue(long value) {

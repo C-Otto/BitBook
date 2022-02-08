@@ -2,6 +2,7 @@ package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.InputOutput;
 import de.cotto.bitbook.backend.model.Transaction;
@@ -76,10 +77,10 @@ public class TransactionFormatter {
         inputsOutputs.stream()
                 .collect(Collectors.toMap(InputOutput::getAddress, InputOutput::getValue, Coins::add))
                 .entrySet().stream()
-                .sorted(Map.Entry.<String, Coins>comparingByValue().reversed())
+                .sorted(Map.Entry.<Address, Coins>comparingByValue().reversed())
                 .forEach(entry -> {
                     Coins coins = entry.getValue();
-                    String address = entry.getKey();
+                    Address address = entry.getKey();
                     String infix = getFormattedOwnershipStatus(address) + " " + formatWithPrice(coins, price);
                     result.append(addressDescriptionService.get(address).getFormattedWithInfix(infix));
                     result.append('\n');
@@ -87,7 +88,7 @@ public class TransactionFormatter {
         return StringUtils.stripEnd(result.toString(), "\n");
     }
 
-    public String formatSingleLineForAddress(Transaction transaction, String address) {
+    public String formatSingleLineForAddress(Transaction transaction, Address address) {
         Coins differenceForAddress = transaction.getDifferenceForAddress(address);
         return formatSingleLineForValue(transaction, differenceForAddress);
     }
@@ -110,7 +111,7 @@ public class TransactionFormatter {
         );
     }
 
-    public String getFormattedOwnershipStatus(String address) {
+    public String getFormattedOwnershipStatus(Address address) {
         return addressFormatter.getFormattedOwnershipStatus(address);
     }
 

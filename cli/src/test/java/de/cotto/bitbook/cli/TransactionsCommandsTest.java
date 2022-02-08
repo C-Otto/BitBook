@@ -2,6 +2,7 @@ package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.model.Coins;
@@ -141,7 +142,7 @@ class TransactionsCommandsTest {
     @Test
     void getAddressTransactions_sorted_using_transaction_sorter() {
         mockSortByHash();
-        String address = INPUT_ADDRESS_1;
+        Address address = INPUT_ADDRESS_1;
         Transaction transaction3 = new Transaction(
                 TRANSACTION_HASH_3,
                 BLOCK_HEIGHT,

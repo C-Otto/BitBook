@@ -23,6 +23,6 @@ class InputJpaDtoTest {
 
     @Test
     void getAddress() {
-        assertThat(INPUT_JPA_DTO_1.getAddress()).isEqualTo(INPUT_ADDRESS_1);
+        assertThat(INPUT_JPA_DTO_1.getAddress()).isEqualTo(INPUT_ADDRESS_1.toString());
     }
 }

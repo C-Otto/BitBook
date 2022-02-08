@@ -1,6 +1,7 @@
 package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,16 +29,16 @@ class UnspentOutputsServiceTest {
 
     @Test
     void returnsNumberOfAddresses() {
-        String address1 = "bc1qngw83";
-        String address2 = "bc1aaaaaa";
+        Address address1 = new Address("bc1qngw83");
+        Address address2 = new Address("bc1aaaaaa");
 
         assertThat(unspentOutputsService.addFromUnspentOutputs(Set.of(address1, address2))).isEqualTo(2);
     }
 
     @Test
     void setsOwnership() {
-        String address1 = "bc1qngw83";
-        String address2 = "bc1aaaaaa";
+        Address address1 = new Address("bc1qngw83");
+        Address address2 = new Address("bc1aaaaaa");
 
         unspentOutputsService.addFromUnspentOutputs(Set.of(address1, address2));
 
@@ -47,8 +48,8 @@ class UnspentOutputsServiceTest {
 
     @Test
     void setsDescriptions() {
-        String address1 = "bc1qngw83";
-        String address2 = "bc1aaaaaa";
+        Address address1 = new Address("bc1qngw83");
+        Address address2 = new Address("bc1aaaaaa");
 
         unspentOutputsService.addFromUnspentOutputs(Set.of(address1, address2));
 

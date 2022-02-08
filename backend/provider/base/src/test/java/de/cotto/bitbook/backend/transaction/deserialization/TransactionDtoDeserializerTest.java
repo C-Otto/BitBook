@@ -1,6 +1,7 @@
 package de.cotto.bitbook.backend.transaction.deserialization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 import org.junit.jupiter.api.Test;
@@ -90,8 +91,8 @@ class TransactionDtoDeserializerTest {
                 }""";
         TestableTransactionDto transactionDto =
                 objectMapper.readValue(json, TestableTransactionDto.class);
-        Input input1 = new Input(Coins.ofSatoshis(100), "xxx");
-        Input input2 = new Input(Coins.ofSatoshis(100), "xxx");
+        Input input1 = new Input(Coins.ofSatoshis(100), new Address("xxx"));
+        Input input2 = new Input(Coins.ofSatoshis(100), new Address("xxx"));
         assertThat(transactionDto.toModel().getInputs()).containsExactly(input1, input2);
     }
 

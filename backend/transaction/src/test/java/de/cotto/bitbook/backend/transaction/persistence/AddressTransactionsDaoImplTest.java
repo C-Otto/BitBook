@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,7 +38,7 @@ class AddressTransactionsDaoImplTest {
 
     @Test
     void getAddressTransactions() {
-        when(repository.findById(ADDRESS)).thenReturn(Optional.of(ADDRESS_TRANSACTIONS_JPA_DTO));
+        when(repository.findById(ADDRESS.toString())).thenReturn(Optional.of(ADDRESS_TRANSACTIONS_JPA_DTO));
 
         AddressTransactions transaction = addressTransactionsDao.getAddressTransactions(ADDRESS);
 
@@ -47,7 +48,9 @@ class AddressTransactionsDaoImplTest {
     @Test
     void saveAddressTransactions() {
         addressTransactionsDao.saveAddressTransactions(ADDRESS_TRANSACTIONS);
-        verify(repository).save(argThat(dto -> ADDRESS_TRANSACTIONS.getAddress().equals(dto.getAddress())));
+        verify(repository).save(argThat(
+                dto -> ADDRESS_TRANSACTIONS.getAddress().equals(new Address(dto.getAddress()))
+        ));
         verify(repository).save(argThat(
                 dto -> ADDRESS_TRANSACTIONS.getLastCheckedAtBlockHeight() == dto.getLastCheckedAtBlockheight()
         ));
@@ -64,8 +67,8 @@ class AddressTransactionsDaoImplTest {
 
     @Test
     void getAddressesStartingWith() {
-        String prefix = ADDRESS.substring(0, 2);
-        when(repository.findByAddressStartingWith(prefix)).thenReturn(List.of(() -> ADDRESS, () -> ADDRESS_2));
+        String prefix = ADDRESS.toString().substring(0, 2);
+        when(repository.findByAddressStartingWith(prefix)).thenReturn(List.of(ADDRESS::toString, ADDRESS_2::toString));
         assertThat(addressTransactionsDao.getAddressesStartingWith(prefix))
                 .containsExactlyInAnyOrder(ADDRESS, ADDRESS_2);
     }

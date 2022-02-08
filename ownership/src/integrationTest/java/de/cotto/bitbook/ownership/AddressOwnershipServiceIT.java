@@ -1,6 +1,7 @@
 package de.cotto.bitbook.ownership;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsService;
 import de.cotto.bitbook.backend.transaction.BalanceService;
 import de.cotto.bitbook.backend.transaction.TransactionDao;
@@ -41,7 +42,7 @@ class AddressOwnershipServiceIT {
 
     @Test
     void markAsOwnedAndGet() {
-        String address = "abc";
+        Address address = new Address("abc");
         addressOwnershipService.setAddressAsOwned(address, "");
         assertThat(addressOwnershipService.getOwnedAddresses()).containsExactly(address);
         verify(addressTransactionsService).requestTransactionsInBackground(address);

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.transaction.deserialization.AddressTransactionsDto;
 
 import java.io.IOException;
@@ -14,11 +15,11 @@ import java.util.Set;
 @JsonDeserialize(using = BitapsAddressTransactionsDto.Deserializer.class)
 public class BitapsAddressTransactionsDto extends AddressTransactionsDto {
     public BitapsAddressTransactionsDto(Set<String> hashes) {
-        super("", hashes);
+        super(Address.NONE, hashes);
     }
 
     @Override
-    protected void validateAddress(String expectedAddress) {
+    protected void validateAddress(Address expectedAddress) {
         // the bitaps.com response does not contain any address, so we cannot validate the DTO
     }
 

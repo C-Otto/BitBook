@@ -63,7 +63,7 @@ class TransactionTest {
                 BLOCK_HEIGHT,
                 DATE_TIME,
                 FEES,
-                List.of(OUTPUT_1, OUTPUT_2, new Output(Coins.NONE, "xxx"))
+                List.of(OUTPUT_1, OUTPUT_2, new Output(Coins.NONE, new Address("xxx")))
         );
         assertThat(coinbaseTransaction.getOutputs()).hasSize(2);
     }
@@ -166,7 +166,7 @@ class TransactionTest {
                 BLOCK_HEIGHT,
                 DATE_TIME,
                 Coins.NONE,
-                List.of(new Input(OUTPUT_VALUE_1.add(OUTPUT_VALUE_1), "a")),
+                List.of(new Input(OUTPUT_VALUE_1.add(OUTPUT_VALUE_1), new Address("a"))),
                 List.of(OUTPUT_1, OUTPUT_1)
         );
         assertThat(transaction.getOutputWithValue(OUTPUT_VALUE_1)).isEmpty();
@@ -243,7 +243,7 @@ class TransactionTest {
     void ignoresEmptyOutputs() {
         List<Output> outputs = List.of(
                 Output.EMPTY,
-                new Output(Coins.NONE, "xx"),
+                new Output(Coins.NONE, new Address("xx")),
                 OUTPUT_1,
                 OUTPUT_2
         );
@@ -279,7 +279,7 @@ class TransactionTest {
     void ignoresEmptyInputs() {
         List<Input> inputs = List.of(
                 Input.EMPTY,
-                new Input(Coins.NONE, "xx"),
+                new Input(Coins.NONE, new Address("xx")),
                 INPUT_1,
                 INPUT_2
         );

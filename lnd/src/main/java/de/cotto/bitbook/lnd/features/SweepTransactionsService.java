@@ -2,6 +2,7 @@ package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Input;
 import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.transaction.TransactionService;
@@ -65,11 +66,11 @@ public class SweepTransactionsService {
         transactionDescriptionService.set(transaction.getHash(), SWEEP_TRANSACTION_DESCRIPTION);
     }
 
-    private String getOutputAddress(Transaction transaction) {
+    private Address getOutputAddress(Transaction transaction) {
         return transaction.getOutputs().get(0).getAddress();
     }
 
-    private Set<String> getInputAddresses(Transaction transaction) {
+    private Set<Address> getInputAddresses(Transaction transaction) {
         return transaction.getInputs().stream().map(Input::getAddress).collect(toSet());
     }
 }

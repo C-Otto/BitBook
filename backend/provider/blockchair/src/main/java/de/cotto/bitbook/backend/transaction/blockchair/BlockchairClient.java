@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.blockchair;
 
+import de.cotto.bitbook.backend.model.Address;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -16,7 +17,7 @@ public interface BlockchairClient {
     Optional<BlockchairTransactionDto> getTransaction(@PathVariable String transactionHash);
 
     @GetMapping("/bitcoin/dashboards/address/{address}")
-    Optional<BlockchairAddressTransactionsDto> getAddressDetails(@PathVariable String address);
+    Optional<BlockchairAddressTransactionsDto> getAddressDetails(@PathVariable Address address);
 
     @GetMapping("/{chainName}/stats")
     Optional<BlockchairBlockHeightDto> getBlockHeight(@PathVariable String chainName);

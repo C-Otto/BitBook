@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.transaction.AddressTransactionsDao;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,7 +44,9 @@ class AddressCompletionDaoImplTest {
     void completeFromInputsAndOutputs() {
         when(inputRepository.findBySourceAddressStartingWith(PREFIX)).thenReturn(Set.of(INPUT_JPA_DTO_1));
         when(outputRepository.findByTargetAddressStartingWith(PREFIX)).thenReturn(Set.of(OUTPUT_JPA_DTO_1));
-        assertThat(addressCompletionDao.completeFromInputsAndOutputs(PREFIX))
-                .containsExactlyInAnyOrder(INPUT_JPA_DTO_1.getAddress(), OUTPUT_JPA_DTO_1.getAddress());
+        assertThat(addressCompletionDao.completeFromInputsAndOutputs(PREFIX)).containsExactlyInAnyOrder(
+                        new Address(INPUT_JPA_DTO_1.getAddress()),
+                        new Address(OUTPUT_JPA_DTO_1.getAddress())
+        );
     }
 }

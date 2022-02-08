@@ -1,5 +1,6 @@
 package de.cotto.bitbook.cli;
 
+import de.cotto.bitbook.backend.model.Address;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,7 +31,7 @@ class AddressConverterTest {
 
     @Test
     void autocompletes_if_ends_in_ellipsis() {
-        when(addressCompletionProvider.completeIfUnique("x…")).thenReturn(Optional.of("xyz"));
+        when(addressCompletionProvider.completeIfUnique("x…")).thenReturn(Optional.of(new Address("xyz")));
         assertThat(addressConverter.convert("x…")).isEqualTo(new CliAddress("xyz"));
     }
 

@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 class AddressTransactionsTest {
     @Test
     void unknown() {
-        assertThat(UNKNOWN).isEqualTo(new AddressTransactions("", emptySet(), 0));
+        assertThat(UNKNOWN).isEqualTo(new AddressTransactions(Address.NONE, emptySet(), 0));
     }
 
     @Test

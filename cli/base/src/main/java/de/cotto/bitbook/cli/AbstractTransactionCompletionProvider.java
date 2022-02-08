@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 public abstract class AbstractTransactionCompletionProvider
-        extends AbstractCompletionProvider<TransactionWithDescription> {
+        extends AbstractCompletionProvider<String, TransactionWithDescription> {
 
     private final TransactionCompletionDao transactionCompletionDao;
 

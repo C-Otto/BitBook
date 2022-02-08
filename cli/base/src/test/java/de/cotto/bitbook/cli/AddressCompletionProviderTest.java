@@ -1,6 +1,7 @@
 package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.transaction.AddressCompletionDao;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AddressCompletionProviderTest {
-    private static final String BC1_ADDRESS = "bc1xxx";
+    private static final Address BC1_ADDRESS = new Address("bc1xxx");
     private static final String PREFIX = "bc1xx";
     @InjectMocks
     private AddressCompletionProvider completionProvider;
@@ -66,27 +67,27 @@ class AddressCompletionProviderTest {
         List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
 
         assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
-                new CompletionProposal(ADDRESS_2),
-                new CompletionProposal(ADDRESS).description(description)
+                new CompletionProposal(ADDRESS_2.toString()),
+                new CompletionProposal(ADDRESS.toString()).description(description)
         );
     }
 
     @Test
     void complete_bc1_address() {
-        input = BC1_ADDRESS;
+        input = BC1_ADDRESS.toString();
         assertCompletion(input);
     }
 
     @Test
     void complete_bc1_address_with_whitespace() {
         input = "      " + BC1_ADDRESS + "        ";
-        assertCompletion(BC1_ADDRESS);
+        assertCompletion(BC1_ADDRESS.toString());
     }
 
     @Test
     void complete_bc1_address_with_ellipsis() {
         input = BC1_ADDRESS + "…";
-        assertCompletion(BC1_ADDRESS);
+        assertCompletion(BC1_ADDRESS.toString());
     }
 
     private void assertCompletion(String expectedInput) {
@@ -107,7 +108,7 @@ class AddressCompletionProviderTest {
         List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
 
         assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
-                new CompletionProposal(INPUT_ADDRESS_1).description(description)
+                new CompletionProposal(INPUT_ADDRESS_1.toString()).description(description)
         );
     }
 
@@ -122,7 +123,7 @@ class AddressCompletionProviderTest {
         List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
 
         assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
-                new CompletionProposal(ADDRESS)
+                new CompletionProposal(ADDRESS.toString())
         );
     }
 
@@ -152,7 +153,7 @@ class AddressCompletionProviderTest {
         List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
 
         assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
-                new CompletionProposal(ADDRESS_2),
+                new CompletionProposal(ADDRESS_2.toString()),
                 new CompletionProposal(addressWithAnsiDescription())
         );
     }
@@ -181,7 +182,7 @@ class AddressCompletionProviderTest {
     @Test
     void complete_single_string_not_unique() {
         when(addressCompletionDao.completeFromAddressTransactions(PREFIX)).thenReturn(Set.of(BC1_ADDRESS));
-        when(addressCompletionDao.completeFromInputsAndOutputs(PREFIX)).thenReturn(Set.of("bc1xxy"));
+        when(addressCompletionDao.completeFromInputsAndOutputs(PREFIX)).thenReturn(Set.of(new Address("bc1xxy")));
         assertThat(completionProvider.completeIfUnique(PREFIX)).isEmpty();
     }
 

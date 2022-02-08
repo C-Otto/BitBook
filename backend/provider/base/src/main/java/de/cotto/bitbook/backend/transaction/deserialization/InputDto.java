@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.deserialization;
 
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 
@@ -16,6 +17,6 @@ public class InputDto extends InputOutputDto {
 
     @Override
     public Input toModel() {
-        return new Input(getValue(), getAddress());
+        return new Input(getValue(), new Address(getAddress()));
     }
 }

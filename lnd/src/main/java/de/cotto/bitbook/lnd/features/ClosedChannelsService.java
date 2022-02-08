@@ -2,6 +2,7 @@ package de.cotto.bitbook.lnd.features;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.lnd.model.ClosedChannel;
 import de.cotto.bitbook.lnd.model.Initiator;
 import de.cotto.bitbook.lnd.model.Resolution;
@@ -44,7 +45,7 @@ public class ClosedChannelsService {
     }
 
     private void addFromClosedChannel(ClosedChannel closedChannel) {
-        String channelAddress = closedChannel.getChannelAddress();
+        Address channelAddress = closedChannel.getChannelAddress();
         String remotePubkey = closedChannel.getRemotePubkey();
 
         setTransactionDescriptions(closedChannel);
@@ -82,7 +83,7 @@ public class ClosedChannelsService {
     }
 
     private void setChannelAddressOwnershipAndDescription(
-            String channelAddress,
+            Address channelAddress,
             Initiator openInitiator,
             String remotePubkey
     ) {
@@ -90,11 +91,11 @@ public class ClosedChannelsService {
         setChannelAddressOwnership(channelAddress, openInitiator);
     }
 
-    private void setChannelAddressDescription(String channelAddress, String remotePubkey) {
+    private void setChannelAddressDescription(Address channelAddress, String remotePubkey) {
         addressDescriptionService.set(channelAddress, "Lightning-Channel with " + remotePubkey);
     }
 
-    private void setChannelAddressOwnership(String channelAddress, Initiator openInitiator) {
+    private void setChannelAddressOwnership(Address channelAddress, Initiator openInitiator) {
         if (openInitiator.equals(Initiator.LOCAL)) {
             addressOwnershipService.setAddressAsOwned(channelAddress);
         } else if (openInitiator.equals(Initiator.REMOTE)) {

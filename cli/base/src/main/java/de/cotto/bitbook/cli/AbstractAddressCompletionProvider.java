@@ -1,13 +1,15 @@
 package de.cotto.bitbook.cli;
 
 import de.cotto.bitbook.backend.AddressDescriptionService;
+import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.transaction.AddressCompletionDao;
 
 import java.util.Set;
 import java.util.function.Function;
 
-public abstract class AbstractAddressCompletionProvider extends AbstractCompletionProvider<AddressWithDescription> {
+public abstract class AbstractAddressCompletionProvider
+        extends AbstractCompletionProvider<Address, AddressWithDescription> {
     private final AddressCompletionDao addressCompletionDao;
 
     public AbstractAddressCompletionProvider(
@@ -19,7 +21,7 @@ public abstract class AbstractAddressCompletionProvider extends AbstractCompleti
     }
 
     @Override
-    protected Set<Function<String, Set<String>>> getStringCompleters() {
+    protected Set<Function<String, Set<Address>>> getStringCompleters() {
         return Set.of(
                 addressCompletionDao::completeFromAddressTransactions,
                 addressCompletionDao::completeFromInputsAndOutputs

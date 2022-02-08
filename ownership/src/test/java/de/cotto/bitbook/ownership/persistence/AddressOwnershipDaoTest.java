@@ -1,5 +1,6 @@
 package de.cotto.bitbook.ownership.persistence;
 
+import de.cotto.bitbook.backend.model.Address;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,8 +35,8 @@ class AddressOwnershipDaoTest {
         when(addressOwnershipRepository.findAll())
                 .thenReturn(List.of(OWNED_ADDRESS_JPA_DTO_1, FOREIGN_ADDRESS_JPA_DTO_1, OWNED_ADDRESS_JPA_DTO_2));
         assertThat(ownedAddressesDao.getOwnedAddresses()).containsExactlyInAnyOrder(
-                OWNED_ADDRESS_JPA_DTO_1.getAddress(),
-                OWNED_ADDRESS_JPA_DTO_2.getAddress()
+                new Address(OWNED_ADDRESS_JPA_DTO_1.getAddress()),
+                new Address(OWNED_ADDRESS_JPA_DTO_2.getAddress())
         );
     }
 
@@ -44,14 +45,14 @@ class AddressOwnershipDaoTest {
         when(addressOwnershipRepository.findAll())
                 .thenReturn(List.of(OWNED_ADDRESS_JPA_DTO_1, FOREIGN_ADDRESS_JPA_DTO_1, FOREIGN_ADDRESS_JPA_DTO_2));
         assertThat(ownedAddressesDao.getForeignAddresses()).containsExactlyInAnyOrder(
-                FOREIGN_ADDRESS_JPA_DTO_1.getAddress(),
-                FOREIGN_ADDRESS_JPA_DTO_2.getAddress()
+                new Address(FOREIGN_ADDRESS_JPA_DTO_1.getAddress()),
+                new Address(FOREIGN_ADDRESS_JPA_DTO_2.getAddress())
         );
     }
 
     @Test
     void setAddressAsOwned() {
-        ownedAddressesDao.setAddressAsOwned(OWNED_ADDRESS_JPA_DTO_1.getAddress());
+        ownedAddressesDao.setAddressAsOwned(new Address(OWNED_ADDRESS_JPA_DTO_1.getAddress()));
         verify(addressOwnershipRepository).save(
                 argThat(dto -> OWNED_ADDRESS_JPA_DTO_1.getAddress().equals(dto.getAddress()))
         );
@@ -62,7 +63,7 @@ class AddressOwnershipDaoTest {
 
     @Test
     void setAddressAsForeign() {
-        ownedAddressesDao.setAddressAsForeign(FOREIGN_ADDRESS_JPA_DTO_1.getAddress());
+        ownedAddressesDao.setAddressAsForeign(new Address(FOREIGN_ADDRESS_JPA_DTO_1.getAddress()));
         verify(addressOwnershipRepository).save(
                 argThat(dto -> FOREIGN_ADDRESS_JPA_DTO_1.getAddress().equals(dto.getAddress()))
         );
@@ -74,7 +75,7 @@ class AddressOwnershipDaoTest {
     @Test
     void remove() {
         ownedAddressesDao.remove(ADDRESS);
-        verify(addressOwnershipRepository).deleteById(ADDRESS);
+        verify(addressOwnershipRepository).deleteById(ADDRESS.toString());
     }
 
     @Test
@@ -84,8 +85,8 @@ class AddressOwnershipDaoTest {
 
     @Test
     void getOwnershipStatus() {
-        when(addressOwnershipRepository.findByAddress(ADDRESS))
-                .thenReturn(Optional.of(new AddressOwnershipJpaDto(ADDRESS, OWNED)));
+        when(addressOwnershipRepository.findByAddress(ADDRESS.toString()))
+                .thenReturn(Optional.of(new AddressOwnershipJpaDto(ADDRESS.toString(), OWNED)));
         assertThat(ownedAddressesDao.getOwnershipStatus(ADDRESS)).isEqualTo(OWNED);
     }
 }
