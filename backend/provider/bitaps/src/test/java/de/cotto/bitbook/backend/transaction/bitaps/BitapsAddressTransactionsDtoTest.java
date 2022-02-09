@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.cotto.bitbook.backend.transaction.deserialization.TestObjectMapper;
 import org.junit.jupiter.api.Test;
 
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_2;
 import static de.cotto.bitbook.backend.transaction.bitaps.BitapsAddressTransactionDtoFixtures.BITAPS_ADDRESS_TRANSACTIONS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;

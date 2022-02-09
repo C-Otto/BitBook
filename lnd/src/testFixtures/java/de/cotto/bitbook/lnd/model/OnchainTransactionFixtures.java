@@ -9,7 +9,7 @@ import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_VALUE_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.FEES;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_3;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
 
 public class OnchainTransactionFixtures {
     public static final OnchainTransaction ONCHAIN_TRANSACTION = new OnchainTransaction(

@@ -22,7 +22,7 @@ import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_VALUE_1;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_VALUE_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.POOL_ACCOUNT_CLOSE;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.POOL_ACCOUNT_CLOSE_DETAILS;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.POOL_ACCOUNT_CLOSE_EXPIRY;

@@ -19,6 +19,7 @@ import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_3;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_4;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_2;
 import static de.cotto.bitbook.cli.TransactionSortOrder.BY_COINS_ABSOLUTE_THEN_DATE_THEN_HASH;
 import static de.cotto.bitbook.cli.TransactionSortOrder.BY_COINS_ABSOLUTE_THEN_HASH;
 import static de.cotto.bitbook.cli.TransactionSortOrder.BY_COINS_THEN_DATE_THEN_HASH;
@@ -119,7 +120,7 @@ class TransactionSorterTest {
         @Test
         void sortsByBlockThenDate() {
             Transaction earlierBlockTransaction = new Transaction(
-                    TransactionFixtures.TRANSACTION_HASH_2,
+                    TRANSACTION_HASH_2,
                     TransactionFixtures.BLOCK_HEIGHT - 1,
                     TransactionFixtures.DATE_TIME.plusDays(1),
                     Coins.NONE,

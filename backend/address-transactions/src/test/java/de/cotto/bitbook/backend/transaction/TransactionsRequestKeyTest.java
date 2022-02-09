@@ -4,8 +4,8 @@ import de.cotto.bitbook.backend.model.AddressTransactions;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.transaction.TransactionsRequestKeyFixtures.TRANSACTIONS_REQUEST_KEY;
 import static org.assertj.core.api.Assertions.assertThat;

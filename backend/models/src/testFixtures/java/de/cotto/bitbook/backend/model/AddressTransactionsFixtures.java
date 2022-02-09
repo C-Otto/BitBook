@@ -2,12 +2,12 @@ package de.cotto.bitbook.backend.model;
 
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS_2;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_3;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_4;
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS_2;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_2;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_3;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_4;
 
 public class AddressTransactionsFixtures {
     public static final Set<TransactionHash> TRANSACTION_HASHES = Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2);

@@ -25,7 +25,7 @@ import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_VALUE_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.FUNDING_TRANSACTION;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.FUNDING_TRANSACTION_DETAILS;
 import static de.cotto.bitbook.lnd.model.OnchainTransactionFixtures.ONCHAIN_TRANSACTION;

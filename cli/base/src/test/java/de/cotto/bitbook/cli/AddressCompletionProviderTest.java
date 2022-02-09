@@ -19,9 +19,9 @@ import org.springframework.shell.CompletionProposal;
 import java.util.List;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS_2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;

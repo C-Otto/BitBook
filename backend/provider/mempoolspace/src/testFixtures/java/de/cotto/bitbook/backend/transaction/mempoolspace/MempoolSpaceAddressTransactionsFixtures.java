@@ -2,10 +2,10 @@ package de.cotto.bitbook.backend.transaction.mempoolspace;
 
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_3;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_4;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_2;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_3;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_4;
 
 public class MempoolSpaceAddressTransactionsFixtures {
     public static final MempoolSpaceAddressTransactionsDto MEMPOOLSPACE_ADDRESS_DETAILS;

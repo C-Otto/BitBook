@@ -26,14 +26,14 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.model.Chain.BTC;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_3;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;

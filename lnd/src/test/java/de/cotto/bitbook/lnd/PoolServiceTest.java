@@ -12,8 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_2;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_2;
 import static de.cotto.bitbook.lnd.model.PoolLeaseFixtures.POOL_LEASE;
 import static de.cotto.bitbook.lnd.model.PoolLeaseFixtures.POOL_LEASE_2;
 import static org.assertj.core.api.Assertions.assertThat;

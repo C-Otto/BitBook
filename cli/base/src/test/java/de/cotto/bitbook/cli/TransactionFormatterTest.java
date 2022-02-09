@@ -40,7 +40,7 @@ import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_VALUE_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;

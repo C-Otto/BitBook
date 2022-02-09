@@ -7,12 +7,12 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_UPDATED;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_3;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH_4;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_3;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_4;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SimpleAddressTransactionsProviderTest {

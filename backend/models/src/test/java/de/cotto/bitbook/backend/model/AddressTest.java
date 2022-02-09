@@ -2,7 +2,7 @@ package de.cotto.bitbook.backend.model;
 
 import org.junit.jupiter.api.Test;
 
-import static de.cotto.bitbook.backend.model.TransactionFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AddressTest {

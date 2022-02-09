@@ -14,7 +14,7 @@ import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.FEES;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
-import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_HASH;
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.transaction.persistence.TransactionJpaDtoFixtures.TRANSACTION_JPA_DTO;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
