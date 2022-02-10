@@ -20,4 +20,12 @@ public record Address(String address) implements Comparable<Address> {
     public int compareTo(Address other) {
         return address.compareTo(other.address);
     }
+
+    public String getScript() {
+        Base58Address base58Address = new Base58Address(address);
+        if (base58Address.isValid()) {
+            return base58Address.getScript();
+        }
+        throw new IllegalStateException("unsupported address type");
+    }
 }

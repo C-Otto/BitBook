@@ -2,6 +2,10 @@ plugins {
     id 'bitbook.java-library-conventions'
 }
 
+dependencies {
+    implementation 'commons-codec:commons-codec:1.11'
+}
+
 jar {
     archivesBaseName = 'backend-models'
 }
