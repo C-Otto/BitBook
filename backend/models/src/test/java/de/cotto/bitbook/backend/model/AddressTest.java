@@ -8,7 +8,7 @@ import static de.cotto.bitbook.backend.model.AddressFixtures.P2SH;
 import static de.cotto.bitbook.backend.model.AddressFixtures.P2TR;
 import static de.cotto.bitbook.backend.model.AddressFixtures.P2WPKH;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class AddressTest {
     @Test
@@ -63,11 +63,16 @@ class AddressTest {
 
     @Test
     void getScript_bech32_p2wpkh() {
-        assertThatIllegalStateException().isThrownBy(P2WPKH::getScript).withMessage("unsupported address type");
+        assertThat(P2WPKH.getScript()).isEqualTo("0014aabf2ef8b9fe76fecf8701e11baa7a3f8792cba6");
     }
 
     @Test
     void getScript_bech32_p2tr() {
-        assertThatIllegalStateException().isThrownBy(P2TR::getScript).withMessage("unsupported address type");
+        assertThat(P2TR.getScript()).isEqualTo("5120a37c3903c8d0db6512e2b40b0dffa05e5a3ab73603ce8c9c4b7771e5412328f9");
+    }
+
+    @Test
+    void getScript_unsupported() {
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> new Address("foo").getScript());
     }
 }

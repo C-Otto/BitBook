@@ -1,7 +1,5 @@
 package de.cotto.bitbook.backend.model;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import java.math.BigInteger;
 import java.util.HexFormat;
 import java.util.regex.Pattern;
@@ -10,7 +8,7 @@ import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 
 public class Base58Address {
     private static final String ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-    private static final Pattern PATTERN = Pattern.compile("[" + ALPHABET + "]+");
+    private static final Pattern PATTERN = Pattern.compile("[" + ALPHABET + "]{26,}");
 
     private static final String P2PKH_PREFIX = "00";
     private static final String P2SH_PREFIX = "05";
@@ -51,15 +49,13 @@ public class Base58Address {
         }
     }
 
-    @VisibleForTesting
-    String getData() {
+    private String getData() {
         String hex = toHex();
         int checksumCutoffIndex = hex.length() - HEX_DIGITS_FOR_CHECKSUM;
         return hex.substring(0, checksumCutoffIndex);
     }
 
-    @VisibleForTesting
-    String toHex() {
+    private String toHex() {
         BigInteger total = BigInteger.ZERO;
         String reversed = getReversedAddressString();
         for (int index = 0; index < reversed.length(); index++) {

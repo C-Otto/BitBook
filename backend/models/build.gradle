@@ -9,3 +9,7 @@ dependencies {
 jar {
     archivesBaseName = 'backend-models'
 }
+
+pitest {
+    testStrengthThreshold = 98
+}

@@ -15,6 +15,8 @@ public class AddressFixtures {
             new Address("bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej");
     public static final Address P2WPKH =
             new Address("bc1q42lja79elem0anu8q8s3h2n687re9jax556pcc");
+    public static final Address P2WSH =
+            new Address("bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3");
     public static final Address P2TR =
-            new Address("bc1pmzfrwwndsqmk5yh69yjr5lfgfg4ev8c0tsc06e");
+            new Address("bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297");
 }

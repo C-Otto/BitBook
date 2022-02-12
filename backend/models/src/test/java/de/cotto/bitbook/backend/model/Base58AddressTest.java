@@ -2,8 +2,6 @@ package de.cotto.bitbook.backend.model;
 
 import org.junit.jupiter.api.Test;
 
-import static de.cotto.bitbook.backend.model.AddressFixtures.P2TR;
-import static de.cotto.bitbook.backend.model.AddressFixtures.P2WPKH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
@@ -12,6 +10,7 @@ class Base58AddressTest {
     private static final String P2SH = AddressFixtures.P2SH.toString();
     private static final String P2SH_2 = AddressFixtures.P2SH_2.toString();
     private static final String P2PKH = AddressFixtures.P2PKH.toString();
+    private static final String P2WPKH = AddressFixtures.P2WPKH.toString();
 
     @Test
     void getScript_p2pkh() {
@@ -34,62 +33,8 @@ class Base58AddressTest {
     @Test
     void getScript_not_base58() {
         assertThatIllegalStateException().isThrownBy(
-                () -> new Base58Address(P2TR.getScript()).getScript()
+                () -> new Base58Address("4CK4fEwbMP7heJarmU4eqA3sMbVJyEnU3V").getScript()
         ).withMessage("unsupported address type");
-    }
-
-    @Test
-    void p2pkh_getData_all_zeros() {
-        assertThat(new Base58Address("1111111111111111111114oLvT2").getData())
-                .isEqualTo("000000000000000000000000000000000000000000");
-    }
-
-    @Test
-    void p2pkh_getData() {
-        assertThat(new Base58Address("1AKDDsfTh8uY4X3ppy1m7jw1fVMBSMkzjP").getData())
-                .isEqualTo("00662ad25db00e7bb38bc04831ae48b4b446d12698");
-    }
-
-    @Test
-    void p2sh_getData() {
-        assertThat(new Base58Address(P2SH).getData())
-                .isEqualTo("0521ef2f4b1ea1f9ed09c1128d1ebb61d4729ca7d6");
-    }
-
-    @Test
-    void p2pkh_toHex_simple() {
-        assertThat(new Base58Address("1A").toHex())
-                .isEqualTo("0009");
-    }
-
-    @Test
-    void p2pkh_toHex_leading_ones() {
-        assertThat(new Base58Address("11111A").toHex())
-                .isEqualTo("000000000009");
-    }
-
-    @Test
-    void p2pkh_toHex_longer() {
-        assertThat(new Base58Address("1AB").toHex())
-                .isEqualTo("000214");
-    }
-
-    @Test
-    void p2pkh_toHex_larger_than_long() {
-        assertThat(new Base58Address("1EUXSxuUVy2PC").toHex())
-                .isEqualTo("0012406eb4c8296c200b");
-    }
-
-    @Test
-    void p2pkh_toHex() {
-        assertThat(new Base58Address("1EUXSxuUVy2PC5enGXR1a3yxbEjNWMHuem").toHex())
-                .isEqualTo("0093ce48570b55c42c2af816aeaba06cfee1224faebb6127fe");
-    }
-
-    @Test
-    void p2sh_toHex() {
-        assertThat(new Base58Address(P2SH).toHex())
-                .isEqualTo("0521ef2f4b1ea1f9ed09c1128d1ebb61d4729ca7d6acd16c94");
     }
 
     @Test
@@ -109,12 +54,22 @@ class Base58AddressTest {
     }
 
     @Test
+    void isValid_short_address() {
+        assertThat(new Base58Address("11111111111111111111BZbvjr").isValid()).isTrue();
+    }
+
+    @Test
+    void isValid_too_short() {
+        assertThat(new Base58Address("1111111111111111111BZbvjr").isValid()).isFalse();
+    }
+
+    @Test
     void isValid_invalid_hash() {
         assertThat(new Base58Address("1EUXSxuUVy2PC5enGXR1a3yxbEjNWMHue7").isValid()).isFalse();
     }
 
     @Test
     void isValid_bech32() {
-        assertThat(new Base58Address(P2WPKH.toString()).isValid()).isFalse();
+        assertThat(new Base58Address(P2WPKH).isValid()).isFalse();
     }
 }
