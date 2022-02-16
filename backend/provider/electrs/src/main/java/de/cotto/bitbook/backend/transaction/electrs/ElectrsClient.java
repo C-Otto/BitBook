@@ -70,6 +70,9 @@ public class ElectrsClient {
         Set<TransactionHash> result = new LinkedHashSet<>();
         JsonNode transactions = jsonNode.get("result");
         for (JsonNode tx : transactions) {
+            if (tx.get("height").intValue() <= 0) {
+                continue;
+            }
             result.add(new TransactionHash(tx.get("tx_hash").textValue()));
         }
         return result;

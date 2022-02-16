@@ -14,21 +14,22 @@ import java.util.Optional;
 import java.util.Set;
 
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ElectrsClientTest {
     private static final String SUBSCRIBE_PATTERN = "\\[\\{" +
-                    "\"method\":\"blockchain.scripthash.subscribe\"," +
-                    "\"params\":\\[\".*\"]," +
-                    "\"id\":\\d+," +
-                    "\"jsonrpc\":\"2.0\"" +
-                    "}]";
+            "\"method\":\"blockchain.scripthash.subscribe\"," +
+            "\"params\":\\[\".*\"]," +
+            "\"id\":\\d+," +
+            "\"jsonrpc\":\"2.0\"" +
+            "}]";
     private static final String GET_HISTORY_PATTERN = "\\[\\{" +
-                    "\"method\":\"blockchain.scripthash.get_history\"," +
-                    "\"params\":\\[\".*\"]," +
-                    "\"id\":\\d+," +
-                    "\"jsonrpc\":\"2.0\"" +
-                    "}]";
+            "\"method\":\"blockchain.scripthash.get_history\"," +
+            "\"params\":\\[\".*\"]," +
+            "\"id\":\\d+," +
+            "\"jsonrpc\":\"2.0\"" +
+            "}]";
     private final TestableJsonRpcClient jsonRpcClient = new TestableJsonRpcClient();
     private final ElectrsClient electrsClient = new ElectrsClient(jsonRpcClient);
 
@@ -49,7 +50,7 @@ class ElectrsClientTest {
     }
 
     @Test
-    void parses_hashes() {
+    void returns_confirmed_hashes() {
         Optional<Set<TransactionHash>> result = electrsClient.getTransactionHashes(ADDRESS);
         assertThat(result.orElseThrow()).containsExactlyInAnyOrder(new TransactionHash("a"), new TransactionHash("b"));
     }
@@ -83,16 +84,18 @@ class ElectrsClientTest {
         private JsonNode response(int messageId) {
             ObjectNode node = objectMapper.createObjectNode();
             ArrayNode hashes = objectMapper.createArrayNode();
-            hashes.add(hashNode("a"));
-            hashes.add(hashNode("b"));
+            hashes.add(hashNode("a", BLOCK_HEIGHT));
+            hashes.add(hashNode("b", BLOCK_HEIGHT - 1));
+            hashes.add(hashNode("c", 0));
             node.put("id", messageId);
             node.set("result", hashes);
             return node;
         }
 
-        private ObjectNode hashNode(String txHash) {
+        private ObjectNode hashNode(String txHash, int height) {
             ObjectNode hashNode = objectMapper.createObjectNode();
             hashNode.put("tx_hash", txHash);
+            hashNode.put("height", height);
             return hashNode;
         }
     }
