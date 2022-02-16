@@ -1,7 +1,6 @@
 package de.cotto.bitbook.backend.model;
 
 import java.util.ArrayList;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -14,11 +13,11 @@ public class Bech32Address {
     private static final Pattern PATTERN = Pattern.compile("bc1[" + CHARSET + "]{1,87}");
     private static final int HUMAN_READABLE_PART_END_INDEX = 2;
     private static final int[] GENERATOR = {0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3};
-    private static final int DATA_LENGTH_P2PKH_WIT = 20;
-    private static final int DATA_LENGTH_P2SH_WIT = 32;
-    private static final int DATA_LENGTH_P2TR_WIT = 32;
-    private static final String OP_0_HEX = "00";
-    private static final String OP_1_HEX = "51";
+    private static final byte DATA_LENGTH_P2PKH_WIT = 20;
+    private static final byte DATA_LENGTH_P2SH_WIT = 32;
+    private static final byte DATA_LENGTH_P2TR_WIT = 32;
+    private static final HexString OP_0_HEX = new HexString((byte) 0);
+    private static final HexString OP_1_HEX = new HexString((byte) 81);
     private static final int CHECKSUM_BYTES = 6;
     private static final int BITS_FOR_BECH32_CHAR = 5;
     private static final int BITS_IN_BYTE = 8;
@@ -43,21 +42,27 @@ public class Bech32Address {
         return decodedDataIsValid();
     }
 
-    public String getScript() {
-        byte[] decoded = getDecoded();
+    public HexString getScript() {
+        HexString decoded = getDecoded();
         byte witnessVersion = getWitnessVersion();
         if (witnessVersion == WITNESS_VERSION_0) {
-            if (decoded.length == DATA_LENGTH_P2PKH_WIT) {
-                String dataLengthInHex = "14";
-                return OP_0_HEX + dataLengthInHex + HexFormat.of().formatHex(decoded);
-            } else if (decoded.length == DATA_LENGTH_P2SH_WIT) {
-                String dataLengthInHex = "20";
-                return OP_0_HEX + dataLengthInHex + HexFormat.of().formatHex(decoded);
+            if (decoded.getNumberOfBytes() == DATA_LENGTH_P2PKH_WIT) {
+                HexString dataLength = new HexString(DATA_LENGTH_P2PKH_WIT);
+                return OP_0_HEX
+                        .append(dataLength)
+                        .append(decoded);
+            } else if (decoded.getNumberOfBytes() == DATA_LENGTH_P2SH_WIT) {
+                HexString dataLength = new HexString(DATA_LENGTH_P2SH_WIT);
+                return OP_0_HEX
+                        .append(dataLength)
+                        .append(decoded);
             }
         }
-        if (witnessVersion == WITNESS_VERSION_1) {
-            String dataLengthInHex = "20";
-            return OP_1_HEX + dataLengthInHex + HexFormat.of().formatHex(decoded);
+        if (witnessVersion == WITNESS_VERSION_1 && decoded.getNumberOfBytes() == DATA_LENGTH_P2TR_WIT) {
+            HexString dataLength = new HexString(DATA_LENGTH_P2TR_WIT);
+            return OP_1_HEX
+                    .append(dataLength)
+                    .append(decoded);
         }
         throw new IllegalStateException("unsupported address type");
     }
@@ -93,14 +98,15 @@ public class Bech32Address {
     }
 
     private boolean decodedDataIsValid() {
-        byte[] decoded = getDecoded();
+        HexString decoded = getDecoded();
+        int numberOfBytes = decoded.getNumberOfBytes();
         byte witnessVersion = getWitnessVersion();
         //noinspection EnhancedSwitchMigration
         switch (witnessVersion) {
             case 0:
-                return decoded.length == DATA_LENGTH_P2PKH_WIT || decoded.length == DATA_LENGTH_P2SH_WIT;
+                return numberOfBytes == DATA_LENGTH_P2PKH_WIT || numberOfBytes == DATA_LENGTH_P2SH_WIT;
             case 1:
-                return decoded.length == DATA_LENGTH_P2TR_WIT;
+                return numberOfBytes == DATA_LENGTH_P2TR_WIT;
             default:
                 return false;
         }
@@ -136,7 +142,7 @@ public class Bech32Address {
         return checksum;
     }
 
-    private byte[] getDecoded() {
+    private HexString getDecoded() {
         boolean isFirst = true;
         int fromBits = BITS_FOR_BECH32_CHAR;
         int toBits = BITS_IN_BYTE;
@@ -151,7 +157,7 @@ public class Bech32Address {
                 continue;
             }
             if (value < 0 || value >> fromBits != 0) {
-                return new byte[0];
+                return HexString.EMPTY;
             }
             acc = ((acc << fromBits) | value) & maxAcc;
             bits += fromBits;
@@ -162,17 +168,9 @@ public class Bech32Address {
         }
         int bitDifference = toBits - bits;
         if (bits >= fromBits || (acc << bitDifference & maxV) != 0) {
-            return new byte[0];
+            return HexString.EMPTY;
         }
-        return toArray(resultList);
-    }
-
-    private byte[] toArray(List<Byte> values) {
-        byte[] result = new byte[values.size()];
-        for (int i = 0; i < values.size(); i++) {
-            result[i] = values.get(i);
-        }
-        return result;
+        return new HexString(resultList);
     }
 
     private byte[] getPayloadWithChecksum() {

@@ -53,22 +53,23 @@ class AddressTest {
 
     @Test
     void getScript_base58_p2pkh() {
-        assertThat(P2PKH.getScript()).isEqualTo("76a91462e907b15cbf27d5425399ebf6f0fb50ebb88f1888ac");
+        assertThat(P2PKH.getScript()).isEqualTo(new HexString("76a91462e907b15cbf27d5425399ebf6f0fb50ebb88f1888ac"));
     }
 
     @Test
     void getScript_base58_p2sh() {
-        assertThat(P2SH.getScript()).isEqualTo("a91421ef2f4b1ea1f9ed09c1128d1ebb61d4729ca7d687");
+        assertThat(P2SH.getScript()).isEqualTo(new HexString("a91421ef2f4b1ea1f9ed09c1128d1ebb61d4729ca7d687"));
     }
 
     @Test
     void getScript_bech32_p2wpkh() {
-        assertThat(P2WPKH.getScript()).isEqualTo("0014aabf2ef8b9fe76fecf8701e11baa7a3f8792cba6");
+        assertThat(P2WPKH.getScript()).isEqualTo(new HexString("0014aabf2ef8b9fe76fecf8701e11baa7a3f8792cba6"));
     }
 
     @Test
     void getScript_bech32_p2tr() {
-        assertThat(P2TR.getScript()).isEqualTo("5120a37c3903c8d0db6512e2b40b0dffa05e5a3ab73603ce8c9c4b7771e5412328f9");
+        assertThat(P2TR.getScript())
+                .isEqualTo(new HexString("5120a37c3903c8d0db6512e2b40b0dffa05e5a3ab73603ce8c9c4b7771e5412328f9"));
     }
 
     @Test

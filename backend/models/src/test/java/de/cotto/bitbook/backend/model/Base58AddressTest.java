@@ -15,19 +15,19 @@ class Base58AddressTest {
     @Test
     void getScript_p2pkh() {
         assertThat(new Base58Address(P2PKH).getScript())
-                .isEqualTo("76a91462e907b15cbf27d5425399ebf6f0fb50ebb88f1888ac");
+                .isEqualTo(new HexString("76a91462e907b15cbf27d5425399ebf6f0fb50ebb88f1888ac"));
     }
 
     @Test
     void getScript_p2pkh_2() {
         assertThat(new Base58Address("12higDjoCCNXSA95xZMWUdPvXNmkAduhWv").getScript())
-                .isEqualTo("76a91412ab8dc588ca9d5787dde7eb29569da63c3a238c88ac");
+                .isEqualTo(new HexString("76a91412ab8dc588ca9d5787dde7eb29569da63c3a238c88ac"));
     }
 
     @Test
     void getScript_p2sh() {
         assertThat(new Base58Address(P2SH_2).getScript())
-                .isEqualTo("a914748284390f9e263a4b766a75d0633c50426eb87587");
+                .isEqualTo(new HexString("a914748284390f9e263a4b766a75d0633c50426eb87587"));
     }
 
     @Test

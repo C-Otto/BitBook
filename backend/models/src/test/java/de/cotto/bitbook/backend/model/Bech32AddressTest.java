@@ -161,21 +161,21 @@ class Bech32AddressTest {
     void getScript_bip_173_example() {
         String address = "BC1QW508D6QEJXTDG4Y5R3ZARVARY0C5XW7KV8F3T4";
         assertThat(new Bech32Address(address).getScript())
-                .isEqualTo("0014751e76e8199196d454941c45d1b3a323f1433bd6");
+                .isEqualTo(new HexString("0014751e76e8199196d454941c45d1b3a323f1433bd6"));
     }
 
     @Test
     void getScript_p2wpkh() {
         String address = P2WPKH.toString();
         assertThat(new Bech32Address(address).getScript())
-                .isEqualTo("0014aabf2ef8b9fe76fecf8701e11baa7a3f8792cba6");
+                .isEqualTo(new HexString("0014aabf2ef8b9fe76fecf8701e11baa7a3f8792cba6"));
     }
 
     @Test
     void getScript_p2wsh() {
         String address = P2WSH.toString();
         assertThat(new Bech32Address(address).getScript())
-                .isEqualTo("00201863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262");
+                .isEqualTo(new HexString("00201863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262"));
     }
 
     @Test
