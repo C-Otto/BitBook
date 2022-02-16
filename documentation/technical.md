@@ -54,6 +54,7 @@ Currently, the following providers are implemented:
  * blockstream.info: A
  * btc.com: AT
  * mempool.space: A
+ * Electrs (localhost:50001): A
 
 For Bitcoin Cash:
 * blockchair.com: H

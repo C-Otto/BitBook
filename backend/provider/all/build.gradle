@@ -10,5 +10,6 @@ dependencies {
     implementation project(':backend:provider:blockcypher')
     implementation project(':backend:provider:blockstreaminfo')
     implementation project(':backend:provider:btccom')
+    implementation project(':backend:provider:electrs')
     implementation project(':backend:provider:mempoolspace')
 }
