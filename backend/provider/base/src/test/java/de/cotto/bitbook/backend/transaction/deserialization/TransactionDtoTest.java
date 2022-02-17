@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.FEES;
@@ -25,8 +26,8 @@ class TransactionDtoTest {
         TestableTransactionDto transactionDto = new TestableTransactionDto(
                 TransactionHash.NONE, 0, LocalDateTime.MIN, 0, List.of(), List.of()
         );
-        Transaction model = transactionDto.toModel();
-        assertThat(model).isEqualTo(Transaction.UNKNOWN);
+        Transaction model = transactionDto.toModel(BTC);
+        assertThat(model).isEqualTo(Transaction.unknown(BTC));
     }
 
     @Test
@@ -39,7 +40,7 @@ class TransactionDtoTest {
                 List.of(InputDto.COINBASE),
                 List.of(OUTPUT_DTO_1, OUTPUT_DTO_2)
         );
-        Transaction model = transactionDto.toModel();
+        Transaction model = transactionDto.toModel(BTC);
         assertThat(model.getOutputs()).hasSize(2);
     }
 
@@ -53,7 +54,7 @@ class TransactionDtoTest {
                 List.of(InputDto.COINBASE, INPUT_DTO_2),
                 List.of(OUTPUT_DTO_1, OUTPUT_DTO_2)
         );
-        assertThatNullPointerException().isThrownBy(transactionDto::toModel);
+        assertThatNullPointerException().isThrownBy(() -> transactionDto.toModel(BTC));
     }
 
     @Test
@@ -66,7 +67,7 @@ class TransactionDtoTest {
                 List.of(INPUT_DTO_1),
                 List.of(OUTPUT_DTO_2)
         );
-        Transaction model = transactionDto.toModel();
+        Transaction model = transactionDto.toModel(BTC);
         assertThat(model.getInputs()).hasSize(1);
     }
 
@@ -80,7 +81,7 @@ class TransactionDtoTest {
                 List.of(INPUT_DTO_1, INPUT_DTO_2),
                 List.of(OUTPUT_DTO_1, OUTPUT_DTO_2)
         );
-        Transaction model = transactionDto.toModel();
+        Transaction model = transactionDto.toModel(BTC);
         assertThat(model).isEqualTo(TRANSACTION);
     }
 }

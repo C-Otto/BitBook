@@ -16,13 +16,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
+
 @Component
 public class PoolTransactionService extends AbstractTransactionsService {
     private static final Pattern POOL_ACCOUNT_CLOSE_PATTERN = Pattern.compile(
-            " poold -- AccountModification\\(acct_key=[0-9a-f]*, expiry=[falsetru]+, deposit=false, is_close=true\\)"
+            " poold -- AccountModification\\(acct_key=[\\da-f]*, expiry=[falsetru]+, deposit=false, is_close=true\\)"
     );
     private static final Pattern POOL_ACCOUNT_DEPOSIT_PATTERN = Pattern.compile(
-            " poold -- AccountModification\\(acct_key=[0-9a-f]*, expiry=false, deposit=true, is_close=false\\)"
+            " poold -- AccountModification\\(acct_key=[\\da-f]*, expiry=false, deposit=true, is_close=false\\)"
     );
 
     public PoolTransactionService(
@@ -49,7 +51,8 @@ public class PoolTransactionService extends AbstractTransactionsService {
         if (!onchainTransaction.getLabel().startsWith(" poold -- AccountCreation(acct_key=")) {
             return 0;
         }
-        Transaction transaction = transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
+        Transaction transaction =
+                transactionService.getTransactionDetails(onchainTransaction.getTransactionHash(), BTC);
         Coins poolAmount = onchainTransaction.getAbsoluteAmountWithoutFees();
         Address poolAddress = transaction.getOutputWithValue(poolAmount).map(InputOutput::getAddress).orElse(null);
         if (poolAddress == null) {
@@ -70,7 +73,8 @@ public class PoolTransactionService extends AbstractTransactionsService {
         if (!POOL_ACCOUNT_DEPOSIT_PATTERN.matcher(onchainTransaction.getLabel()).matches()) {
             return 0;
         }
-        Transaction transaction = transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
+        Transaction transaction =
+                transactionService.getTransactionDetails(onchainTransaction.getTransactionHash(), BTC);
         Coins subtractedAmount = Coins.NONE.subtract(onchainTransaction.getAmount());
         Coins otherInputs = transaction.getInputs().stream()
                 .filter(input -> !DEFAULT_DESCRIPTION.equals(
@@ -99,7 +103,7 @@ public class PoolTransactionService extends AbstractTransactionsService {
     ) {
         String accountId = getAccountId(label);
         transactionDescriptionService.set(transaction.getHash(), descriptionPrefix + accountId);
-        addressOwnershipService.setAddressAsOwned(poolAddress);
+        addressOwnershipService.setAddressAsOwned(poolAddress, BTC);
         addressDescriptionService.set(poolAddress, "pool account " + accountId);
 
         transaction.getInputAddresses().forEach(this::setAddressAsOwnedWithDescription);
@@ -115,7 +119,8 @@ public class PoolTransactionService extends AbstractTransactionsService {
         if (!POOL_ACCOUNT_CLOSE_PATTERN.matcher(onchainTransaction.getLabel()).matches()) {
             return 0;
         }
-        Transaction transaction = transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
+        Transaction transaction =
+                transactionService.getTransactionDetails(onchainTransaction.getTransactionHash(), BTC);
         Output lndOutput = getIfExactlyOne(transaction.getOutputs()).orElse(null);
         Coins poolAmount = onchainTransaction.getAmount();
         if (lndOutput == null || !lndOutput.getValue().equals(poolAmount)) {
@@ -128,7 +133,7 @@ public class PoolTransactionService extends AbstractTransactionsService {
     private void setForPoolAccountClose(Transaction transaction, String label) {
         String accountId = getAccountId(label);
         transactionDescriptionService.set(transaction.getHash(), "Closing pool account " + accountId);
-        transaction.getAllAddresses().forEach(addressOwnershipService::setAddressAsOwned);
+        transaction.getAllAddresses().forEach(address -> addressOwnershipService.setAddressAsOwned(address, BTC));
         transaction.getInputAddresses()
                 .forEach(address -> addressDescriptionService.set(address, "pool account " + accountId));
         transaction.getOutputAddresses()

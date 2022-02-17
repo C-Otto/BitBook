@@ -1,24 +1,18 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.Chain;
+import de.cotto.bitbook.backend.model.HashAndChain;
 import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.request.PrioritizedRequest;
 import de.cotto.bitbook.backend.request.RequestPriority;
 
-public final class TransactionRequest extends PrioritizedRequest<TransactionHash, Transaction> {
-    public TransactionRequest(TransactionHash transactionHash, RequestPriority priority) {
-        super(transactionHash, priority);
+public final class TransactionRequest extends PrioritizedRequest<HashAndChain, Transaction> {
+    public TransactionRequest(TransactionHash transactionHash, Chain chain, RequestPriority priority) {
+        super(new HashAndChain(transactionHash, chain), priority);
     }
 
-    public TransactionHash getHash() {
+    public HashAndChain getHashAndChain() {
         return getKey();
-    }
-
-    @Override
-    public String toString() {
-        return "TransactionRequest{" +
-               "transactionHash='" + getHash() + '\'' +
-               ", priority=" + getPriority() +
-               '}';
     }
 }

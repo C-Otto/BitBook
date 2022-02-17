@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 
 @Component
@@ -61,7 +62,7 @@ public class ChannelsService {
     private void setChannelOwnership(Channel channel) {
         Address channelAddress = channel.getChannelAddress();
         if (channel.isInitiator()) {
-            addressOwnershipService.setAddressAsOwned(channelAddress);
+            addressOwnershipService.setAddressAsOwned(channelAddress, BTC);
         }
         if (!OWNED.equals(addressOwnershipService.getOwnershipStatus(channelAddress))) {
             addressOwnershipService.setAddressAsForeign(channelAddress);

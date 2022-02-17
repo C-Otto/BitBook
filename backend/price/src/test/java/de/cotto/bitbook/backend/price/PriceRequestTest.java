@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class PriceRequestTest {
     private static final LocalDate DATE = LocalDate.of(2021, 1, 2);
-    public static final PriceContext PRICE_CONTEXT = new PriceContext(DATE, BTC);
+    private static final PriceContext PRICE_CONTEXT = new PriceContext(DATE, BTC);
 
     @Test
     void getPriceContext() {

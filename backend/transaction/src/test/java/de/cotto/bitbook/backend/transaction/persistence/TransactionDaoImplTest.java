@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.ZoneOffset;
 import java.util.Optional;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
@@ -31,15 +32,16 @@ class TransactionDaoImplTest {
 
     @Test
     void getTransaction_unknown() {
-        Transaction transaction = transactionDao.getTransaction(TRANSACTION_HASH);
-        assertThat(transaction).isEqualTo(Transaction.UNKNOWN);
+        Transaction transaction = transactionDao.getTransaction(TRANSACTION_HASH, BTC);
+        assertThat(transaction).isEqualTo(Transaction.unknown(BTC));
     }
 
     @Test
     void getTransaction() {
-        when(transactionRepository.findById(TRANSACTION_HASH.toString())).thenReturn(Optional.of(TRANSACTION_JPA_DTO));
+        when(transactionRepository.findById(new TransactionJpaDtoId(TRANSACTION_HASH.toString(), BTC.toString())))
+                .thenReturn(Optional.of(TRANSACTION_JPA_DTO));
 
-        Transaction transaction = transactionDao.getTransaction(TRANSACTION_HASH);
+        Transaction transaction = transactionDao.getTransaction(TRANSACTION_HASH, BTC);
 
         assertThat(transaction).isEqualTo(TRANSACTION);
     }

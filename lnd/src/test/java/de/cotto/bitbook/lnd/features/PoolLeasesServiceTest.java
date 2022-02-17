@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_1;
@@ -54,7 +55,7 @@ class PoolLeasesServiceTest {
 
     @BeforeEach
     void setUp() {
-        when(transactionService.getTransactionDetails(POOL_LEASE.getTransactionHash())).thenReturn(TRANSACTION);
+        when(transactionService.getTransactionDetails(POOL_LEASE.getTransactionHash(), BTC)).thenReturn(TRANSACTION);
         lenient().when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_1)).thenReturn(UNKNOWN);
         lenient().when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_2)).thenReturn(OWNED);
         lenient().when(addressDescriptionService.getDescription(any())).thenReturn("");
@@ -88,7 +89,7 @@ class PoolLeasesServiceTest {
     @Test
     void marks_channel_address_as_owned() {
         poolLeasesService.addFromLeases(Set.of(POOL_LEASE));
-        verify(addressOwnershipService).setAddressAsOwned(channelAddress);
+        verify(addressOwnershipService).setAddressAsOwned(channelAddress, BTC);
     }
 
     @Test
@@ -109,12 +110,13 @@ class PoolLeasesServiceTest {
     @Test
     void marks_change_address_as_owned() {
         poolLeasesService.addFromLeases(Set.of(POOL_LEASE));
-        verify(addressOwnershipService).setAddressAsOwned(changeAddress);
+        verify(addressOwnershipService).setAddressAsOwned(changeAddress, BTC);
     }
 
     @Test
     void unknown_transaction_details() {
-        when(transactionService.getTransactionDetails(POOL_LEASE.getTransactionHash())).thenReturn(Transaction.UNKNOWN);
+        when(transactionService.getTransactionDetails(POOL_LEASE.getTransactionHash(), BTC))
+                .thenReturn(Transaction.unknown(BTC));
         assertThat(poolLeasesService.addFromLeases(Set.of(POOL_LEASE))).isEqualTo(0);
     }
 }

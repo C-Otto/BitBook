@@ -22,7 +22,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -32,6 +31,8 @@ import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS_3;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_2;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.Chain.BCD;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
@@ -48,9 +49,11 @@ import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -107,7 +110,7 @@ class AddressOwnershipServiceTest {
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(addresses);
             mockTransactionHashes(Set.of(INPUT_ADDRESS_1, ADDRESS_2), TRANSACTION);
 
-            assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
+            assertThat(addressOwnershipService.getNeighbourTransactions(BTC)).containsOnly(
                     entry(TRANSACTION, TRANSACTION.getDifferenceForAddress(INPUT_ADDRESS_1).add(TRANSACTION.getFees()))
             );
         }
@@ -121,7 +124,7 @@ class AddressOwnershipServiceTest {
             Transaction transactionWithFee = sendOneSatoshiTo(ownedAddress, foreignAddress);
             mockTransactionHashes(ownedAddress, transactionWithFee);
 
-            assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
+            assertThat(addressOwnershipService.getNeighbourTransactions(BTC)).containsOnly(
                     entry(transactionWithFee, Coins.NONE)
             );
         }
@@ -135,7 +138,7 @@ class AddressOwnershipServiceTest {
             Transaction transactionWithFee = sendOneSatoshiWithFeeTo(foreignAddress, ownedAddress);
             mockTransactionHashes(ownedAddress, transactionWithFee);
 
-            assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
+            assertThat(addressOwnershipService.getNeighbourTransactions(BTC)).containsOnly(
                     entry(transactionWithFee, Coins.NONE)
             );
         }
@@ -152,7 +155,7 @@ class AddressOwnershipServiceTest {
             );
             mockTransactionHashes(ADDRESS, transactionToForeignAddress);
 
-            assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
+            assertThat(addressOwnershipService.getNeighbourTransactions(BTC)).containsOnly(
                     entry(transactionToForeignAddress, Coins.NONE)
             );
         }
@@ -166,7 +169,7 @@ class AddressOwnershipServiceTest {
             Transaction transaction = createTransactionSplittingInput(foreignAddress, ownedAddress, ADDRESS_3);
             mockTransactionHashes(ownedAddress, transaction);
 
-            assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
+            assertThat(addressOwnershipService.getNeighbourTransactions(BTC)).containsOnly(
                     entry(transaction, Coins.NONE)
 
             );
@@ -181,7 +184,7 @@ class AddressOwnershipServiceTest {
             Transaction transaction = createTransactionSplittingInput(ownedAddress, foreignAddress, ADDRESS_3);
             mockTransactionHashes(ownedAddress, transaction);
 
-            assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
+            assertThat(addressOwnershipService.getNeighbourTransactions(BTC)).containsOnly(
                     entry(transaction, Coins.ofSatoshis(-1))
             );
         }
@@ -193,22 +196,24 @@ class AddressOwnershipServiceTest {
             Set<Address> ownedAddresses = Set.of(ownedAddress, ownedAddress2);
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(ownedAddresses);
             Transaction transaction = createTransactionSplittingInput(ownedAddress, ownedAddress2, ADDRESS_3);
-            when(addressTransactionsService.getTransactionsForAddresses(ownedAddresses)).thenReturn(Set.of(
+            when(addressTransactionsService.getTransactionsForAddresses(ownedAddresses, BTC)).thenReturn(Set.of(
                     new AddressTransactions(
                             ownedAddress,
                             Set.of(TRANSACTION_HASH),
-                            LAST_CHECKED_AT_BLOCK_HEIGHT
+                            LAST_CHECKED_AT_BLOCK_HEIGHT,
+                            BTC
                     ),
                     new AddressTransactions(
                             ownedAddress,
                             Set.of(TRANSACTION_HASH_2),
-                            LAST_CHECKED_AT_BLOCK_HEIGHT
+                            LAST_CHECKED_AT_BLOCK_HEIGHT,
+                            BTC
                     )
             ));
-            when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
+            when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2), BTC))
                     .thenReturn(Set.of(transaction));
 
-            assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
+            assertThat(addressOwnershipService.getNeighbourTransactions(BTC)).containsOnly(
                     entry(transaction, Coins.ofSatoshis(-1))
             );
         }
@@ -223,7 +228,7 @@ class AddressOwnershipServiceTest {
             );
             mockTransactionHashes(ownedAddress, transaction);
 
-            assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
+            assertThat(addressOwnershipService.getNeighbourTransactions(BTC)).containsOnly(
                     entry(transaction, Coins.ofSatoshis(1))
             );
         }
@@ -232,13 +237,14 @@ class AddressOwnershipServiceTest {
         void returns_aggregated_coin_difference_per_transaction() {
             Set<Address> addresses = Set.of(INPUT_ADDRESS_1, INPUT_ADDRESS_2);
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(addresses);
-            when(addressTransactionsService.getTransactionsForAddresses(addresses))
+            when(addressTransactionsService.getTransactionsForAddresses(addresses, BTC))
                     .thenReturn(Set.of(ADDRESS_TRANSACTIONS, ADDRESS_TRANSACTIONS_2));
             when(transactionService.getTransactionDetails(
-                    Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2, TRANSACTION_HASH_3, TRANSACTION_HASH_4)
+                    Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2, TRANSACTION_HASH_3, TRANSACTION_HASH_4),
+                    BTC
             )).thenReturn(Set.of(TRANSACTION, TRANSACTION_2, TRANSACTION_3, TRANSACTION_4));
 
-            assertThat(addressOwnershipService.getNeighbourTransactions()).containsOnly(
+            assertThat(addressOwnershipService.getNeighbourTransactions(BTC)).containsOnly(
                     entry(TRANSACTION, Coins.ofSatoshis(-2_147_484_882L)),
                     entry(TRANSACTION_2, Coins.NONE),
                     entry(TRANSACTION_3, Coins.ofSatoshis(-22_749)),
@@ -254,7 +260,8 @@ class AddressOwnershipServiceTest {
                 DATE_TIME,
                 Coins.ofSatoshis(1),
                 List.of(new Input(Coins.ofSatoshis(2), sourceAddress)),
-                List.of(new Output(Coins.ofSatoshis(1), targetAddress))
+                List.of(new Output(Coins.ofSatoshis(1), targetAddress)),
+                BTC
         );
     }
 
@@ -265,38 +272,41 @@ class AddressOwnershipServiceTest {
                 DATE_TIME,
                 Coins.NONE,
                 List.of(new Input(Coins.ofSatoshis(1), sourceAddress)),
-                List.of(new Output(Coins.ofSatoshis(1), targetAddress))
+                List.of(new Output(Coins.ofSatoshis(1), targetAddress)),
+                BTC
         );
     }
 
     @Test
     void setAddressAsOwned() {
-        addressOwnershipService.setAddressAsOwned(ADDRESS);
+        addressOwnershipService.setAddressAsOwned(ADDRESS, BTC);
         verify(ownedAddressesDao).setAddressAsOwned(ADDRESS);
     }
 
     @Test
     void setAddressAsOwned_with_description() {
-        addressOwnershipService.setAddressAsOwned(ADDRESS, DESCRIPTION);
+        addressOwnershipService.setAddressAsOwned(ADDRESS, BTC, DESCRIPTION);
         verify(ownedAddressesDao).setAddressAsOwned(ADDRESS);
     }
 
     @Test
     void setAddressAsOwned_with_description_persists_description() {
-        addressOwnershipService.setAddressAsOwned(ADDRESS, DESCRIPTION);
+        addressOwnershipService.setAddressAsOwned(ADDRESS, BTC, DESCRIPTION);
         verify(addressDescriptionService).set(ADDRESS, DESCRIPTION);
     }
 
     @Test
-    void setAddressAsOwned_requests_address_details_in_background() {
-        addressOwnershipService.setAddressAsOwned(ADDRESS);
-        verify(addressTransactionsService).requestTransactionsInBackground(ADDRESS);
+    void setAddressAsOwned_requests_address_details_in_background_but_only_for_set_chain() {
+        addressOwnershipService.setAddressAsOwned(ADDRESS, BCD);
+        verify(addressTransactionsService).requestTransactionsInBackground(ADDRESS, BCD);
+        verifyNoMoreInteractions(addressTransactionsService);
     }
 
     @Test
-    void setAddressAsOwned_with_description_requests_address_details_in_background() {
-        addressOwnershipService.setAddressAsOwned(ADDRESS, DESCRIPTION);
-        verify(addressTransactionsService).requestTransactionsInBackground(ADDRESS);
+    void setAddressAsOwned_with_description_requests_address_details_in_background_but_only_for_set_chain() {
+        addressOwnershipService.setAddressAsOwned(ADDRESS, BCD, DESCRIPTION);
+        verify(addressTransactionsService).requestTransactionsInBackground(ADDRESS, BCD);
+        verifyNoMoreInteractions(addressTransactionsService);
     }
 
     @Test
@@ -328,10 +338,10 @@ class AddressOwnershipServiceTest {
         Address address1 = new Address("abc");
         Address address2 = new Address("def");
         when(ownedAddressesDao.getOwnedAddresses()).thenReturn(Set.of(address1, address2));
-        when(balanceService.getBalance(address1)).thenReturn(Coins.ofSatoshis(100));
-        when(balanceService.getBalance(address2)).thenReturn(Coins.ofSatoshis(23));
+        when(balanceService.getBalance(address1, BTC)).thenReturn(Coins.ofSatoshis(100));
+        when(balanceService.getBalance(address2, BTC)).thenReturn(Coins.ofSatoshis(23));
 
-        Coins balance = addressOwnershipService.getBalance();
+        Coins balance = addressOwnershipService.getBalance(BTC);
 
         assertThat(balance).isEqualTo(Coins.ofSatoshis(123));
     }
@@ -340,13 +350,13 @@ class AddressOwnershipServiceTest {
     void getBalance_preloads_address_transactions() {
         Set<Address> addresses = Set.of(ADDRESS, ADDRESS_2);
         when(ownedAddressesDao.getOwnedAddresses()).thenReturn(addresses);
-        when(balanceService.getBalance(any())).thenReturn(Coins.ofSatoshis(1));
+        when(balanceService.getBalance(any(), eq(BTC))).thenReturn(Coins.ofSatoshis(1));
 
-        addressOwnershipService.getBalance();
+        addressOwnershipService.getBalance(BTC);
 
         InOrder inOrder = inOrder(addressTransactionsService, balanceService);
-        inOrder.verify(addressTransactionsService).getTransactionsForAddresses(addresses);
-        inOrder.verify(balanceService, atLeastOnce()).getBalance(any());
+        inOrder.verify(addressTransactionsService).getTransactionsForAddresses(addresses, BTC);
+        inOrder.verify(balanceService, atLeastOnce()).getBalance(any(), eq(BTC));
     }
 
     @Test
@@ -370,7 +380,7 @@ class AddressOwnershipServiceTest {
         void returns_transactions() {
             Set<Address> ownedAddresses = Set.of(ownedAddress, ADDRESS_2);
             when(ownedAddressesDao.getOwnedAddresses()).thenReturn(ownedAddresses);
-            when(addressTransactionsService.getTransactionsForAddresses(ownedAddresses))
+            when(addressTransactionsService.getTransactionsForAddresses(ownedAddresses, BTC))
                     .thenReturn(Set.of(ADDRESS_TRANSACTIONS, ADDRESS_TRANSACTIONS_2));
             Set<TransactionHash> hashes = Set.of(
                     TRANSACTION_HASH,
@@ -378,9 +388,9 @@ class AddressOwnershipServiceTest {
                     TRANSACTION_HASH_3,
                     TRANSACTION_HASH_4
             );
-            when(transactionService.getTransactionDetails(hashes)).thenReturn(Set.of(TRANSACTION, TRANSACTION_2));
+            when(transactionService.getTransactionDetails(hashes, BTC)).thenReturn(Set.of(TRANSACTION, TRANSACTION_2));
 
-            assertThat(addressOwnershipService.getMyTransactionsWithCoins())
+            assertThat(addressOwnershipService.getMyTransactionsWithCoins(BTC))
                     .containsOnlyKeys(TRANSACTION, TRANSACTION_2);
         }
 
@@ -392,7 +402,7 @@ class AddressOwnershipServiceTest {
             Transaction transactionWithFee = sendOneSatoshiWithFeeTo(ownedAddress, ownedAddress2);
             mockTransactionHashes(ownedAddresses, transactionWithFee);
 
-            assertThat(addressOwnershipService.getMyTransactionsWithCoins()).containsOnly(
+            assertThat(addressOwnershipService.getMyTransactionsWithCoins(BTC)).containsOnly(
                     entry(transactionWithFee, Coins.ofSatoshis(-1))
             );
         }
@@ -402,7 +412,7 @@ class AddressOwnershipServiceTest {
             Transaction transactionWithFee = sendOneSatoshiTo(ownedAddress, ADDRESS_2);
             mockTransactionHashes(ownedAddress, transactionWithFee);
 
-            assertThat(addressOwnershipService.getMyTransactionsWithCoins()).containsOnly(
+            assertThat(addressOwnershipService.getMyTransactionsWithCoins(BTC)).containsOnly(
                     entry(transactionWithFee, Coins.ofSatoshis(-1))
             );
         }
@@ -412,7 +422,7 @@ class AddressOwnershipServiceTest {
             Transaction transactionWithFee = sendOneSatoshiTo(ADDRESS_2, ownedAddress);
             mockTransactionHashes(ownedAddress, transactionWithFee);
 
-            assertThat(addressOwnershipService.getMyTransactionsWithCoins()).containsOnly(
+            assertThat(addressOwnershipService.getMyTransactionsWithCoins(BTC)).containsOnly(
                     entry(transactionWithFee, Coins.ofSatoshis(1))
             );
         }
@@ -422,7 +432,7 @@ class AddressOwnershipServiceTest {
             Transaction transactionWithFee = sendOneSatoshiWithFeeTo(ADDRESS_2, ownedAddress);
             mockTransactionHashes(ownedAddress, transactionWithFee);
 
-            assertThat(addressOwnershipService.getMyTransactionsWithCoins()).containsOnly(
+            assertThat(addressOwnershipService.getMyTransactionsWithCoins(BTC)).containsOnly(
                     entry(transactionWithFee, Coins.ofSatoshis(1))
             );
         }
@@ -432,7 +442,7 @@ class AddressOwnershipServiceTest {
             Transaction transaction = createTransactionSplittingInput(ADDRESS_2, ownedAddress, ADDRESS_3);
             mockTransactionHashes(ownedAddress, transaction);
 
-            assertThat(addressOwnershipService.getMyTransactionsWithCoins()).containsOnly(
+            assertThat(addressOwnershipService.getMyTransactionsWithCoins(BTC)).containsOnly(
                     entry(transaction, Coins.ofSatoshis(1))
 
             );
@@ -443,7 +453,7 @@ class AddressOwnershipServiceTest {
             Transaction transaction = createTransactionSplittingInput(ownedAddress, ADDRESS_2, ADDRESS_3);
             mockTransactionHashes(ownedAddress, transaction);
 
-            assertThat(addressOwnershipService.getMyTransactionsWithCoins()).containsOnly(
+            assertThat(addressOwnershipService.getMyTransactionsWithCoins(BTC)).containsOnly(
                     entry(transaction, Coins.ofSatoshis(-2))
             );
         }
@@ -456,7 +466,7 @@ class AddressOwnershipServiceTest {
             Transaction transaction = createTransactionSplittingInput(ownedAddress, ADDRESS_2, ownedAddress2);
             mockTransactionHashes(ownedAddresses, transaction);
 
-            assertThat(addressOwnershipService.getMyTransactionsWithCoins()).containsOnly(
+            assertThat(addressOwnershipService.getMyTransactionsWithCoins(BTC)).containsOnly(
                     entry(transaction, Coins.ofSatoshis(-1))
             );
         }
@@ -467,13 +477,14 @@ class AddressOwnershipServiceTest {
     }
 
     private void mockTransactionHashes(Set<Address> addresses, Transaction transaction) {
-        when(addressTransactionsService.getTransactionsForAddresses(addresses)).thenReturn(
+        when(addressTransactionsService.getTransactionsForAddresses(addresses, BTC)).thenReturn(
                 Set.of(new AddressTransactions(
                         new Address("x"),
                         Set.of(TRANSACTION_HASH),
-                        LAST_CHECKED_AT_BLOCK_HEIGHT
+                        LAST_CHECKED_AT_BLOCK_HEIGHT,
+                        BTC
                 )));
-        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH))).thenReturn(Set.of(transaction));
+        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH), BTC)).thenReturn(Set.of(transaction));
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -492,7 +503,8 @@ class AddressOwnershipServiceTest {
                 DATE_TIME,
                 Coins.NONE,
                 List.of(input),
-                Arrays.asList(outputs)
+                List.of(outputs),
+                BTC
         );
     }
 }

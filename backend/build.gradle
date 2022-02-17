@@ -14,6 +14,7 @@ dependencies {
     implementation project(':backend:models')
     runtimeOnly 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
     runtimeOnly 'com.h2database:h2'
+    testImplementation testFixtures(project(':backend:models'))
 }
 
 jacocoTestCoverageVerification {

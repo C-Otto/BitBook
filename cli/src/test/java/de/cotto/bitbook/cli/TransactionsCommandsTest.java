@@ -38,6 +38,7 @@ import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
@@ -90,7 +91,7 @@ class TransactionsCommandsTest {
 
     @Test
     void getTransactionDetails() {
-        when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(TRANSACTION);
+        when(transactionService.getTransactionDetails(TRANSACTION_HASH, BTC)).thenReturn(TRANSACTION);
         when(transactionFormatter.format(TRANSACTION)).thenReturn(EXPECTED);
         String details = transactionsCommands.getTransactionDetails(CLI_TRANSACTION_HASH);
         assertThat(details).isEqualTo(EXPECTED);
@@ -112,9 +113,8 @@ class TransactionsCommandsTest {
     @Test
     void getAddressTransactions_unknown_transaction_returned_for_two_hashes() {
         prepareMocks();
-        when(transactionService.getTransactionDetails(anySet()))
-                .thenReturn(Set.of(Transaction.UNKNOWN, TRANSACTION_2));
-        when(addressTransactionsService.getTransactions(any())).thenReturn(ADDRESS_TRANSACTIONS);
+        when(transactionService.getTransactionDetails(anySet(), eq(BTC)))
+                .thenReturn(Set.of(Transaction.unknown(BTC), TRANSACTION_2));
 
         String details = transactionsCommands.getAddressTransactions(new CliAddress(ADDRESS));
 
@@ -127,9 +127,7 @@ class TransactionsCommandsTest {
     @Test
     void getAddressTransactions_does_not_return_all_requested_transactions() {
         prepareMocks();
-        when(transactionService.getTransactionDetails(anySet()))
-                .thenReturn(Set.of(TRANSACTION));
-        when(addressTransactionsService.getTransactions(any())).thenReturn(ADDRESS_TRANSACTIONS);
+        when(transactionService.getTransactionDetails(anySet(), eq(BTC))).thenReturn(Set.of(TRANSACTION));
 
         String details = transactionsCommands.getAddressTransactions(new CliAddress(ADDRESS));
 
@@ -149,18 +147,22 @@ class TransactionsCommandsTest {
                 DATE_TIME,
                 Coins.ofSatoshis(1_000_000),
                 List.of(new Input(Coins.ofSatoshis(1_000_000), address)),
-                List.of()
+                List.of(),
+                BTC
         );
         when(addressDescriptionService.getDescription(address)).thenReturn("");
         when(addressFormatter.getFormattedOwnershipStatus(address)).thenReturn("?");
         AddressTransactions addressTransactions = new AddressTransactions(
                 ADDRESS,
                 Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2, TRANSACTION_HASH_3),
-                LAST_CHECKED_AT_BLOCK_HEIGHT
+                LAST_CHECKED_AT_BLOCK_HEIGHT,
+                BTC
         );
-        when(addressTransactionsService.getTransactions(address)).thenReturn(addressTransactions);
-        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2, TRANSACTION_HASH_3)))
-                .thenReturn(Set.of(TRANSACTION, TRANSACTION_2, transaction3));
+        when(addressTransactionsService.getTransactions(address, BTC)).thenReturn(addressTransactions);
+        when(transactionService.getTransactionDetails(
+                Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2, TRANSACTION_HASH_3),
+                BTC
+        )).thenReturn(Set.of(TRANSACTION, TRANSACTION_2, transaction3));
 
         when(transactionFormatter.formatSingleLineForAddress(TRANSACTION, address)).thenReturn("f1");
         when(transactionFormatter.formatSingleLineForAddress(TRANSACTION_2, address)).thenReturn("f2");
@@ -181,8 +183,8 @@ class TransactionsCommandsTest {
         mockSortByHash();
         when(addressFormatter.getFormattedOwnershipStatus(ADDRESS)).thenReturn("?");
         when(addressDescriptionService.getDescription(ADDRESS)).thenReturn("description");
-        when(addressTransactionsService.getTransactions(ADDRESS)).thenReturn(ADDRESS_TRANSACTIONS);
-        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
+        when(addressTransactionsService.getTransactions(ADDRESS, BTC)).thenReturn(ADDRESS_TRANSACTIONS);
+        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2), BTC))
                 .thenReturn(Set.of(TRANSACTION, TRANSACTION_2));
 
         String addressTransactions = transactionsCommands.getAddressTransactions(new CliAddress(ADDRESS));
@@ -194,9 +196,10 @@ class TransactionsCommandsTest {
     @Test
     void getAddressTransactions_requests_all_prices_before_formatting_details() {
         mockSortByHash();
-        when(addressTransactionsService.getTransactions(ADDRESS))
-                .thenReturn(new AddressTransactions(ADDRESS, Set.of(TRANSACTION_HASH), LAST_CHECKED_AT_BLOCK_HEIGHT));
-        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH))).thenReturn(Set.of(TRANSACTION));
+        when(addressTransactionsService.getTransactions(ADDRESS, BTC)).thenReturn(
+                new AddressTransactions(ADDRESS, Set.of(TRANSACTION_HASH), LAST_CHECKED_AT_BLOCK_HEIGHT, BTC)
+        );
+        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH), BTC)).thenReturn(Set.of(TRANSACTION));
 
         transactionsCommands.getAddressTransactions(new CliAddress(ADDRESS));
 
@@ -241,6 +244,7 @@ class TransactionsCommandsTest {
 
     private void prepareMocks() {
         mockSortByHash();
+        when(addressTransactionsService.getTransactions(any(), eq(BTC))).thenReturn(ADDRESS_TRANSACTIONS);
         when(addressDescriptionService.getDescription(any())).thenReturn("");
         when(addressFormatter.getFormattedOwnershipStatus(ADDRESS)).thenReturn("?");
         when(transactionFormatter.formatSingleLineForAddress(any(), any()))

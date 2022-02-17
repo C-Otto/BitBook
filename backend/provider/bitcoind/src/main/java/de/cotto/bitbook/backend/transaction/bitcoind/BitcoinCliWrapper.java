@@ -10,8 +10,8 @@ import java.util.Optional;
 @Component
 public class BitcoinCliWrapper {
 
-    public static final String COMMAND = "bitcoin-cli";
-    public static final String GET_BLOCK_COUNT = "getblockcount";
+    private static final String COMMAND = "bitcoin-cli";
+    private static final String GET_BLOCK_COUNT = "getblockcount";
 
     public BitcoinCliWrapper() {
         // default constructor

@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.lnd.model.ChannelFixtures.CHANNEL;
 import static de.cotto.bitbook.lnd.model.ChannelFixtures.CHANNEL_ADDRESS;
 import static de.cotto.bitbook.lnd.model.ChannelFixtures.CHANNEL_LOCAL;
@@ -60,7 +61,7 @@ class ChannelsServiceTest {
     @Test
     void sets_ownership_to_owned_if_local() {
         channelsService.addFromChannels(Set.of(CHANNEL_LOCAL));
-        verify(addressOwnershipService).setAddressAsOwned(CHANNEL_ADDRESS);
+        verify(addressOwnershipService).setAddressAsOwned(CHANNEL_ADDRESS, BTC);
     }
 
     @Test

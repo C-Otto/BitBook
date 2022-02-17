@@ -146,7 +146,8 @@ class TransactionFormatterTest {
                     DATE_TIME,
                     sumOfInputs,
                     List.of(new Input(INPUT_VALUE_1, INPUT_ADDRESS_1), new Input(INPUT_VALUE_2, INPUT_ADDRESS_1)),
-                    List.of()
+                    List.of(),
+                    BTC
             );
             String details = formattedCoinsWithPrice(sumOfInputs, price);
             assertThat(transactionFormatter.format(transaction))
@@ -162,7 +163,8 @@ class TransactionFormatterTest {
                     DATE_TIME,
                     Coins.NONE,
                     List.of(new Input(sumOfOutputs, INPUT_ADDRESS_1)),
-                    List.of(new Output(OUTPUT_VALUE_1, OUTPUT_ADDRESS_1), new Output(OUTPUT_VALUE_2, OUTPUT_ADDRESS_1))
+                    List.of(new Output(OUTPUT_VALUE_1, OUTPUT_ADDRESS_1), new Output(OUTPUT_VALUE_2, OUTPUT_ADDRESS_1)),
+                    BTC
             );
             String details = formattedCoinsWithPrice(sumOfOutputs, price);
             assertThat(transactionFormatter.format(transaction))

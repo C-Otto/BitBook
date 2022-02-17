@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.ZoneOffset;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_VALUE_1;
@@ -68,7 +69,7 @@ class BlockchainInfoTransactionDtoTest {
         );
         BlockchainInfoTransactionDto blockchainInfoTransactionDto =
                 objectMapper.readValue(json, BlockchainInfoTransactionDto.class);
-        assertThat(blockchainInfoTransactionDto.toModel()).isEqualTo(TRANSACTION);
+        assertThat(blockchainInfoTransactionDto.toModel(BTC)).isEqualTo(TRANSACTION);
     }
 
     @Test
@@ -100,7 +101,7 @@ class BlockchainInfoTransactionDtoTest {
         BlockchainInfoTransactionDto blockchainInfoTransactionDto =
                 objectMapper.readValue(json, BlockchainInfoTransactionDto.class);
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(blockchainInfoTransactionDto::toModel);
+                .isThrownBy(() -> blockchainInfoTransactionDto.toModel(BTC));
     }
 
     @Test
@@ -127,7 +128,7 @@ class BlockchainInfoTransactionDtoTest {
                   }""".formatted(TRANSACTION_HASH, formattedDateTime, BLOCK_HEIGHT);
         BlockchainInfoTransactionDto blockchainInfoTransactionDto =
                 objectMapper.readValue(json, BlockchainInfoTransactionDto.class);
-        assertThat(blockchainInfoTransactionDto.toModel().getOutputs()).hasSize(1);
+        assertThat(blockchainInfoTransactionDto.toModel(BTC).getOutputs()).hasSize(1);
     }
 
     @Test
@@ -153,7 +154,7 @@ class BlockchainInfoTransactionDtoTest {
                     "block_height": %d
                   }""".formatted(TRANSACTION_HASH, formattedDateTime, BLOCK_HEIGHT);
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                objectMapper.readValue(json, BlockchainInfoTransactionDto.class).toModel()
+                objectMapper.readValue(json, BlockchainInfoTransactionDto.class).toModel(BTC)
         );
     }
 
@@ -183,7 +184,7 @@ class BlockchainInfoTransactionDtoTest {
                     "block_height": %d
                   }""".formatted(TRANSACTION_HASH, formattedDateTime, BLOCK_HEIGHT);
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                objectMapper.readValue(json, BlockchainInfoTransactionDto.class).toModel()
+                objectMapper.readValue(json, BlockchainInfoTransactionDto.class).toModel(BTC)
         );
     }
 
@@ -209,7 +210,7 @@ class BlockchainInfoTransactionDtoTest {
                     "block_height": %d
                   }""".formatted(TRANSACTION_HASH, formattedDateTime, BLOCK_HEIGHT);
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                objectMapper.readValue(json, BlockchainInfoTransactionDto.class).toModel()
+                objectMapper.readValue(json, BlockchainInfoTransactionDto.class).toModel(BTC)
         );
     }
 
@@ -235,7 +236,7 @@ class BlockchainInfoTransactionDtoTest {
                     "block_height": %d
                   }""".formatted(TRANSACTION_HASH, formattedDateTime, BLOCK_HEIGHT);
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                objectMapper.readValue(json, BlockchainInfoTransactionDto.class).toModel()
+                objectMapper.readValue(json, BlockchainInfoTransactionDto.class).toModel(BTC)
         );
     }
 }

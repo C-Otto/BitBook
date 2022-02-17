@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static de.cotto.bitbook.backend.model.Chain.BCH;
+import static de.cotto.bitbook.backend.model.Chain.BSV;
 import static de.cotto.bitbook.backend.model.Chain.BTC;
 
 @Component
@@ -26,25 +28,13 @@ public class BlockchairBlockHeightProvider implements BlockHeightProvider {
     @Override
     public Optional<Integer> get(Chain chain) throws ProviderException {
         throwIfUnsupported(chain);
-        String chainName = getChainName(chain);
+        String chainName = BlockchairChainName.get(chain);
         BlockchairBlockHeightDto dto = blockchairClient.getBlockHeight(chainName).orElseThrow(ProviderException::new);
         return Optional.of(dto.getBlockHeight());
     }
 
     @Override
     public boolean isSupported(Chain chain) {
-        return chain == BTC || chain == Chain.BCH;
-    }
-
-    private String getChainName(Chain chain) {
-        //noinspection EnhancedSwitchMigration
-        switch (chain) {
-            case BTC:
-                return "bitcoin";
-            case BCH:
-                return "bitcoin-cash";
-            default:
-                throw new IllegalStateException();
-        }
+        return chain == BTC || chain == BCH || chain == BSV;
     }
 }

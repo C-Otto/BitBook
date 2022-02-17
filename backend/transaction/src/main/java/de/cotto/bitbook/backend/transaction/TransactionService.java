@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.price.PriceService;
@@ -12,7 +13,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
-import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
 import static java.util.stream.Collectors.toSet;
@@ -40,54 +40,63 @@ public class TransactionService {
         this.blockHeightService = blockHeightService;
     }
 
-    public Set<Transaction> getTransactionDetails(Set<TransactionHash> transactionHashes) {
-        return getTransactionDetails(transactionHashes, STANDARD);
+    public Set<Transaction> getTransactionDetails(Set<TransactionHash> transactionHashes, Chain chain) {
+        return getTransactionDetails(transactionHashes, chain, STANDARD);
     }
 
-    public Transaction getTransactionDetails(TransactionHash transactionHash) {
-        return getFromFuture(getTransactionDetails(transactionHash, STANDARD));
+    public Transaction getTransactionDetails(TransactionHash transactionHash, Chain chain) {
+        return getFromFuture(getTransactionDetails(transactionHash, chain, STANDARD), chain);
     }
 
     private Future<Transaction> getTransactionDetails(
             TransactionHash transactionHash,
+            Chain chain,
             RequestPriority requestPriority
     ) {
-        return getFromPersistenceOrDownload(transactionHash, requestPriority);
+        return getFromPersistenceOrDownload(transactionHash, chain, requestPriority);
     }
 
     private Set<Transaction> getTransactionDetails(
             Set<TransactionHash> transactionHashes,
+            Chain chain,
             RequestPriority requestPriority
     ) {
         Set<Future<Transaction>> futures = transactionHashes.stream()
-                .map(transactionHash -> getTransactionDetails(transactionHash, requestPriority))
+                .map(transactionHash -> getTransactionDetails(transactionHash, chain, requestPriority))
                 .collect(toSet());
-        return futures.stream().map(this::getFromFuture).collect(toSet());
+        return futures.stream()
+                .map(future -> getFromFuture(future, chain))
+                .collect(toSet());
     }
 
     @Async
-    public void requestInBackground(Set<TransactionHash> transactionHashes) {
-        getTransactionDetails(transactionHashes, LOWEST);
+    public void requestInBackground(Set<TransactionHash> transactionHashes, Chain chain) {
+        getTransactionDetails(transactionHashes, chain, LOWEST);
     }
 
     private Future<Transaction> getFromPersistenceOrDownload(
             TransactionHash transactionHash,
+            Chain chain,
             RequestPriority requestPriority
     ) {
-        Transaction persistedTransaction = transactionDao.getTransaction(transactionHash);
+        Transaction persistedTransaction = transactionDao.getTransaction(transactionHash, chain);
         if (persistedTransaction.isValid()) {
             triggerPriceRequest(persistedTransaction);
             return CompletableFuture.completedFuture(persistedTransaction);
         }
-        return downloadAndPersist(transactionHash, requestPriority);
+        return downloadAndPersist(transactionHash, chain, requestPriority);
     }
 
-    private Future<Transaction> downloadAndPersist(TransactionHash transactionHash, RequestPriority requestPriority) {
-        TransactionRequest request = new TransactionRequest(transactionHash, requestPriority);
+    private Future<Transaction> downloadAndPersist(
+            TransactionHash transactionHash,
+            Chain chain,
+            RequestPriority requestPriority
+    ) {
+        TransactionRequest request = new TransactionRequest(transactionHash, chain, requestPriority);
         return prioritizingTransactionProvider.getTransaction(request).getFuture()
                 .thenApply(transaction -> {
                     if (isInvalidOrTooRecent(transaction)) {
-                        return Transaction.UNKNOWN;
+                        return Transaction.unknown(transaction.getChain());
                     }
                     persistAndRequestPrice(transaction);
                     return transaction;
@@ -105,7 +114,7 @@ public class TransactionService {
             return true;
         }
         // too recent, may get lost in chain reorganization
-        return blockHeight > getChainBlockHeight() - CONFIRMATION_LIMIT;
+        return blockHeight > getChainBlockHeight(transaction.getChain()) - CONFIRMATION_LIMIT;
     }
 
     private void persistAndRequestPrice(Transaction transaction) {
@@ -114,14 +123,14 @@ public class TransactionService {
     }
 
     private void triggerPriceRequest(Transaction transaction) {
-        priceService.requestPriceInBackground(transaction.getTime(), BTC);
+        priceService.requestPriceInBackground(transaction.getTime(), transaction.getChain());
     }
 
-    private int getChainBlockHeight() {
-        return blockHeightService.getBlockHeight(BTC);
+    private int getChainBlockHeight(Chain chain) {
+        return blockHeightService.getBlockHeight(chain);
     }
 
-    private Transaction getFromFuture(Future<Transaction> future) {
-        return ResultFuture.getOrElse(future, Transaction.UNKNOWN);
+    private Transaction getFromFuture(Future<Transaction> future, Chain chain) {
+        return ResultFuture.getOrElse(future, Transaction.unknown(chain));
     }
 }

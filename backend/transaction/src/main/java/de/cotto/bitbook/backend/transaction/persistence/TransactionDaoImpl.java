@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.persistence;
 
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.TransactionDao;
@@ -17,10 +18,10 @@ public class TransactionDaoImpl implements TransactionDao {
     }
 
     @Override
-    public Transaction getTransaction(TransactionHash transactionHash) {
-        return transactionRepository.findById(transactionHash.toString())
+    public Transaction getTransaction(TransactionHash transactionHash, Chain chain) {
+        return transactionRepository.findById(new TransactionJpaDtoId(transactionHash.toString(), chain.toString()))
                 .map(TransactionJpaDto::toModel)
-                .orElse(Transaction.UNKNOWN);
+                .orElse(Transaction.unknown(chain));
     }
 
     @Override

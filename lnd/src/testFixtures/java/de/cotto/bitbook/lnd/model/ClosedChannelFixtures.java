@@ -10,13 +10,11 @@ import de.cotto.bitbook.backend.model.TransactionHash;
 import java.util.List;
 import java.util.Set;
 
-import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
-import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
-import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_2;
 
 public class ClosedChannelFixtures {
@@ -28,24 +26,18 @@ public class ClosedChannelFixtures {
     public static final Address SETTLEMENT_ADDRESS = OUTPUT_ADDRESS_1;
     private static final Coins SETTLED_BALANCE = Coins.ofSatoshis(400);
 
-    public static final Transaction OPENING_TRANSACTION = new Transaction(
-            TRANSACTION_HASH,
-            BLOCK_HEIGHT,
-            DATE_TIME,
-            Coins.ofSatoshis(100),
-            List.of(
-                    new Input(Coins.ofSatoshis(550), INPUT_ADDRESS_1),
-                    new Input(Coins.ofSatoshis(50), INPUT_ADDRESS_2)
-            ),
-            List.of(new Output(CHANNEL_CAPACITY, CHANNEL_ADDRESS))
-    );
+    public static final Transaction OPENING_TRANSACTION = ChannelFixtures.OPENING_TRANSACTION;
     public static final Transaction CLOSING_TRANSACTION = new Transaction(
             TRANSACTION_HASH_2,
             BLOCK_HEIGHT,
             DATE_TIME,
             Coins.ofSatoshis(50),
             List.of(new Input(CHANNEL_CAPACITY, CHANNEL_ADDRESS)),
-            List.of(new Output(SETTLED_BALANCE, SETTLEMENT_ADDRESS), new Output(Coins.ofSatoshis(50), OUTPUT_ADDRESS_2))
+            List.of(
+                    new Output(SETTLED_BALANCE, SETTLEMENT_ADDRESS),
+                    new Output(Coins.ofSatoshis(50), OUTPUT_ADDRESS_2)
+            ),
+            BTC
     );
     private static final String REMOTE_PUBKEY = "pubkey";
     private static final Initiator OPEN_INITIATOR = Initiator.REMOTE;
@@ -70,7 +62,8 @@ public class ClosedChannelFixtures {
                     List.of(
                             new Output(SETTLED_BALANCE, SETTLEMENT_ADDRESS),
                             new Output(SETTLED_BALANCE, OUTPUT_ADDRESS_2)
-                    )
+                    ),
+                    BTC
             ))
             .build();
 

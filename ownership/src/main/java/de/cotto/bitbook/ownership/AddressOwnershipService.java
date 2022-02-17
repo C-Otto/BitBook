@@ -5,6 +5,7 @@ import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.model.TransactionHash;
@@ -49,10 +50,10 @@ public class AddressOwnershipService {
         return addressOwnershipDao.getOwnedAddresses().stream().map(addressDescriptionService::get).collect(toSet());
     }
 
-    public Map<Transaction, Coins> getNeighbourTransactions() {
+    public Map<Transaction, Coins> getNeighbourTransactions(Chain chain) {
         Set<Address> ownedAddresses = getOwnedAddresses();
         Set<Address> foreignAddresses = addressOwnershipDao.getForeignAddresses();
-        Set<Transaction> myTransactions = getMyTransactions();
+        Set<Transaction> myTransactions = getMyTransactions(chain);
 
         Map<Transaction, Coins> differencesOwned = getDifferences(myTransactions, ownedAddresses);
         Map<Transaction, Coins> differencesForeign = getDifferences(myTransactions, foreignAddresses);
@@ -68,13 +69,13 @@ public class AddressOwnershipService {
         }
     }
 
-    public void setAddressAsOwned(Address address) {
+    public void setAddressAsOwned(Address address, Chain chain) {
         addressOwnershipDao.setAddressAsOwned(address);
-        addressTransactionsService.requestTransactionsInBackground(address);
+        addressTransactionsService.requestTransactionsInBackground(address, chain);
     }
 
-    public void setAddressAsOwned(Address address, String description) {
-        setAddressAsOwned(address);
+    public void setAddressAsOwned(Address address, Chain chain, String description) {
+        setAddressAsOwned(address, chain);
         addressDescriptionService.set(address, description);
     }
 
@@ -91,11 +92,11 @@ public class AddressOwnershipService {
         addressOwnershipDao.remove(address);
     }
 
-    public Coins getBalance() {
+    public Coins getBalance(Chain chain) {
         Set<Address> ownedAddresses = getOwnedAddresses();
-        addressTransactionsService.getTransactionsForAddresses(ownedAddresses);
+        addressTransactionsService.getTransactionsForAddresses(ownedAddresses, chain);
         return ownedAddresses.parallelStream()
-                .map(balanceService::getBalance)
+                .map(address -> balanceService.getBalance(address, chain))
                 .reduce(Coins.NONE, Coins::add);
     }
 
@@ -103,17 +104,17 @@ public class AddressOwnershipService {
         return addressOwnershipDao.getOwnershipStatus(address);
     }
 
-    public Map<Transaction, Coins> getMyTransactionsWithCoins() {
-        return getDifferences(getMyTransactions(), getOwnedAddresses());
+    public Map<Transaction, Coins> getMyTransactionsWithCoins(Chain chain) {
+        return getDifferences(getMyTransactions(chain), getOwnedAddresses());
     }
 
-    private Set<Transaction> getMyTransactions() {
+    private Set<Transaction> getMyTransactions(Chain chain) {
         Set<TransactionHash> hashes =
-                addressTransactionsService.getTransactionsForAddresses(getOwnedAddresses()).stream()
-                .map(AddressTransactions::getTransactionHashes)
-                .flatMap(Set::stream)
-                .collect(toSet());
-        return transactionService.getTransactionDetails(hashes);
+                addressTransactionsService.getTransactionsForAddresses(getOwnedAddresses(), chain).stream()
+                        .map(AddressTransactions::getTransactionHashes)
+                        .flatMap(Set::stream)
+                        .collect(toSet());
+        return transactionService.getTransactionDetails(hashes, chain);
     }
 
     private Map<Transaction, Coins> getDifferences(

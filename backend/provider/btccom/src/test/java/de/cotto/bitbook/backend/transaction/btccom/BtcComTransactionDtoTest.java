@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.ZoneOffset;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_VALUE_1;
@@ -79,7 +80,7 @@ class BtcComTransactionDtoTest {
                 OUTPUT_ADDRESS_2, OUTPUT_VALUE_2.getSatoshis());
         BtcComTransactionDto btcComTransactionDto =
                 objectMapper.readValue(json, BtcComTransactionDto.class);
-        assertThat(btcComTransactionDto.toModel()).isEqualTo(TRANSACTION);
+        assertThat(btcComTransactionDto.toModel(BTC)).isEqualTo(TRANSACTION);
     }
 
     @Test
@@ -224,7 +225,7 @@ class BtcComTransactionDtoTest {
                 }""";
         BtcComTransactionDto btcComTransactionDto =
                 objectMapper.readValue(json, BtcComTransactionDto.class);
-        assertThat(btcComTransactionDto.toModel().getOutputs()).hasSize(1);
+        assertThat(btcComTransactionDto.toModel(BTC).getOutputs()).hasSize(1);
     }
 
     @Test
@@ -259,7 +260,7 @@ class BtcComTransactionDtoTest {
                   }
                 }""";
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                objectMapper.readValue(json, BtcComTransactionDto.class).toModel()
+                objectMapper.readValue(json, BtcComTransactionDto.class).toModel(BTC)
         );
     }
 
@@ -295,7 +296,7 @@ class BtcComTransactionDtoTest {
                   }
                 }""";
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                objectMapper.readValue(json, BtcComTransactionDto.class).toModel()
+                objectMapper.readValue(json, BtcComTransactionDto.class).toModel(BTC)
         );
     }
 
@@ -353,6 +354,6 @@ class BtcComTransactionDtoTest {
                 }""";
         BtcComTransactionDto btcComTransactionDto =
                 objectMapper.readValue(json, BtcComTransactionDto.class);
-        assertThat(btcComTransactionDto.toModel().getOutputs()).isEmpty();
+        assertThat(btcComTransactionDto.toModel(BTC).getOutputs()).isEmpty();
     }
 }

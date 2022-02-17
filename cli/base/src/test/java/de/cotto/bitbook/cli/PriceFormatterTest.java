@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class PriceFormatterTest {
-    public static final Price PRICE = Price.of(100);
+    private static final Price PRICE = Price.of(100);
 
     @InjectMocks
     private PriceFormatter priceFormatter;

@@ -10,6 +10,8 @@ import java.util.Set;
 
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS_2;
+import static de.cotto.bitbook.backend.model.Chain.BSV;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_2;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
@@ -32,18 +34,18 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 class TransactionTest {
 
     @Test
-    void unknown_transaction_is_equal_to_any_transaction_with_empty_hash() {
-        assertThat(Transaction.UNKNOWN).isEqualTo(new Transaction(TransactionHash.NONE, BLOCK_HEIGHT));
+    void unknown_transaction_is_equal_to_any_transaction_in_same_chain_with_empty_hash() {
+        assertThat(Transaction.unknown(BSV)).isEqualTo(new Transaction(TransactionHash.NONE, BLOCK_HEIGHT, BSV));
     }
 
     @Test
     void isValid_false() {
-        assertThat(Transaction.UNKNOWN.isValid()).isFalse();
+        assertThat(Transaction.unknown(BTC).isValid()).isFalse();
     }
 
     @Test
     void isInvalid_true() {
-        assertThat(Transaction.UNKNOWN.isInvalid()).isTrue();
+        assertThat(Transaction.unknown(BTC).isInvalid()).isTrue();
     }
 
     @Test
@@ -63,7 +65,8 @@ class TransactionTest {
                 BLOCK_HEIGHT,
                 DATE_TIME,
                 FEES,
-                List.of(OUTPUT_1, OUTPUT_2, new Output(Coins.NONE, new Address("xxx")))
+                List.of(OUTPUT_1, OUTPUT_2, new Output(Coins.NONE, new Address("xxx"))),
+                BTC
         );
         assertThat(coinbaseTransaction.getOutputs()).hasSize(2);
     }
@@ -107,7 +110,8 @@ class TransactionTest {
                 DATE_TIME,
                 Coins.NONE,
                 List.of(new Input(coins1, ADDRESS), new Input(coins2, ADDRESS)),
-                List.of(new Output(coins3, ADDRESS_2), new Output(coins4, ADDRESS))
+                List.of(new Output(coins3, ADDRESS_2), new Output(coins4, ADDRESS)),
+                BTC
         );
         Coins difference = coins4.subtract(coins1).subtract(coins2);
         assertThat(transaction.getDifferenceForAddress(ADDRESS)).isEqualTo(difference);
@@ -167,7 +171,8 @@ class TransactionTest {
                 DATE_TIME,
                 Coins.NONE,
                 List.of(new Input(OUTPUT_VALUE_1.add(OUTPUT_VALUE_1), new Address("a"))),
-                List.of(OUTPUT_1, OUTPUT_1)
+                List.of(OUTPUT_1, OUTPUT_1),
+                BTC
         );
         assertThat(transaction.getOutputWithValue(OUTPUT_VALUE_1)).isEmpty();
     }
@@ -176,19 +181,27 @@ class TransactionTest {
     void testToString() {
         List<Input> inputs = TRANSACTION.getInputs();
         List<Output> outputs = TRANSACTION.getOutputs();
-        String expectedString = "Transaction{hash='%s', blockHeight=%s, time=%s, fees=%s, inputs=%s, outputs=%s}"
-                .formatted(TRANSACTION_HASH, BLOCK_HEIGHT, DATE_TIME, FEES, inputs, outputs);
+        String expectedString =
+                "Transaction{hash='%s', blockHeight=%s, time=%s, fees=%s, inputs=%s, outputs=%s, chain='%s'}".formatted(
+                        TRANSACTION_HASH,
+                        BLOCK_HEIGHT,
+                        DATE_TIME,
+                        FEES,
+                        inputs,
+                        outputs,
+                        BTC
+                );
         assertThat(TRANSACTION).hasToString(expectedString);
     }
 
     @Test
     void testToString_unknown() {
-        assertThat(new Transaction(TransactionHash.NONE, BLOCK_HEIGHT)).hasToString("Transaction{UNKNOWN}");
+        assertThat(new Transaction(TransactionHash.NONE, BLOCK_HEIGHT, BTC)).hasToString("Transaction{UNKNOWN}");
     }
 
     @Test
     void testToString_empty_hash() {
-        assertThat(Transaction.UNKNOWN).hasToString("Transaction{UNKNOWN}");
+        assertThat(Transaction.unknown(BTC)).hasToString("Transaction{UNKNOWN}");
     }
 
     @Test
@@ -198,12 +211,17 @@ class TransactionTest {
 
     @Test
     void testEquals_both_unknown() {
-        assertThat(new Transaction(TransactionHash.NONE, BLOCK_HEIGHT)).isEqualTo(Transaction.UNKNOWN);
+        assertThat(new Transaction(TransactionHash.NONE, BLOCK_HEIGHT, BTC)).isEqualTo(Transaction.unknown(BTC));
+    }
+
+    @Test
+    void testEquals_both_unknown_different_chain() {
+        assertThat(Transaction.unknown(BSV)).isNotEqualTo(Transaction.unknown(BTC));
     }
 
     @Test
     void testEquals_one_is_unknown() {
-        assertThat(TRANSACTION).isNotEqualTo(Transaction.UNKNOWN);
+        assertThat(TRANSACTION).isNotEqualTo(Transaction.unknown(BTC));
     }
 
     @Test
@@ -224,7 +242,8 @@ class TransactionTest {
                 DATE_TIME.withNano(789),
                 FEES,
                 List.of(INPUT_1, INPUT_2),
-                List.of(OUTPUT_1, OUTPUT_2)
+                List.of(OUTPUT_1, OUTPUT_2),
+                BTC
         );
         assertThat(transaction.getTime()).isEqualTo(DATE_TIME);
     }
@@ -248,7 +267,7 @@ class TransactionTest {
                 OUTPUT_2
         );
         Transaction transaction =
-                new Transaction(TRANSACTION_HASH, BLOCK_HEIGHT, DATE_TIME, FEES, TRANSACTION.getInputs(), outputs);
+                new Transaction(TRANSACTION_HASH, BLOCK_HEIGHT, DATE_TIME, FEES, TRANSACTION.getInputs(), outputs, BTC);
         assertThat(transaction.getOutputs()).isEqualTo(TRANSACTION.getOutputs());
     }
 
@@ -265,7 +284,7 @@ class TransactionTest {
         outputs.add(OUTPUT_1);
         outputs.add(OUTPUT_2);
         Transaction transaction =
-                new Transaction(TRANSACTION_HASH, BLOCK_HEIGHT, DATE_TIME, FEES, TRANSACTION.getInputs(), outputs);
+                new Transaction(TRANSACTION_HASH, BLOCK_HEIGHT, DATE_TIME, FEES, TRANSACTION.getInputs(), outputs, BTC);
         outputs.clear();
         assertThat(transaction.getOutputs()).isEqualTo(TRANSACTION.getOutputs());
     }
@@ -284,7 +303,7 @@ class TransactionTest {
                 INPUT_2
         );
         Transaction transaction =
-                new Transaction(TRANSACTION_HASH, BLOCK_HEIGHT, DATE_TIME, FEES, inputs, TRANSACTION.getOutputs());
+                new Transaction(TRANSACTION_HASH, BLOCK_HEIGHT, DATE_TIME, FEES, inputs, TRANSACTION.getOutputs(), BTC);
         assertThat(transaction.getInputs()).isEqualTo(TRANSACTION.getInputs());
     }
 
@@ -302,7 +321,8 @@ class TransactionTest {
         inputs.add(INPUT_1);
         inputs.add(INPUT_2);
         List<Output> outputs = TRANSACTION.getOutputs();
-        Transaction transaction = new Transaction(TRANSACTION_HASH, BLOCK_HEIGHT, DATE_TIME, FEES, inputs, outputs);
+        Transaction transaction =
+                new Transaction(TRANSACTION_HASH, BLOCK_HEIGHT, DATE_TIME, FEES, inputs, outputs, BTC);
         inputs.clear();
         assertThat(transaction.getInputs()).isEqualTo(TRANSACTION.getInputs());
     }
@@ -310,7 +330,7 @@ class TransactionTest {
     @Test
     void wrong_sum_of_coins() {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                new Transaction(TRANSACTION_HASH, BLOCK_HEIGHT, DATE_TIME, FEES, List.of(), List.of())
+                new Transaction(TRANSACTION_HASH, BLOCK_HEIGHT, DATE_TIME, FEES, List.of(), List.of(), BTC)
         );
     }
 
@@ -321,7 +341,8 @@ class TransactionTest {
                 DATE_TIME,
                 inFromAddress.subtract(outToAddress2),
                 List.of(new Input(inFromAddress, ADDRESS)),
-                List.of(new Output(outToAddress2, ADDRESS_2))
+                List.of(new Output(outToAddress2, ADDRESS_2)),
+                BTC
         );
     }
 }

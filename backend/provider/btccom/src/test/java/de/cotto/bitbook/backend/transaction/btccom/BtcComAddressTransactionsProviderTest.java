@@ -14,6 +14,8 @@ import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_UPDATED;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.Chain.BCH;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.transaction.btccom.BtcComAddressTransactionsFixtures.BTCCOM_ADDRESS_DETAILS;
 import static de.cotto.bitbook.backend.transaction.btccom.BtcComAddressTransactionsFixtures.BTCCOM_ADDRESS_UPDATED;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,16 +31,28 @@ class BtcComAddressTransactionsProviderTest {
     private BtcComClient btcComClient;
 
     @Test
-    void getAddressDetails() {
+    void isSupported_btc() {
+        TransactionsRequestKey key = new TransactionsRequestKey(ADDRESS, BTC, 789);
+        assertThat(provider.isSupported(key)).isTrue();
+    }
+
+    @Test
+    void isSupported_bch() {
+        TransactionsRequestKey key = new TransactionsRequestKey(ADDRESS, BCH, 456);
+        assertThat(provider.isSupported(key)).isFalse();
+    }
+
+    @Test
+    void getAddressDetails() throws Exception {
         when(btcComClient.getAddressDetails(ADDRESS))
                 .thenReturn(Optional.of(BTCCOM_ADDRESS_DETAILS));
         Optional<AddressTransactions> addressTransactions =
-                provider.get(new TransactionsRequestKey(ADDRESS, LAST_CHECKED_AT_BLOCK_HEIGHT));
+                provider.get(new TransactionsRequestKey(ADDRESS, BTC, LAST_CHECKED_AT_BLOCK_HEIGHT));
         assertThat(addressTransactions).contains(ADDRESS_TRANSACTIONS);
     }
 
     @Test
-    void getUpdates_no_update_returned() {
+    void getUpdates_no_update_returned() throws Exception {
         when(btcComClient.getAddressDetails(ADDRESS)).thenReturn(Optional.empty());
 
         Optional<AddressTransactions> updated =
@@ -48,7 +62,7 @@ class BtcComAddressTransactionsProviderTest {
     }
 
     @Test
-    void getUpdates() {
+    void getUpdates() throws Exception {
         when(btcComClient.getAddressDetails(ADDRESS)).thenReturn(Optional.of(BTCCOM_ADDRESS_UPDATED));
         TransactionsRequestKey transactionsRequestKey = new TransactionsRequestKey(
                 ADDRESS_TRANSACTIONS,

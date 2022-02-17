@@ -18,7 +18,6 @@ import static java.util.stream.Collectors.toSet;
 public class Transaction {
     private static final LocalDateTime UNKNOWN_DATE_TIME = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.UTC);
     private static final Address COINBASE_ADDRESS = new Address("coinbase");
-    public static final Transaction UNKNOWN = new Transaction(TransactionHash.NONE, 0);
 
     private final TransactionHash hash;
     private final int blockHeight;
@@ -26,6 +25,7 @@ public class Transaction {
     private final Coins fees;
     private final List<Input> inputs;
     private final List<Output> outputs;
+    private final Chain chain;
 
     public Transaction(
             TransactionHash hash,
@@ -33,7 +33,8 @@ public class Transaction {
             LocalDateTime time,
             Coins fees,
             List<Input> inputs,
-            List<Output> outputs
+            List<Output> outputs,
+            Chain chain
     ) {
         this.hash = hash;
         this.blockHeight = blockHeight;
@@ -41,11 +42,16 @@ public class Transaction {
         this.fees = fees;
         this.inputs = inputs.stream().filter(input -> input.getValue().getSatoshis() > 0).collect(toList());
         this.outputs = outputs.stream().filter(output -> output.getValue().getSatoshis() > 0).collect(toList());
+        this.chain = chain;
         validateCoinsSum(hash, fees, inputs, outputs);
     }
 
-    public Transaction(TransactionHash hash, int blockHeight) {
-        this(hash, blockHeight, UNKNOWN_DATE_TIME, Coins.NONE, List.of(), List.of());
+    public Transaction(TransactionHash hash, int blockHeight, Chain chain) {
+        this(hash, blockHeight, UNKNOWN_DATE_TIME, Coins.NONE, List.of(), List.of(), chain);
+    }
+
+    public static Transaction unknown(Chain chain) {
+        return new Transaction(TransactionHash.NONE, 0, chain);
     }
 
     public static Transaction forCoinbase(
@@ -53,13 +59,14 @@ public class Transaction {
             int blockHeight,
             LocalDateTime time,
             Coins fees,
-            List<Output> outputs
+            List<Output> outputs,
+            Chain chain
     ) {
         Input coinbaseInput = new Input(
                 outputs.stream().map(InputOutput::getValue).reduce(fees, Coins::add),
                 COINBASE_ADDRESS
         );
-        return new Transaction(hash, blockHeight, time, fees, List.of(coinbaseInput), outputs);
+        return new Transaction(hash, blockHeight, time, fees, List.of(coinbaseInput), outputs, chain);
     }
 
     public List<InputOutput> getIncomingToAndOutgoingFromAddress(Address address) {
@@ -136,6 +143,10 @@ public class Transaction {
         return outputs.stream().map(InputOutput::getAddress).collect(toSet());
     }
 
+    public Chain getChain() {
+        return chain;
+    }
+
     @SuppressWarnings("PMD.AvoidLiteralsInIfCondition")
     public Optional<Output> getOutputWithValue(Coins expectedValue) {
         List<Output> candidates = getOutputs().stream()
@@ -157,6 +168,7 @@ public class Transaction {
                     ", fees=" + fees +
                     ", inputs=" + inputs +
                     ", outputs=" + outputs +
+                    ", chain='" + chain + '\'' +
                     '}';
         }
         return "Transaction{UNKNOWN}";
@@ -174,7 +186,7 @@ public class Transaction {
 
         Transaction that = (Transaction) other;
         if (isValid() == that.isValid() && !isValid()) {
-            return true;
+            return chain.equals(that.chain);
         }
 
         if (blockHeight != that.blockHeight) {
@@ -192,6 +204,9 @@ public class Transaction {
         if (!Objects.equals(outputs, that.outputs)) {
             return false;
         }
+        if (!Objects.equals(chain, that.chain)) {
+            return false;
+        }
         return Objects.equals(time, that.time);
     }
 
@@ -203,6 +218,7 @@ public class Transaction {
         result = 31 * result + fees.hashCode();
         result = 31 * result + inputs.hashCode();
         result = 31 * result + outputs.hashCode();
+        result = 31 * result + chain.hashCode();
         return result;
     }
 

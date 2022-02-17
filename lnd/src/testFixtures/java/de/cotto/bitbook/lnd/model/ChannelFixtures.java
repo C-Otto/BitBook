@@ -8,6 +8,7 @@ import de.cotto.bitbook.backend.model.Transaction;
 
 import java.util.List;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
@@ -27,7 +28,8 @@ public class ChannelFixtures {
                     new Input(Coins.ofSatoshis(550), INPUT_ADDRESS_1),
                     new Input(Coins.ofSatoshis(50), INPUT_ADDRESS_2)
             ),
-            List.of(new Output(CHANNEL_CAPACITY, CHANNEL_ADDRESS))
+            List.of(new Output(CHANNEL_CAPACITY, CHANNEL_ADDRESS)),
+            BTC
     );
     public static final String REMOTE_PUBKEY = "pubkey";
 

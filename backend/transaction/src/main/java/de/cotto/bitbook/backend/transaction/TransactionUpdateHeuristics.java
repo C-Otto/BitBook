@@ -7,11 +7,16 @@ import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Transaction;
+import de.cotto.bitbook.backend.model.TransactionHash;
+import de.cotto.bitbook.backend.request.RequestPriority;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.util.Set;
+
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 
 @Component
 public class TransactionUpdateHeuristics {
@@ -48,7 +53,7 @@ public class TransactionUpdateHeuristics {
     }
 
     public boolean isRecentEnough(AddressTransactions addressTransactions) {
-        int currentBlockHeight = blockHeightService.getBlockHeight(Chain.BTC);
+        int currentBlockHeight = blockHeightService.getBlockHeight(addressTransactions.getChain());
         int age = currentBlockHeight - addressTransactions.getLastCheckedAtBlockHeight();
         if (age <= MANY_TRANSACTIONS_AGE_LIMIT) {
             return true;
@@ -60,7 +65,7 @@ public class TransactionUpdateHeuristics {
         if (age <= RECENT_TRANSACTIONS_AGE_LIMIT) {
             return true;
         }
-        boolean hasRecentTransaction = getHasRecentTransaction(addressTransactions);
+        boolean hasRecentTransaction = hasRecentTransaction(addressTransactions);
         if (hasRecentTransaction) {
             return false;
         }
@@ -73,11 +78,19 @@ public class TransactionUpdateHeuristics {
         return isUsedLimitedUseAddress(addressTransactions) && age <= LIMITED_USE_AGE_LIMIT;
     }
 
-    private boolean getHasRecentTransaction(AddressTransactions addressTransactions) {
+    public AddressTransactionsRequest getRequestWithTweakedPriority(AddressTransactionsRequest request) {
+        if (request.getPriority() == RequestPriority.STANDARD) {
+            return AddressTransactionsRequest.create(request.getKey(), RequestPriority.MEDIUM);
+        }
+        return request;
+    }
+
+    private boolean hasRecentTransaction(AddressTransactions addressTransactions) {
+        Chain chain = addressTransactions.getChain();
         LocalDateTime cutoffDate = LocalDateTime.now(ZoneOffset.UTC)
                 .minus(RECENT_TRANSACTION_DAY_LIMIT, ChronoUnit.DAYS);
         return addressTransactions.getTransactionHashes().stream()
-                .map(transactionDao::getTransaction)
+                .map(transactionHash -> transactionDao.getTransaction(transactionHash, chain))
                 .filter(Transaction::isValid)
                 .map(Transaction::getTime)
                 .anyMatch(dateTime -> dateTime.isAfter(cutoffDate));
@@ -85,7 +98,9 @@ public class TransactionUpdateHeuristics {
 
     private boolean hasEmptyBalance(AddressTransactions addressTransactions) {
         Address address = addressTransactions.getAddress();
-        Coins balance = transactionService.getTransactionDetails(addressTransactions.getTransactionHashes()).stream()
+        Set<TransactionHash> transactionHashes = addressTransactions.getTransactionHashes();
+        Chain chain = addressTransactions.getChain();
+        Coins balance = transactionService.getTransactionDetails(transactionHashes, chain).stream()
                 .map(transactionDetails -> transactionDetails.getDifferenceForAddress(address))
                 .reduce(Coins.NONE, Coins::add);
         return balance.equals(Coins.NONE);
@@ -101,9 +116,13 @@ public class TransactionUpdateHeuristics {
     }
 
     private boolean containsSweepTransaction(AddressTransactions addressTransactions) {
+        Chain chain = addressTransactions.getChain();
+        if (chain != BTC) {
+            return false;
+        }
         return addressTransactions.getTransactionHashes().stream()
                 .filter(hash -> LND_SWEEP_TRANSACTION.equals(transactionDescriptionService.getDescription(hash)))
-                .map(transactionDao::getTransaction)
+                .map(transactionHash -> transactionDao.getTransaction(transactionHash, chain))
                 .anyMatch(transaction -> transaction.getInputAddresses().contains(addressTransactions.getAddress()));
 
     }

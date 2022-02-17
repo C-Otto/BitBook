@@ -37,6 +37,10 @@ class BitcoinCliWrapperTest {
         @Nullable
         private String[] command;
 
+        private TestableBitcoinCliWrapper() {
+            super();
+        }
+
         @Override
         protected Optional<String> execute(String... command) {
             this.command = command;

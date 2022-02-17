@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 import static de.cotto.bitbook.ownership.OwnershipStatus.UNKNOWN;
 
@@ -72,7 +73,7 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
             return 0;
         }
         Transaction transaction =
-                transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
+                transactionService.getTransactionDetails(onchainTransaction.getTransactionHash(), BTC);
         Coins amount = onchainTransaction.getAmount();
         Address address = transaction.getOutputWithValue(amount).map(InputOutput::getAddress).orElse(null);
         if (address == null) {
@@ -90,7 +91,7 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
             return 0;
         }
         TransactionHash transactionHash = onchainTransaction.getTransactionHash();
-        Transaction transaction = transactionService.getTransactionDetails(transactionHash);
+        Transaction transaction = transactionService.getTransactionDetails(transactionHash, BTC);
         if (hasUnownedInput(transaction) || hasMismatchedInputDescription(transaction)) {
             return 0;
         }
@@ -99,7 +100,7 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
         if (channelOpenOutput == null || hasUnexpectedChannelCapacity(channelOpenOutput, expectedAmount)) {
             return 0;
         }
-        addressOwnershipService.setAddressAsOwned(channelOpenOutput.getAddress());
+        addressOwnershipService.setAddressAsOwned(channelOpenOutput.getAddress(), BTC);
         setInitiatorInTransactionDescription(transactionHash);
         setDescriptionAndOwnershipForOtherOutputs(transaction, channelOpenOutput);
         return 1;
@@ -164,7 +165,8 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
         if (onchainTransaction.hasLabel() || !onchainTransaction.hasFees() || amount.isNonNegative()) {
             return 0;
         }
-        Transaction transaction = transactionService.getTransactionDetails(onchainTransaction.getTransactionHash());
+        Transaction transaction =
+                transactionService.getTransactionDetails(onchainTransaction.getTransactionHash(), BTC);
         boolean unownedInput = transaction.getInputAddresses().stream()
                 .anyMatch(address -> !OWNED.equals(addressOwnershipService.getOwnershipStatus(address)));
         if (unownedInput) {

@@ -14,6 +14,8 @@ import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS_UPDATED;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.Chain.BCH;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.transaction.mempoolspace.MempoolSpaceAddressTransactionsFixtures.MEMPOOLSPACE_ADDRESS_DETAILS;
 import static de.cotto.bitbook.backend.transaction.mempoolspace.MempoolSpaceAddressTransactionsFixtures.MEMPOOLSPACE_ADDRESS_UPDATED;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,37 +26,49 @@ import static org.mockito.Mockito.when;
 class MempoolSpaceAddressTransactionsProviderTest {
 
     @InjectMocks
-    private MempoolSpaceAddressTransactionsProvider addressTransactionsProvider;
+    private MempoolSpaceAddressTransactionsProvider provider;
 
     @Mock
     private MempoolSpaceClient mempoolSpaceClient;
 
     @Test
-    void getAddressDetails() {
+    void isSupported_btc() {
+        TransactionsRequestKey key = new TransactionsRequestKey(ADDRESS, BTC, 123);
+        assertThat(provider.isSupported(key)).isTrue();
+    }
+
+    @Test
+    void isSupported_bch() {
+        TransactionsRequestKey key = new TransactionsRequestKey(ADDRESS, BCH, 123);
+        assertThat(provider.isSupported(key)).isFalse();
+    }
+
+    @Test
+    void getAddressDetails() throws Exception {
         when(mempoolSpaceClient.getAddressDetails(ADDRESS)).thenReturn(Optional.of(MEMPOOLSPACE_ADDRESS_DETAILS));
-        Optional<AddressTransactions> addressTransactions = addressTransactionsProvider.get(
-                new TransactionsRequestKey(ADDRESS, LAST_CHECKED_AT_BLOCK_HEIGHT)
+        Optional<AddressTransactions> addressTransactions = provider.get(
+                new TransactionsRequestKey(ADDRESS, BTC, LAST_CHECKED_AT_BLOCK_HEIGHT)
         );
         assertThat(addressTransactions).contains(ADDRESS_TRANSACTIONS);
     }
 
     @Test
-    void getUpdates() {
+    void getUpdates() throws Exception {
         when(mempoolSpaceClient.getAddressDetails(ADDRESS)).thenReturn(Optional.of(MEMPOOLSPACE_ADDRESS_UPDATED));
         TransactionsRequestKey transactionsRequestKey = new TransactionsRequestKey(
                 ADDRESS_TRANSACTIONS,
                 ADDRESS_TRANSACTIONS_UPDATED.getLastCheckedAtBlockHeight()
         );
         Optional<AddressTransactions> updated =
-                addressTransactionsProvider.get(transactionsRequestKey);
+                provider.get(transactionsRequestKey);
         assertThat(updated).contains(ADDRESS_TRANSACTIONS_UPDATED);
     }
 
     @Test
-    void getUpdates_no_update_returned() {
+    void getUpdates_no_update_returned() throws Exception {
         when(mempoolSpaceClient.getAddressDetails(ADDRESS)).thenReturn(Optional.empty());
 
-        Optional<AddressTransactions> updated = addressTransactionsProvider.get(
+        Optional<AddressTransactions> updated = provider.get(
                 new TransactionsRequestKey(ADDRESS_TRANSACTIONS, LAST_CHECKED_AT_BLOCK_HEIGHT)
         );
 
@@ -63,7 +77,7 @@ class MempoolSpaceAddressTransactionsProviderTest {
 
     @Test
     void getName() {
-        assertThat(addressTransactionsProvider.getName())
+        assertThat(provider.getName())
                 .isEqualTo("MempoolSpaceAddressTransactionsProvider");
     }
 }

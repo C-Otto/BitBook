@@ -4,6 +4,7 @@ import de.cotto.bitbook.backend.model.Transaction;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.lnd.model.ChannelFixtures.CHANNEL;
 import static de.cotto.bitbook.lnd.model.ChannelFixtures.CHANNEL_ADDRESS;
 import static de.cotto.bitbook.lnd.model.ChannelFixtures.OPENING_TRANSACTION;
@@ -35,7 +36,7 @@ class ChannelTest {
     @Test
     void transaction_must_be_valid() {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
-                () -> new Channel(true, "pubkey", Transaction.UNKNOWN, 0)
+                () -> new Channel(true, "pubkey", Transaction.unknown(BTC), 0)
         );
     }
 

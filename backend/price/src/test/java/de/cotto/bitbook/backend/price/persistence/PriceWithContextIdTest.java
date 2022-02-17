@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class PriceWithContextIdTest {
 
-    public static final LocalDate DATE = LocalDate.now(ZoneOffset.UTC);
+    private static final LocalDate DATE = LocalDate.now(ZoneOffset.UTC);
 
     @Test
     void fromModel() {

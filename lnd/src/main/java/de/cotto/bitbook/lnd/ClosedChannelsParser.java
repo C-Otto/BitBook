@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
+
 @Component
 public class ClosedChannelsParser {
     private static final TransactionHash UNKNOWN_HASH =
@@ -46,14 +48,14 @@ public class ClosedChannelsParser {
         for (JsonNode channelNode : channels) {
             allTransactionHashes.addAll(getValidTransactionHashes(channelNode));
         }
-        transactionService.getTransactionDetails(allTransactionHashes);
+        transactionService.getTransactionDetails(allTransactionHashes, BTC);
     }
 
     private ClosedChannel parseClosedChannel(JsonNode channelNode) {
         TransactionHash openingTransactionHash = parseOpeningTransaction(channelNode);
         TransactionHash closingTransactionHash = new TransactionHash(channelNode.get("closing_tx_hash").textValue());
-        Transaction openingTransaction = transactionService.getTransactionDetails(openingTransactionHash);
-        Transaction closingTransaction = transactionService.getTransactionDetails(closingTransactionHash);
+        Transaction openingTransaction = transactionService.getTransactionDetails(openingTransactionHash, BTC);
+        Transaction closingTransaction = transactionService.getTransactionDetails(closingTransactionHash, BTC);
         return ClosedChannel.builder()
                 .withChainHash(channelNode.get("chain_hash").textValue())
                 .withOpeningTransaction(openingTransaction)

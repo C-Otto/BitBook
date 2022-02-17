@@ -17,6 +17,7 @@ import java.util.Set;
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS_2;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.transaction.persistence.AddressTransactionsJpaDtoFixtures.ADDRESS_TRANSACTIONS_JPA_DTO;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,15 +35,16 @@ class AddressTransactionsDaoImplTest {
 
     @Test
     void getAddressTransactions_unknown() {
-        AddressTransactions transaction = addressTransactionsDao.getAddressTransactions(ADDRESS);
-        assertThat(transaction).isEqualTo(AddressTransactions.UNKNOWN);
+        AddressTransactions transaction = addressTransactionsDao.getAddressTransactions(ADDRESS, BTC);
+        assertThat(transaction).isEqualTo(AddressTransactions.unknown(BTC));
     }
 
     @Test
     void getAddressTransactions() {
-        when(repository.findById(ADDRESS.toString())).thenReturn(Optional.of(ADDRESS_TRANSACTIONS_JPA_DTO));
+        when(repository.findById(AddressTransactionsJpaDtoId.fromModels(ADDRESS, BTC)))
+                .thenReturn(Optional.of(ADDRESS_TRANSACTIONS_JPA_DTO));
 
-        AddressTransactions transaction = addressTransactionsDao.getAddressTransactions(ADDRESS);
+        AddressTransactions transaction = addressTransactionsDao.getAddressTransactions(ADDRESS, BTC);
 
         assertThat(transaction).isEqualTo(ADDRESS_TRANSACTIONS);
     }
@@ -65,7 +67,7 @@ class AddressTransactionsDaoImplTest {
     void saveAddressTransactions_also_for_zero_transactions() {
         // we know that there are no known transactions for the address, which is useful information!
         // with this, we don't need to check this address again for a while
-        addressTransactionsDao.saveAddressTransactions(new AddressTransactions(ADDRESS, Set.of(), 123));
+        addressTransactionsDao.saveAddressTransactions(new AddressTransactions(ADDRESS, Set.of(), 123, BTC));
         verify(repository).save(argThat(
                 dto -> ADDRESS.equals(new Address(dto.getAddress()))
         ));

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_3;
@@ -125,7 +126,8 @@ class TransactionSorterTest {
                     TransactionFixtures.DATE_TIME.plusDays(1),
                     Coins.NONE,
                     List.of(),
-                    List.of()
+                    List.of(),
+                    BTC
             );
             Map.Entry<Transaction, Coins> block1date2 = entry(earlierBlockTransaction, COINS);
             Map.Entry<Transaction, Coins> block2date1 = entry(TRANSACTION, COINS);

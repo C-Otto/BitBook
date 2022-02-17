@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
+
 @Component
 public class MempoolSpaceAddressTransactionsProvider extends SimpleAddressTransactionsProvider {
     private final MempoolSpaceClient mempoolSpaceClient;
@@ -30,6 +32,6 @@ public class MempoolSpaceAddressTransactionsProvider extends SimpleAddressTransa
         Address address = transactionsRequestKey.getAddress();
         logger.debug("Contacting mempool.space API for transactions for address {}", address);
         return mempoolSpaceClient.getAddressDetails(address)
-                .map(dto -> dto.toModel(transactionsRequestKey.getBlockHeight(), address));
+                .map(dto -> dto.toModel(transactionsRequestKey.getBlockHeight(), address, BTC));
     }
 }

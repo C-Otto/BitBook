@@ -3,12 +3,14 @@ package de.cotto.bitbook.backend.transaction.persistence;
 import com.google.common.annotations.VisibleForTesting;
 import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.model.TransactionHash;
 
 import javax.annotation.Nullable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 import java.util.Set;
 
@@ -16,11 +18,16 @@ import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toSet;
 
 @Entity
+@IdClass(AddressTransactionsJpaDtoId.class)
 @Table(name = "address_transactions")
 public class AddressTransactionsJpaDto {
     @Id
     @Nullable
     private String address;
+
+    @Id
+    @Nullable
+    private String chain;
 
     @Nullable
     @ElementCollection
@@ -35,6 +42,7 @@ public class AddressTransactionsJpaDto {
     public static AddressTransactionsJpaDto fromModel(AddressTransactions addressTransactions) {
         AddressTransactionsJpaDto dto = new AddressTransactionsJpaDto();
         dto.setAddress(addressTransactions.getAddress().toString());
+        dto.setChain(addressTransactions.getChain().toString());
         dto.setTransactionHashes(
                 addressTransactions.getTransactionHashes().stream()
                         .map(TransactionHash::toString)
@@ -48,7 +56,8 @@ public class AddressTransactionsJpaDto {
         return new AddressTransactions(
                 new Address(requireNonNull(address)),
                 requireNonNull(transactionHashes).stream().map(TransactionHash::new).collect(toSet()),
-                lastCheckedAtBlockheight
+                lastCheckedAtBlockheight,
+                Chain.valueOf(requireNonNull(chain))
         );
     }
 
@@ -70,6 +79,11 @@ public class AddressTransactionsJpaDto {
     @VisibleForTesting
     protected void setAddress(@Nullable String address) {
         this.address = address;
+    }
+
+    @VisibleForTesting
+    protected void setChain(@Nullable String chain) {
+        this.chain = chain;
     }
 
     @VisibleForTesting

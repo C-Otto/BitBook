@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.lnd.model.CloseType.COOPERATIVE_REMOTE;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.AMBIGUOUS_SETTLEMENT_ADDRESS;
@@ -22,6 +23,9 @@ import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.WITH_RESOLUTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ClosedChannelTest {
+
+    public static final Transaction UNKNOWN_BTC = Transaction.unknown(BTC);
+
     @Test
     void invalid_for_other_genesis_block_hash() {
         ClosedChannel closedChannel = CLOSED_CHANNEL.toBuilder().withChainHash("xxx").build();
@@ -36,13 +40,13 @@ class ClosedChannelTest {
 
     @Test
     void invalid_for_unknown_open_transaction() {
-        ClosedChannel closedChannel = CLOSED_CHANNEL.toBuilder().withOpeningTransaction(Transaction.UNKNOWN).build();
+        ClosedChannel closedChannel = CLOSED_CHANNEL.toBuilder().withOpeningTransaction(UNKNOWN_BTC).build();
         assertThat(closedChannel.isValid()).isFalse();
     }
 
     @Test
     void invalid_for_unknown_close_transaction() {
-        ClosedChannel closedChannel = CLOSED_CHANNEL.toBuilder().withClosingTransaction(Transaction.UNKNOWN).build();
+        ClosedChannel closedChannel = CLOSED_CHANNEL.toBuilder().withClosingTransaction(UNKNOWN_BTC).build();
         assertThat(closedChannel.isValid()).isFalse();
     }
 
@@ -56,7 +60,8 @@ class ClosedChannelTest {
                 validClosingTransaction.getTime(),
                 fees,
                 validClosingTransaction.getInputs(),
-                List.of()
+                List.of(),
+                BTC
         );
         ClosedChannel closedChannel = CLOSED_CHANNEL.toBuilder().withClosingTransaction(closingTransaction).build();
         assertThat(closedChannel.isValid()).isFalse();

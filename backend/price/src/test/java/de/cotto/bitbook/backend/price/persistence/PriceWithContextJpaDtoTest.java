@@ -15,7 +15,7 @@ class PriceWithContextJpaDtoTest {
     private static final LocalDate DATE = LocalDate.of(2009, 1, 3);
     private static final LocalDate DATE_BCH = LocalDate.of(2017, 8, 1);
     private static final PriceContext PRICE_CONTEXT_BTC = new PriceContext(DATE, BTC);
-    public static final PriceContext PRICE_CONTEXT_BCH = new PriceContext(DATE_BCH, BCH);
+    private static final PriceContext PRICE_CONTEXT_BCH = new PriceContext(DATE_BCH, BCH);
     private static final Price PRICE = Price.of(500);
 
     @Test

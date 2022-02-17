@@ -15,6 +15,7 @@ public class PriceWithContextId implements Serializable {
     @Nullable
     private String chain;
 
+    @SuppressWarnings("unused")
     public PriceWithContextId() {
         // for JPA
     }

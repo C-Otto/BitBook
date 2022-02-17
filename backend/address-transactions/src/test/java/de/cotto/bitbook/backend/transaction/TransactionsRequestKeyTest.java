@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.transaction.TransactionsRequestKeyFixtures.TRANSACTIONS_REQUEST_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,8 +46,9 @@ class TransactionsRequestKeyTest {
         assertThat(TRANSACTIONS_REQUEST_KEY).hasToString(
                 "TransactionsRequestKey{" +
                 "address='" + ADDRESS + "'" +
-                ", addressTransactions='" + AddressTransactions.UNKNOWN + "'" +
+                ", addressTransactions='" + AddressTransactions.unknown(BTC) + "'" +
                 ", blockHeight=" + BLOCK_HEIGHT +
+                ", chain='" + BTC + '\'' +
                 "}"
         );
     }
@@ -58,6 +60,7 @@ class TransactionsRequestKeyTest {
                 "address='" + ADDRESS + "'" +
                 ", addressTransactions='" + ADDRESS_TRANSACTIONS + "'" +
                 ", blockHeight=" + BLOCK_HEIGHT +
+                ", chain='" + BTC + '\'' +
                 "}"
         );
     }

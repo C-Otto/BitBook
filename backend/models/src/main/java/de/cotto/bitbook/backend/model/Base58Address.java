@@ -10,6 +10,7 @@ public class Base58Address {
     private static final HexString P2PKH_PREFIX = new HexString("00");
     private static final HexString P2SH_PREFIX = new HexString("05");
 
+    private static final HexString ZERO_BYTE_HEX = new HexString("00");
     private static final HexString OP_DUP_HEX = new HexString("76");
     private static final HexString OP_HASH160_HEX = new HexString("a9");
     private static final HexString OP_EQUALVERIFY_HEX = new HexString("88");
@@ -97,7 +98,7 @@ public class Base58Address {
         HexString result = hex;
         long numberOfLeadingOnes = countLeadingZeros();
         for (int i = 0; i < numberOfLeadingOnes; i++) {
-            result = P2PKH_PREFIX.append(result);
+            result = ZERO_BYTE_HEX.append(result);
         }
         return result;
     }

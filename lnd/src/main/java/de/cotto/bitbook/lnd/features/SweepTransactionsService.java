@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static java.util.stream.Collectors.toSet;
 
 @Component
@@ -37,7 +38,7 @@ public class SweepTransactionsService {
     }
 
     public long addFromSweeps(Set<TransactionHash> hashes) {
-        Set<Transaction> sweepTransactions = transactionService.getTransactionDetails(hashes).stream()
+        Set<Transaction> sweepTransactions = transactionService.getTransactionDetails(hashes, BTC).stream()
                 .filter(this::isSweepTransaction)
                 .collect(toSet());
         sweepTransactions.forEach(transaction -> {
@@ -59,8 +60,8 @@ public class SweepTransactionsService {
     }
 
     private void setAddressesAsOwned(Transaction transaction) {
-        getInputAddresses(transaction).forEach(addressOwnershipService::setAddressAsOwned);
-        addressOwnershipService.setAddressAsOwned(getOutputAddress(transaction));
+        getInputAddresses(transaction).forEach(address -> addressOwnershipService.setAddressAsOwned(address, BTC));
+        addressOwnershipService.setAddressAsOwned(getOutputAddress(transaction), BTC);
     }
 
     private void addTransactionDescription(Transaction transaction) {

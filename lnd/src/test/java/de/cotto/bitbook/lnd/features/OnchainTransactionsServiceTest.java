@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_1;
@@ -75,25 +76,25 @@ class OnchainTransactionsServiceTest {
 
     @Test
     void loops_until_fixed_point_is_reached() {
-        when(transactionService.getTransactionDetails(FUNDING_TRANSACTION.getTransactionHash()))
+        when(transactionService.getTransactionDetails(FUNDING_TRANSACTION.getTransactionHash(), BTC))
                 .thenReturn(FUNDING_TRANSACTION_DETAILS);
         onchainTransactionsService.addFromOnchainTransactions(Set.of(FUNDING_TRANSACTION));
-        verify(addressOwnershipService, times(2)).setAddressAsOwned(OUTPUT_ADDRESS_2);
+        verify(addressOwnershipService, times(2)).setAddressAsOwned(OUTPUT_ADDRESS_2, BTC);
     }
 
     @Nested
     class FundingTransactionSuccess {
         @Test
         void sets_ownership_for_funding_transaction() {
-            when(transactionService.getTransactionDetails(FUNDING_TRANSACTION.getTransactionHash()))
+            when(transactionService.getTransactionDetails(FUNDING_TRANSACTION.getTransactionHash(), BTC))
                     .thenReturn(FUNDING_TRANSACTION_DETAILS);
             assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(FUNDING_TRANSACTION))).isEqualTo(1);
-            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_2);
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_2, BTC);
         }
 
         @Test
         void sets_description_for_funding_transaction() {
-            when(transactionService.getTransactionDetails(FUNDING_TRANSACTION.getTransactionHash()))
+            when(transactionService.getTransactionDetails(FUNDING_TRANSACTION.getTransactionHash(), BTC))
                     .thenReturn(FUNDING_TRANSACTION_DETAILS);
             assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(FUNDING_TRANSACTION))).isEqualTo(1);
             verify(addressDescriptionService, atLeastOnce()).set(OUTPUT_ADDRESS_2, DEFAULT_DESCRIPTION);
@@ -104,7 +105,7 @@ class OnchainTransactionsServiceTest {
     class FundingTransactionFailure {
         @BeforeEach
         void setUp() {
-            lenient().when(transactionService.getTransactionDetails(FUNDING_TRANSACTION.getTransactionHash()))
+            lenient().when(transactionService.getTransactionDetails(FUNDING_TRANSACTION.getTransactionHash(), BTC))
                     .thenReturn(FUNDING_TRANSACTION_DETAILS);
         }
 
@@ -146,10 +147,11 @@ class OnchainTransactionsServiceTest {
             OnchainTransaction onchainTransaction = new OnchainTransaction(
                     TRANSACTION_HASH,
                     "",
-                    OUTPUT_VALUE_2.add(Coins.ofSatoshis(1)),
+                    OUTPUT_VALUE_2.add(Coins.ofSatoshis(100)),
                     Coins.NONE
             );
-            when(transactionService.getTransactionDetails(any(TransactionHash.class))).thenReturn(TRANSACTION);
+            when(transactionService.getTransactionDetails(any(TransactionHash.class), eq(BTC)))
+                    .thenReturn(TRANSACTION);
             assertFailure(onchainTransaction);
         }
 
@@ -158,10 +160,11 @@ class OnchainTransactionsServiceTest {
             OnchainTransaction onchainTransaction = new OnchainTransaction(
                     TRANSACTION_HASH,
                     "",
-                    OUTPUT_VALUE_2.add(Coins.ofSatoshis(1)),
+                    OUTPUT_VALUE_2,
                     Coins.NONE
             );
-            when(transactionService.getTransactionDetails(any(TransactionHash.class))).thenReturn(Transaction.UNKNOWN);
+            when(transactionService.getTransactionDetails(any(TransactionHash.class), eq(BTC)))
+                    .thenReturn(Transaction.unknown(BTC));
             assertFailure(onchainTransaction);
         }
 
@@ -175,7 +178,7 @@ class OnchainTransactionsServiceTest {
     class OpeningTransactionSuccess {
         @BeforeEach
         void setUp() {
-            when(transactionService.getTransactionDetails(OPENING_TRANSACTION.getTransactionHash()))
+            when(transactionService.getTransactionDetails(OPENING_TRANSACTION.getTransactionHash(), BTC))
                     .thenReturn(OPENING_TRANSACTION_DETAILS);
             Address unknownOutputAddress = OUTPUT_ADDRESS_1;
 
@@ -193,7 +196,7 @@ class OnchainTransactionsServiceTest {
         void sets_ownership_for_change_output() {
             assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION)))
                     .isGreaterThanOrEqualTo(1);
-            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_1);
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_1, BTC);
         }
 
         @Test
@@ -206,7 +209,7 @@ class OnchainTransactionsServiceTest {
         void sets_ownership_for_channel_output() {
             assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION)))
                     .isGreaterThanOrEqualTo(1);
-            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_2);
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_2, BTC);
         }
 
         @Test
@@ -256,7 +259,7 @@ class OnchainTransactionsServiceTest {
     class OpeningTransactionFailure {
         @BeforeEach
         void setUp() {
-            lenient().when(transactionService.getTransactionDetails(OPENING_TRANSACTION.getTransactionHash()))
+            lenient().when(transactionService.getTransactionDetails(OPENING_TRANSACTION.getTransactionHash(), BTC))
                     .thenReturn(OPENING_TRANSACTION_DETAILS);
         }
 
@@ -286,8 +289,8 @@ class OnchainTransactionsServiceTest {
 
         @Test
         void unknown_transaction_details() {
-            when(transactionService.getTransactionDetails(OPENING_TRANSACTION.getTransactionHash()))
-                    .thenReturn(Transaction.UNKNOWN);
+            when(transactionService.getTransactionDetails(OPENING_TRANSACTION.getTransactionHash(), BTC))
+                    .thenReturn(Transaction.unknown(BTC));
             OnchainTransaction openingTransaction = new OnchainTransaction(
                     TRANSACTION_HASH,
                     "",
@@ -303,7 +306,7 @@ class OnchainTransactionsServiceTest {
             setupInputMocksForOpeningTransaction();
             when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_2)).thenReturn(UNKNOWN);
             assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION))).isEqualTo(0);
-            verify(addressOwnershipService, never()).setAddressAsOwned(any());
+            verify(addressOwnershipService, never()).setAddressAsOwned(any(), any());
         }
 
         @Test
@@ -311,7 +314,7 @@ class OnchainTransactionsServiceTest {
             setupInputMocksForOpeningTransaction();
             when(addressDescriptionService.getDescription(INPUT_ADDRESS_2)).thenReturn("lnd?");
             onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION));
-            verify(addressOwnershipService, never()).setAddressAsOwned(OUTPUT_ADDRESS_2);
+            verify(addressOwnershipService, never()).setAddressAsOwned(OUTPUT_ADDRESS_2, BTC);
         }
 
         @Test
@@ -320,7 +323,7 @@ class OnchainTransactionsServiceTest {
             when(addressDescriptionService.getDescription(OUTPUT_ADDRESS_1)).thenReturn("");
             when(addressDescriptionService.getDescription(OUTPUT_ADDRESS_2)).thenReturn("");
             onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION));
-            verify(addressOwnershipService, never()).setAddressAsOwned(OUTPUT_ADDRESS_2);
+            verify(addressOwnershipService, never()).setAddressAsOwned(OUTPUT_ADDRESS_2, BTC);
         }
 
         @Test
@@ -329,7 +332,7 @@ class OnchainTransactionsServiceTest {
             when(addressDescriptionService.getDescription(OUTPUT_ADDRESS_1)).thenReturn("");
             when(addressDescriptionService.getDescription(OUTPUT_ADDRESS_2)).thenReturn("Lightning-Channel with_xxx");
             onchainTransactionsService.addFromOnchainTransactions(Set.of(OPENING_TRANSACTION));
-            verify(addressOwnershipService, never()).setAddressAsOwned(OUTPUT_ADDRESS_2);
+            verify(addressOwnershipService, never()).setAddressAsOwned(OUTPUT_ADDRESS_2, BTC);
         }
 
         @Test
@@ -344,7 +347,7 @@ class OnchainTransactionsServiceTest {
             when(addressDescriptionService.getDescription(OUTPUT_ADDRESS_1)).thenReturn("");
             when(addressDescriptionService.getDescription(OUTPUT_ADDRESS_2)).thenReturn("Lightning-Channel with xxx");
             assertThat(onchainTransactionsService.addFromOnchainTransactions(Set.of(openingTransaction))).isEqualTo(0);
-            verify(addressOwnershipService, never()).setAddressAsOwned(any());
+            verify(addressOwnershipService, never()).setAddressAsOwned(any(), any());
         }
     }
 
@@ -359,7 +362,8 @@ class OnchainTransactionsServiceTest {
     class Sweep {
         @Test
         void forwards_to_sweep_transaction_service() {
-            when(transactionService.getTransactionDetails(any(TransactionHash.class))).thenReturn(Transaction.UNKNOWN);
+            when(transactionService.getTransactionDetails(any(TransactionHash.class), eq(BTC)))
+                    .thenReturn(Transaction.unknown(BTC));
             when(sweepTransactionsService.addFromSweeps(Set.of(TRANSACTION_HASH))).thenReturn(1L);
             OnchainTransaction transaction = new OnchainTransaction(
                     TRANSACTION_HASH,
@@ -384,7 +388,8 @@ class OnchainTransactionsServiceTest {
 
         @Test
         void amount_does_not_match_fee() {
-            when(transactionService.getTransactionDetails(any(TransactionHash.class))).thenReturn(Transaction.UNKNOWN);
+            when(transactionService.getTransactionDetails(any(TransactionHash.class), eq(BTC)))
+                    .thenReturn(Transaction.unknown(BTC));
             OnchainTransaction transaction = new OnchainTransaction(
                     TRANSACTION_HASH,
                     "",
@@ -397,7 +402,8 @@ class OnchainTransactionsServiceTest {
 
         @Test
         void amount_zero() {
-            when(transactionService.getTransactionDetails(any(TransactionHash.class))).thenReturn(Transaction.UNKNOWN);
+            when(transactionService.getTransactionDetails(any(TransactionHash.class), eq(BTC)))
+                    .thenReturn(Transaction.unknown(BTC));
             OnchainTransaction transaction = new OnchainTransaction(
                     TRANSACTION_HASH,
                     "",
@@ -433,7 +439,7 @@ class OnchainTransactionsServiceTest {
         void marks_change_output_as_owned() {
             mockForSuccess();
             onchainTransactionsService.addFromOnchainTransactions(Set.of(SPEND_TRANSACTION));
-            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_1);
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_1, BTC);
         }
 
         @Test
@@ -461,7 +467,7 @@ class OnchainTransactionsServiceTest {
 
         @Test
         void no_fee() {
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(Transaction.UNKNOWN);
+            when(transactionService.getTransactionDetails(TRANSACTION_HASH, BTC)).thenReturn(Transaction.unknown(BTC));
             OnchainTransaction transaction = new OnchainTransaction(
                     SPEND_TRANSACTION.getTransactionHash(),
                     SPEND_TRANSACTION.getLabel(),
@@ -484,7 +490,7 @@ class OnchainTransactionsServiceTest {
 
         @Test
         void unknown_transaction_details() {
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(Transaction.UNKNOWN);
+            when(transactionService.getTransactionDetails(TRANSACTION_HASH, BTC)).thenReturn(Transaction.unknown(BTC));
             OnchainTransaction transaction = new OnchainTransaction(
                     SPEND_TRANSACTION.getTransactionHash(),
                     "",
@@ -525,7 +531,7 @@ class OnchainTransactionsServiceTest {
         }
 
         private void mockForSuccess() {
-            when(transactionService.getTransactionDetails(TRANSACTION_HASH)).thenReturn(SPEND_TRANSACTION_DETAILS);
+            when(transactionService.getTransactionDetails(TRANSACTION_HASH, BTC)).thenReturn(SPEND_TRANSACTION_DETAILS);
             when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_1)).thenReturn(OWNED);
             when(addressOwnershipService.getOwnershipStatus(INPUT_ADDRESS_2)).thenReturn(OWNED);
             lenient().when(addressOwnershipService.getOwnershipStatus(OUTPUT_ADDRESS_1)).thenReturn(UNKNOWN);

@@ -37,6 +37,7 @@ import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
@@ -88,7 +89,7 @@ class OwnershipCommandsTest {
         when(priceService.getCurrentPrice(BTC)).thenReturn(price);
         when(priceFormatter.format(coins, price)).thenReturn("formattedPrice");
         String expected = coins + " [formattedPrice]";
-        when(addressOwnershipService.getBalance()).thenReturn(coins);
+        when(addressOwnershipService.getBalance(BTC)).thenReturn(coins);
         assertThat(ownershipCommands.getBalance()).isEqualTo(expected);
     }
 
@@ -96,14 +97,14 @@ class OwnershipCommandsTest {
     void getOwnedAddresses_with_balance() {
         Address address1 = new Address("abc");
         Address address2 = new Address("def");
-        when(balanceService.getBalance(address1)).thenReturn(Coins.ofSatoshis(123));
-        when(balanceService.getBalance(address2)).thenReturn(Coins.ofSatoshis(234));
+        when(balanceService.getBalance(address1, BTC)).thenReturn(Coins.ofSatoshis(123));
+        when(balanceService.getBalance(address2, BTC)).thenReturn(Coins.ofSatoshis(234));
         when(addressOwnershipService.getOwnedAddressesWithDescription()).thenReturn(Set.of(
                 new AddressWithDescription(address1),
                 new AddressWithDescription(address2)
         ));
-        when(addressTransactionsService.getTransactions(any()))
-                .thenReturn(new AddressTransactions(ADDRESS, Set.of(TRANSACTION_HASH), 123));
+        when(addressTransactionsService.getTransactions(any(), eq(BTC)))
+                .thenReturn(new AddressTransactions(ADDRESS, Set.of(TRANSACTION_HASH), 123, BTC));
         assertThat(ownershipCommands.getOwnedAddresses()).matches(
                 ANYTHING + address1 + ANYTHING + 123 + ANYTHING + "\n" +
                 ANYTHING + address2 + ANYTHING + 234 + ANYTHING
@@ -112,19 +113,19 @@ class OwnershipCommandsTest {
 
     @Test
     void getOwnedAddresses_preloads_address_transactions() {
-        when(balanceService.getBalance(any())).thenReturn(Coins.ofSatoshis(123));
+        when(balanceService.getBalance(any(), eq(BTC))).thenReturn(Coins.ofSatoshis(123));
         when(addressOwnershipService.getOwnedAddressesWithDescription()).thenReturn(Set.of(
                 new AddressWithDescription(ADDRESS),
                 new AddressWithDescription(ADDRESS_2)
         ));
-        when(addressTransactionsService.getTransactions(any()))
-                .thenReturn(new AddressTransactions(ADDRESS, Set.of(TRANSACTION_HASH), 123));
+        when(addressTransactionsService.getTransactions(any(), eq(BTC)))
+                .thenReturn(new AddressTransactions(ADDRESS, Set.of(TRANSACTION_HASH), 123, BTC));
 
         ownershipCommands.getOwnedAddresses();
 
         InOrder inOrder = inOrder(addressTransactionsService, balanceService);
-        inOrder.verify(addressTransactionsService).getTransactionsForAddresses(Set.of(ADDRESS, ADDRESS_2));
-        inOrder.verify(balanceService, atLeastOnce()).getBalance(any());
+        inOrder.verify(addressTransactionsService).getTransactionsForAddresses(Set.of(ADDRESS, ADDRESS_2), BTC);
+        inOrder.verify(balanceService, atLeastOnce()).getBalance(any(), eq(BTC));
     }
 
     @Test
@@ -132,11 +133,11 @@ class OwnershipCommandsTest {
         AddressWithDescription address1 = new AddressWithDescription(new Address("xxx"), "b-DESCRIPTION");
         AddressWithDescription address2 = new AddressWithDescription(new Address("yyy"), "a-DESCRIPTION");
         AddressWithDescription address3 = new AddressWithDescription(new Address("zzz"), "c-DESCRIPTION");
-        when(addressTransactionsService.getTransactions(any()))
-                .thenReturn(new AddressTransactions(ADDRESS, Set.of(TRANSACTION_HASH), 123));
-        when(balanceService.getBalance(address1.getAddress())).thenReturn(Coins.ofSatoshis(123));
-        when(balanceService.getBalance(address2.getAddress())).thenReturn(Coins.ofSatoshis(100));
-        when(balanceService.getBalance(address3.getAddress())).thenReturn(Coins.ofSatoshis(1000));
+        when(addressTransactionsService.getTransactions(any(), eq(BTC)))
+                .thenReturn(new AddressTransactions(ADDRESS, Set.of(TRANSACTION_HASH), 123, BTC));
+        when(balanceService.getBalance(address1.getAddress(), BTC)).thenReturn(Coins.ofSatoshis(123));
+        when(balanceService.getBalance(address2.getAddress(), BTC)).thenReturn(Coins.ofSatoshis(100));
+        when(balanceService.getBalance(address3.getAddress(), BTC)).thenReturn(Coins.ofSatoshis(1000));
         Set<AddressWithDescription> addresses = Set.of(address1, address2, address3);
         when(addressOwnershipService.getOwnedAddressesWithDescription()).thenReturn(addresses);
         assertThat(ownershipCommands.getOwnedAddresses())
@@ -148,8 +149,8 @@ class OwnershipCommandsTest {
     @Test
     void getOwnedAddresses_ignores_addresses_without_transaction() {
         Address address = new Address("abc");
-        when(addressTransactionsService.getTransactions(address))
-                .thenReturn(new AddressTransactions(address, Set.of(), 123));
+        when(addressTransactionsService.getTransactions(address, BTC))
+                .thenReturn(new AddressTransactions(address, Set.of(), 123, BTC));
         when(addressOwnershipService.getOwnedAddressesWithDescription()).thenReturn(Set.of(
                 new AddressWithDescription(address)
         ));
@@ -169,7 +170,7 @@ class OwnershipCommandsTest {
         void getMyTransactions_includes_value_and_orders_transaction_sorter() {
             Coins value1 = Coins.ofSatoshis(1);
             Coins value2 = Coins.ofSatoshis(2);
-            when(addressOwnershipService.getMyTransactionsWithCoins()).thenReturn(
+            when(addressOwnershipService.getMyTransactionsWithCoins(BTC)).thenReturn(
                     Map.of(TRANSACTION, value1, TRANSACTION_2, value2)
             );
             assertThat(ownershipCommands.getMyTransactions()).matches(
@@ -180,7 +181,7 @@ class OwnershipCommandsTest {
 
         @Test
         void getMyTransactions_preloads_prices() {
-            when(addressOwnershipService.getMyTransactionsWithCoins()).thenReturn(
+            when(addressOwnershipService.getMyTransactionsWithCoins(BTC)).thenReturn(
                     Map.of(TRANSACTION_2, Coins.NONE, TRANSACTION_3, Coins.NONE)
             );
             ownershipCommands.getMyTransactions();
@@ -195,7 +196,7 @@ class OwnershipCommandsTest {
             Coins coins1 = Coins.ofSatoshis(1);
             Coins coins2 = Coins.ofSatoshis(2);
 
-            when(addressOwnershipService.getNeighbourTransactions()).thenReturn(Map.of(
+            when(addressOwnershipService.getNeighbourTransactions(BTC)).thenReturn(Map.of(
                     TRANSACTION, coins1,
                     TRANSACTION_2, coins2
             ));
@@ -205,7 +206,7 @@ class OwnershipCommandsTest {
 
         @Test
         void getNeighbourTransactions_does_not_show_zero_values() {
-            when(addressOwnershipService.getNeighbourTransactions()).thenReturn(Map.of(
+            when(addressOwnershipService.getNeighbourTransactions(BTC)).thenReturn(Map.of(
                     TRANSACTION, Coins.NONE,
                     TRANSACTION_2, Coins.ofSatoshis(1)
             ));
@@ -215,7 +216,7 @@ class OwnershipCommandsTest {
 
         @Test
         void getNeighbourTransactions_preloads_prices() {
-            when(addressOwnershipService.getNeighbourTransactions()).thenReturn(Map.of(
+            when(addressOwnershipService.getNeighbourTransactions(BTC)).thenReturn(Map.of(
                     TRANSACTION, Coins.NONE,
                     TRANSACTION_2, Coins.ofSatoshis(1)
             ));
@@ -232,7 +233,7 @@ class OwnershipCommandsTest {
         String description = "description";
         assertThat(ownershipCommands.markAddressAsOwned(new CliAddress(ADDRESS), description))
                 .isEqualTo("OK");
-        verify(addressOwnershipService).setAddressAsOwned(ADDRESS, description);
+        verify(addressOwnershipService).setAddressAsOwned(ADDRESS, BTC, description);
     }
 
     @Test

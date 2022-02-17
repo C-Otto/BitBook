@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
+
 @Component
 public class BlockstreamAddressTransactionsProvider extends SimpleAddressTransactionsProvider {
     private final BlockstreamInfoClient blockstreamInfoClient;
@@ -30,6 +32,6 @@ public class BlockstreamAddressTransactionsProvider extends SimpleAddressTransac
         Address address = transactionsRequestKey.getAddress();
         logger.debug("Contacting blockstream.info API for transactions for address {}", address);
         return blockstreamInfoClient.getAddressDetails(address)
-                .map(dto -> dto.toModel(transactionsRequestKey.getBlockHeight(), address));
+                .map(dto -> dto.toModel(transactionsRequestKey.getBlockHeight(), address, BTC));
     }
 }

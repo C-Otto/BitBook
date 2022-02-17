@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS_3;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_2;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,8 +19,8 @@ class AddressTransactionsDtoTest {
         AddressTransactionsDto dto =
                 new AddressTransactionsDto(ADDRESS_3, Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2));
         AddressTransactions addressTransactions =
-                new AddressTransactions(ADDRESS_3, Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2), 123);
-        assertThat(dto.toModel(123, ADDRESS_3)).isEqualTo(addressTransactions);
+                new AddressTransactions(ADDRESS_3, Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2), 123, BTC);
+        assertThat(dto.toModel(123, ADDRESS_3, BTC)).isEqualTo(addressTransactions);
     }
 
     @Test
@@ -27,7 +28,7 @@ class AddressTransactionsDtoTest {
         AddressTransactionsDto dto =
                 new AddressTransactionsDto(ADDRESS_3, Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2));
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> dto.toModel(123, new Address("def")));
+                .isThrownBy(() -> dto.toModel(123, new Address("def"), BTC));
     }
 
     @Test

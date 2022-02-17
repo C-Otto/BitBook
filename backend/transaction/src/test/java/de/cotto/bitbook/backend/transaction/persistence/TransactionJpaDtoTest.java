@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static de.cotto.bitbook.backend.model.Chain.BCD;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_1;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
@@ -19,14 +20,6 @@ import static de.cotto.bitbook.backend.transaction.persistence.TransactionJpaDto
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 class TransactionJpaDtoTest {
-
-    @Test
-    void toModel_nullHash() {
-        TransactionJpaDto dto = new TransactionJpaDto();
-        Transaction model = dto.toModel();
-        assertThat(model).isEqualTo(Transaction.UNKNOWN);
-    }
-
     @Test
     void toModel() {
         Transaction model = TRANSACTION_JPA_DTO.toModel();
@@ -46,7 +39,8 @@ class TransactionJpaDtoTest {
                 BLOCK_HEIGHT,
                 DATE_TIME,
                 FEES,
-                List.of(OUTPUT_1, OUTPUT_2, new Output(Coins.NONE, new Address("xxx")))
+                List.of(OUTPUT_1, OUTPUT_2, new Output(Coins.NONE, new Address("xxx"))),
+                BCD
         );
         assertThat(TransactionJpaDto.fromModel(coinbaseTransaction).toModel()).isEqualTo(coinbaseTransaction);
     }

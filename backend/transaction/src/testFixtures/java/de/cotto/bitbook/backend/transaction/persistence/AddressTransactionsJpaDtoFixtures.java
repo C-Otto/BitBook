@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 
 public class AddressTransactionsJpaDtoFixtures {
     public static final AddressTransactionsJpaDto ADDRESS_TRANSACTIONS_JPA_DTO;
@@ -13,6 +14,7 @@ public class AddressTransactionsJpaDtoFixtures {
     static {
         ADDRESS_TRANSACTIONS_JPA_DTO = new AddressTransactionsJpaDto();
         ADDRESS_TRANSACTIONS_JPA_DTO.setAddress(ADDRESS_TRANSACTIONS.getAddress().toString());
+        ADDRESS_TRANSACTIONS_JPA_DTO.setChain(BTC.toString());
         Set<String> hashes = ADDRESS_TRANSACTIONS.getTransactionHashes().stream()
                 .map(TransactionHash::toString)
                 .collect(Collectors.toSet());

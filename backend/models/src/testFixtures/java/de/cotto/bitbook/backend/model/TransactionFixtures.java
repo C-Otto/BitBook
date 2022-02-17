@@ -6,6 +6,9 @@ import java.util.List;
 
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS_2;
+import static de.cotto.bitbook.backend.model.Chain.BCH;
+import static de.cotto.bitbook.backend.model.Chain.BSV;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_2;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_1;
@@ -26,7 +29,28 @@ public class TransactionFixtures {
             DATE_TIME,
             FEES,
             List.of(INPUT_1, INPUT_2),
-            List.of(OUTPUT_1, OUTPUT_2)
+            List.of(OUTPUT_1, OUTPUT_2),
+            BTC
+    );
+
+    public static final Transaction TRANSACTION_BCH = new Transaction(
+            TRANSACTION_HASH,
+            BLOCK_HEIGHT,
+            DATE_TIME,
+            FEES,
+            List.of(INPUT_1, INPUT_2),
+            List.of(OUTPUT_1, OUTPUT_2),
+            BCH
+    );
+
+    public static final Transaction TRANSACTION_BSV = new Transaction(
+            TRANSACTION_HASH,
+            BLOCK_HEIGHT,
+            DATE_TIME,
+            FEES,
+            List.of(INPUT_1, INPUT_2),
+            List.of(OUTPUT_1, OUTPUT_2),
+            BSV
     );
 
     public static final Transaction TRANSACTION_2 = new Transaction(
@@ -35,7 +59,8 @@ public class TransactionFixtures {
             DATE_TIME.plusDays(12),
             Coins.NONE,
             List.of(new Input(Coins.ofSatoshis(2_147_484_882L), new Address("abc"))),
-            List.of(OUTPUT_1, OUTPUT_2)
+            List.of(OUTPUT_1, OUTPUT_2),
+            BTC
     );
 
     public static final Transaction TRANSACTION_3 = new Transaction(
@@ -44,7 +69,8 @@ public class TransactionFixtures {
             DATE_TIME,
             Coins.NONE,
             List.of(INPUT_1, new Input(Coins.ofSatoshis(2_147_460_899L), ADDRESS)),
-            List.of(OUTPUT_1)
+            List.of(OUTPUT_1),
+            BTC
     );
 
     public static final Transaction TRANSACTION_4 = new Transaction(
@@ -53,6 +79,7 @@ public class TransactionFixtures {
             DATE_TIME,
             Coins.NONE,
             List.of(new Input(Coins.ofSatoshis(2), ADDRESS_2), INPUT_2),
-            List.of(OUTPUT_1)
+            List.of(OUTPUT_1),
+            BTC
     );
 }

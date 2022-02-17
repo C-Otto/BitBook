@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION_2;
@@ -53,14 +54,14 @@ class SweepTransactionsServiceTest {
 
     @Test
     void unknown_transaction() {
-        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH)))
-                .thenReturn(Set.of(Transaction.UNKNOWN));
+        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH), BTC))
+                .thenReturn(Set.of(Transaction.unknown(BTC)));
         assertFailure(Set.of(TRANSACTION_HASH));
     }
 
     @Test
     void not_sweep_because_of_two_outputs() {
-        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH))).thenReturn(Set.of(TRANSACTION_2));
+        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH), BTC)).thenReturn(Set.of(TRANSACTION_2));
         assertFailure(Set.of(TRANSACTION_HASH));
     }
 
@@ -77,7 +78,8 @@ class SweepTransactionsServiceTest {
                 DATE_TIME,
                 Coins.ofSatoshis(1),
                 List.of(INPUT_SWEEP_1),
-                List.of(OUTPUT_SWEEP_1)
+                List.of(OUTPUT_SWEEP_1),
+                BTC
         );
 
         private static final Transaction SWEEP_TRANSACTION_2 = new Transaction(
@@ -86,14 +88,15 @@ class SweepTransactionsServiceTest {
                 DATE_TIME,
                 Coins.ofSatoshis(0),
                 List.of(INPUT_SWEEP_2),
-                List.of(OUTPUT_SWEEP_2)
+                List.of(OUTPUT_SWEEP_2),
+                BTC
         );
 
         private final Set<TransactionHash> hashes = Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2);
 
         @BeforeEach
         void setUp() {
-            when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
+            when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2), BTC))
                     .thenReturn(Set.of(SWEEP_TRANSACTION, SWEEP_TRANSACTION_2));
         }
 
@@ -105,7 +108,7 @@ class SweepTransactionsServiceTest {
         @Test
         void accepts_two_inputs() {
             // this may happen for closed channels with unsettled HTLCs or claimed anchors
-            when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
+            when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2), BTC))
                     .thenReturn(Set.of(TRANSACTION_4, SWEEP_TRANSACTION_2));
             assertThat(sweepTransactionsService.addFromSweeps(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
                     .isEqualTo(2);
@@ -133,7 +136,7 @@ class SweepTransactionsServiceTest {
 
         @Test
         void sets_address_descriptions_for_all_inputs() {
-            when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
+            when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2), BTC))
                     .thenReturn(Set.of(TRANSACTION_4));
             sweepTransactionsService.addFromSweeps(hashes);
 
@@ -145,20 +148,20 @@ class SweepTransactionsServiceTest {
         void sets_address_ownership() {
             sweepTransactionsService.addFromSweeps(hashes);
 
-            verify(addressOwnershipService).setAddressAsOwned(INPUT_SWEEP_1.getAddress());
-            verify(addressOwnershipService).setAddressAsOwned(INPUT_SWEEP_2.getAddress());
-            verify(addressOwnershipService).setAddressAsOwned(OUTPUT_SWEEP_1.getAddress());
-            verify(addressOwnershipService).setAddressAsOwned(OUTPUT_SWEEP_2.getAddress());
+            verify(addressOwnershipService).setAddressAsOwned(INPUT_SWEEP_1.getAddress(), BTC);
+            verify(addressOwnershipService).setAddressAsOwned(INPUT_SWEEP_2.getAddress(), BTC);
+            verify(addressOwnershipService).setAddressAsOwned(OUTPUT_SWEEP_1.getAddress(), BTC);
+            verify(addressOwnershipService).setAddressAsOwned(OUTPUT_SWEEP_2.getAddress(), BTC);
         }
 
         @Test
         void sets_address_ownership_for_all_inputs() {
-            when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2)))
+            when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2), BTC))
                     .thenReturn(Set.of(TRANSACTION_4));
             sweepTransactionsService.addFromSweeps(hashes);
 
             TRANSACTION_4.getInputs()
-                    .forEach(input -> verify(addressOwnershipService).setAddressAsOwned(input.getAddress()));
+                    .forEach(input -> verify(addressOwnershipService).setAddressAsOwned(input.getAddress(), BTC));
         }
     }
 

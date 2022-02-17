@@ -57,12 +57,16 @@ Currently, the following providers are implemented:
  * Electrs (localhost:50001): A
 
 For Bitcoin Cash:
-* blockchair.com: H
+* blockchair.com: ATH
+* fullstack.cash: H
+
+For Bitcoin SV:
+* blockchair.com: ATH
 
 #### Requests and Queue
 For each type of result (e.g. transaction details), a `PrioritizingProvider` implementation
-is responsible for transforming requests into results. Each request has a priority (at the moment either 'standard'
-or 'lowest'), so that higher-priority requests are served earlier than others.
+is responsible for transforming requests into results. Each request has a priority ('lowest', 'medium', 'standard'),
+so that higher-priority requests are served earlier than others.
 The code automatically merges duplicates in the queue, attaches new requests to in-flight requests, and picks
 providers (APIs) based on their recent performance/failure rates.
 

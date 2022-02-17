@@ -14,11 +14,17 @@ import java.util.Optional;
 @RateLimiter(name = "blockchair")
 @CircuitBreaker(name = "blockchair")
 public interface BlockchairClient {
-    @GetMapping("/bitcoin/dashboards/transaction/{transactionHash}")
-    Optional<BlockchairTransactionDto> getTransaction(@PathVariable TransactionHash transactionHash);
+    @GetMapping("/{chainName}/dashboards/transaction/{transactionHash}")
+    Optional<BlockchairTransactionDto> getTransaction(
+            @PathVariable String chainName,
+            @PathVariable TransactionHash transactionHash
+    );
 
-    @GetMapping("/bitcoin/dashboards/address/{address}")
-    Optional<BlockchairAddressTransactionsDto> getAddressDetails(@PathVariable Address address);
+    @GetMapping("/{chainName}/dashboards/address/{address}")
+    Optional<BlockchairAddressTransactionsDto> getAddressDetails(
+            @PathVariable String chainName,
+            @PathVariable Address address
+    );
 
     @GetMapping("/{chainName}/stats")
     Optional<BlockchairBlockHeightDto> getBlockHeight(@PathVariable String chainName);

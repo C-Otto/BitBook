@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_1;
@@ -65,7 +66,7 @@ class PoolTransactionServiceTest {
 
         @BeforeEach
         void setUp() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash()))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash(), BTC))
                     .thenReturn(POOL_ACCOUNT_CREATION_DETAILS);
         }
 
@@ -94,7 +95,7 @@ class PoolTransactionServiceTest {
         @Test
         void sets_ownership_for_pool_address() {
             poolTransactionService.addFromOnchainTransaction(POOL_ACCOUNT_CREATION);
-            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_2);
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_2, BTC);
         }
 
         @Test
@@ -107,14 +108,14 @@ class PoolTransactionServiceTest {
         @Test
         void sets_ownership_for_other_outputs() {
             poolTransactionService.addFromOnchainTransaction(POOL_ACCOUNT_CREATION);
-            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_1);
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_1, BTC);
         }
 
         @Test
         void sets_ownership_for_inputs() {
             poolTransactionService.addFromOnchainTransaction(POOL_ACCOUNT_CREATION);
-            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(INPUT_ADDRESS_1);
-            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(INPUT_ADDRESS_2);
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(INPUT_ADDRESS_1, BTC);
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(INPUT_ADDRESS_2, BTC);
         }
 
         @Test
@@ -151,8 +152,8 @@ class PoolTransactionServiceTest {
 
         @Test
         void unknown_transaction_details() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash()))
-                    .thenReturn(Transaction.UNKNOWN);
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash(), BTC))
+                    .thenReturn(Transaction.unknown(BTC));
             OnchainTransaction transaction = new OnchainTransaction(
                     TRANSACTION_HASH,
                     " poold -- AccountCreation(acct_key=" + POOL_ACCOUNT_ID + ")",
@@ -164,7 +165,7 @@ class PoolTransactionServiceTest {
 
         @Test
         void mismatching_amount_for_pool_address() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash()))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash(), BTC))
                     .thenReturn(POOL_ACCOUNT_CREATION_DETAILS);
             OnchainTransaction transaction = new OnchainTransaction(
                     POOL_ACCOUNT_CREATION.getTransactionHash(),
@@ -182,7 +183,7 @@ class PoolTransactionServiceTest {
 
         @BeforeEach
         void setUp() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash()))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash(), BTC))
                     .thenReturn(POOL_ACCOUNT_CLOSE_DETAILS);
         }
 
@@ -216,7 +217,7 @@ class PoolTransactionServiceTest {
         @Test
         void sets_ownership_for_pool_addresses() {
             poolTransactionService.addFromOnchainTransaction(POOL_ACCOUNT_CLOSE);
-            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(INPUT_ADDRESS_1);
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(INPUT_ADDRESS_1, BTC);
         }
 
         @Test
@@ -228,7 +229,7 @@ class PoolTransactionServiceTest {
         @Test
         void sets_ownership_for_outputs() {
             poolTransactionService.addFromOnchainTransaction(POOL_ACCOUNT_CLOSE);
-            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_1);
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_1, BTC);
         }
     }
 
@@ -261,7 +262,7 @@ class PoolTransactionServiceTest {
 
         @Test
         void mismatching_amount_for_pool_address() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash()))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash(), BTC))
                     .thenReturn(POOL_ACCOUNT_CLOSE_DETAILS);
             OnchainTransaction transaction = new OnchainTransaction(
                     POOL_ACCOUNT_CLOSE.getTransactionHash(),
@@ -274,7 +275,7 @@ class PoolTransactionServiceTest {
 
         @Test
         void two_outputs_sum_matches_pool_amount() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash()))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash(), BTC))
                     .thenReturn(TRANSACTION);
             OnchainTransaction transaction = new OnchainTransaction(
                     POOL_ACCOUNT_CLOSE.getTransactionHash(),
@@ -287,7 +288,7 @@ class PoolTransactionServiceTest {
 
         @Test
         void two_outputs_first_matches_pool_amount() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash()))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash(), BTC))
                     .thenReturn(TRANSACTION);
             OnchainTransaction transaction = new OnchainTransaction(
                     POOL_ACCOUNT_CLOSE.getTransactionHash(),
@@ -318,7 +319,7 @@ class PoolTransactionServiceTest {
         void setUp() {
             when(addressDescriptionService.getDescription(INPUT_ADDRESS_1)).thenReturn("");
             when(addressDescriptionService.getDescription(INPUT_ADDRESS_2)).thenReturn(DEFAULT_DESCRIPTION);
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_DEPOSIT.getTransactionHash()))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_DEPOSIT.getTransactionHash(), BTC))
                     .thenReturn(POOL_ACCOUNT_DEPOSIT_DETAILS);
         }
 
@@ -353,7 +354,7 @@ class PoolTransactionServiceTest {
         @Test
         void sets_ownership_for_pool_addresses() {
             poolTransactionService.addFromOnchainTransaction(POOL_ACCOUNT_DEPOSIT);
-            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_2);
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_2, BTC);
         }
 
         @Test
@@ -366,7 +367,7 @@ class PoolTransactionServiceTest {
         @Test
         void sets_ownership_for_other_outputs() {
             poolTransactionService.addFromOnchainTransaction(POOL_ACCOUNT_DEPOSIT);
-            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_1);
+            verify(addressOwnershipService, atLeastOnce()).setAddressAsOwned(OUTPUT_ADDRESS_1, BTC);
         }
     }
 
@@ -405,7 +406,7 @@ class PoolTransactionServiceTest {
 
         @Test
         void mismatching_amount_for_pool_address() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_DEPOSIT.getTransactionHash()))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_DEPOSIT.getTransactionHash(), BTC))
                     .thenReturn(POOL_ACCOUNT_DEPOSIT_DETAILS);
             OnchainTransaction transaction = new OnchainTransaction(
                     POOL_ACCOUNT_DEPOSIT.getTransactionHash(),

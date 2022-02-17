@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_2;
 import static de.cotto.bitbook.backend.transaction.blockchair.BlockchairAddressTransactionsFixtures.BLOCKCHAIR_ADDRESS_DETAILS;
@@ -18,7 +19,7 @@ class BlockchairAddressTransactionsDtoTest {
 
     @Test
     void toModel() {
-        assertThat(BLOCKCHAIR_ADDRESS_DETAILS.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS))
+        assertThat(BLOCKCHAIR_ADDRESS_DETAILS.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS, BTC))
                 .isEqualTo(ADDRESS_TRANSACTIONS);
     }
 
@@ -40,7 +41,7 @@ class BlockchairAddressTransactionsDtoTest {
                  }""".formatted(ADDRESS, TRANSACTION_HASH, TRANSACTION_HASH_2);
         BlockchairAddressTransactionsDto blockchairTransactionDto =
                 objectMapper.readValue(json, BlockchairAddressTransactionsDto.class);
-        assertThat(blockchairTransactionDto.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS))
+        assertThat(blockchairTransactionDto.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS, BTC))
                 .isEqualTo(ADDRESS_TRANSACTIONS);
     }
 
@@ -62,7 +63,7 @@ class BlockchairAddressTransactionsDtoTest {
                  }""".formatted("xxx", TRANSACTION_HASH, TRANSACTION_HASH_2);
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() ->
                 objectMapper.readValue(json, BlockchairAddressTransactionsDto.class)
-                        .toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS)
+                        .toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS, BTC)
         );
     }
 

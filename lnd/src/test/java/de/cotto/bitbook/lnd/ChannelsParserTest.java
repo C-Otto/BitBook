@@ -18,11 +18,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.lnd.model.ChannelFixtures.OPENING_TRANSACTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
@@ -54,8 +56,8 @@ class ChannelsParserTest {
 
     @Test
     void parses_channel_and_gets_transaction_details() throws IOException {
-        when(transactionService.getTransactionDetails(Set.of(HASH_SOMEWHERE))).thenReturn(Set.of());
-        when(transactionService.getTransactionDetails(HASH_SOMEWHERE)).thenReturn(OPENING_TRANSACTION);
+        when(transactionService.getTransactionDetails(Set.of(HASH_SOMEWHERE), BTC)).thenReturn(Set.of());
+        when(transactionService.getTransactionDetails(HASH_SOMEWHERE, BTC)).thenReturn(OPENING_TRANSACTION);
         String json = "{\"channels\":[" +
                       "{" +
                       "\"remote_pubkey\":\"pubkey\", " +
@@ -69,8 +71,9 @@ class ChannelsParserTest {
 
     @Test
     void parses_many_channels() throws IOException {
-        when(transactionService.getTransactionDetails(Set.of(HASH_A, new TransactionHash("b")))).thenReturn(Set.of());
-        when(transactionService.getTransactionDetails(any(TransactionHash.class))).thenReturn(TRANSACTION);
+        when(transactionService.getTransactionDetails(Set.of(HASH_A, new TransactionHash("b")), BTC))
+                .thenReturn(Set.of());
+        when(transactionService.getTransactionDetails(any(TransactionHash.class), eq(BTC))).thenReturn(TRANSACTION);
         String json = "{\"channels\":[" +
                       "{\"remote_pubkey\":\"pubkey\", \"initiator\": true, \"channel_point\": \"a:1\"}," +
                       "{\"remote_pubkey\":\"pubkey2\", \"initiator\": false, \"channel_point\": \"b:2\"}" +
@@ -80,23 +83,25 @@ class ChannelsParserTest {
 
     @Test
     void preloads_transaction_details() throws IOException {
-        when(transactionService.getTransactionDetails(anySet())).thenReturn(Set.of());
-        when(transactionService.getTransactionDetails(any(TransactionHash.class))).thenReturn(TRANSACTION);
+        when(transactionService.getTransactionDetails(anySet(), eq(BTC))).thenReturn(Set.of());
+        when(transactionService.getTransactionDetails(any(TransactionHash.class), eq(BTC))).thenReturn(TRANSACTION);
         String json = "{\"channels\":[" +
                       "{\"remote_pubkey\":\"pubkey\", \"initiator\": true, \"channel_point\": \"a:1\"}," +
                       "{\"remote_pubkey\":\"pubkey2\", \"initiator\": false, \"channel_point\": \"b:2\"}" +
                       "]}";
         channelsParser.parse(toJsonNode(json));
         InOrder inOrder = Mockito.inOrder(transactionService);
-        inOrder.verify(transactionService).getTransactionDetails(Set.of(HASH_A, new TransactionHash("b")));
-        inOrder.verify(transactionService, times(2)).getTransactionDetails(any(TransactionHash.class));
+        inOrder.verify(transactionService).getTransactionDetails(Set.of(HASH_A, new TransactionHash("b")), BTC);
+        inOrder.verify(transactionService, times(2))
+                .getTransactionDetails(any(TransactionHash.class), eq(BTC));
     }
 
     @Test
     void ignores_channel_with_unknown_transaction() throws IOException {
         String json = "{\"channels\":[{\"remote_pubkey\":\"pubkey\", \"initiator\":true,\"channel_point\":\"a:1\"}]}";
-        when(transactionService.getTransactionDetails(Set.of(HASH_A))).thenReturn(Set.of(Transaction.UNKNOWN));
-        when(transactionService.getTransactionDetails(HASH_A)).thenReturn(Transaction.UNKNOWN);
+        when(transactionService.getTransactionDetails(Set.of(HASH_A), BTC))
+                .thenReturn(Set.of(Transaction.unknown(BTC)));
+        when(transactionService.getTransactionDetails(HASH_A, BTC)).thenReturn(Transaction.unknown(BTC));
         assertThat(channelsParser.parse(toJsonNode(json))).isEmpty();
     }
 

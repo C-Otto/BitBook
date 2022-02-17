@@ -3,6 +3,7 @@ package de.cotto.bitbook.backend.request;
 import org.junit.jupiter.api.Test;
 
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
+import static de.cotto.bitbook.backend.request.RequestPriority.MEDIUM;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,8 +14,28 @@ class RequestPriorityTest {
     }
 
     @Test
+    void asInteger_standard_smaller_than_medium() {
+        assertThat(STANDARD.getIntegerForComparison()).isLessThan(MEDIUM.getIntegerForComparison());
+    }
+
+    @Test
+    void asInteger_medium_smaller_than_lowest() {
+        assertThat(MEDIUM.getIntegerForComparison()).isLessThan(LOWEST.getIntegerForComparison());
+    }
+
+    @Test
     void isAtLeast_standard_standard() {
         assertThat(STANDARD.isAtLeast(STANDARD)).isTrue();
+    }
+
+    @Test
+    void isAtLeast_standard_medium() {
+        assertThat(STANDARD.isAtLeast(MEDIUM)).isTrue();
+    }
+
+    @Test
+    void isAtLeast_medium_lowest() {
+        assertThat(MEDIUM.isAtLeast(LOWEST)).isTrue();
     }
 
     @Test
@@ -40,6 +61,11 @@ class RequestPriorityTest {
     @Test
     void getHighestPriority_other() {
         assertThat(LOWEST.getHighestPriority(STANDARD)).isEqualTo(STANDARD);
+    }
+
+    @Test
+    void getHighestPriority_medium_vs_lowest() {
+        assertThat(MEDIUM.getHighestPriority(LOWEST)).isEqualTo(MEDIUM);
     }
 
     @Test

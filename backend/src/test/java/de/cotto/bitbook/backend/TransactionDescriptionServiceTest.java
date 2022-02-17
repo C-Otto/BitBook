@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -18,8 +19,6 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("CPD-START")
 @ExtendWith(MockitoExtension.class)
 class TransactionDescriptionServiceTest {
-    private static final TransactionHash TRANSACTION_HASH = new TransactionHash("foo");
-
     @InjectMocks
     private TransactionDescriptionService service;
 

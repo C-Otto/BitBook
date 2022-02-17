@@ -4,6 +4,7 @@ import com.google.common.base.Functions;
 import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.price.PriceService;
@@ -63,7 +64,7 @@ public class OwnershipCommands {
 
     @ShellMethod("Get the total balance over all owned addresses")
     public String getBalance() {
-        Coins balance = addressOwnershipService.getBalance();
+        Coins balance = addressOwnershipService.getBalance(selectedChain.getChain());
         Price price = priceService.getCurrentPrice(selectedChain.getChain());
         String formattedPrice = priceFormatter.format(balance, price);
         return "%s [%s]".formatted(balance, formattedPrice);
@@ -71,15 +72,16 @@ public class OwnershipCommands {
 
     @ShellMethod("Get all owned addresses")
     public String getOwnedAddresses() {
-        Price currentPrice = priceService.getCurrentPrice(selectedChain.getChain());
+        Chain chain = selectedChain.getChain();
+        Price currentPrice = priceService.getCurrentPrice(chain);
         Set<AddressWithDescription> ownedAddressesWithDescription =
                 addressOwnershipService.getOwnedAddressesWithDescription();
-        preloadAddressTransactions(ownedAddressesWithDescription);
+        preloadAddressTransactions(ownedAddressesWithDescription, chain);
         return ownedAddressesWithDescription.parallelStream()
                 .filter(this::hasAtLeastOneTransaction)
                 .collect(Collectors.toMap(
                         Functions.identity(),
-                        addressWithDescription -> balanceService.getBalance(addressWithDescription.getAddress())
+                        addressWithDescription -> balanceService.getBalance(addressWithDescription.getAddress(), chain)
                 )).entrySet().stream()
                 .sorted(comparingByValue())
                 .map(entry -> formatAddressWithPrice(entry.getKey(), entry.getValue(), currentPrice))
@@ -88,7 +90,8 @@ public class OwnershipCommands {
 
     @ShellMethod("Get all transactions that touch at least one owned address")
     public String getMyTransactions() {
-        Map<Transaction, Coins> transactionsWithCoins = addressOwnershipService.getMyTransactionsWithCoins();
+        Map<Transaction, Coins> transactionsWithCoins =
+                addressOwnershipService.getMyTransactionsWithCoins(selectedChain.getChain());
         preloadPrices(transactionsWithCoins.keySet());
         return transactionsWithCoins.entrySet().stream()
                 .sorted(transactionSorter.getComparator())
@@ -98,7 +101,8 @@ public class OwnershipCommands {
 
     @ShellMethod("Get transactions connected to own addresses where source/target has unknown ownership")
     public String getNeighbourTransactions() {
-        Map<Transaction, Coins> transactionsWithCoins = addressOwnershipService.getNeighbourTransactions();
+        Map<Transaction, Coins> transactionsWithCoins =
+                addressOwnershipService.getNeighbourTransactions(selectedChain.getChain());
         preloadPrices(transactionsWithCoins.keySet());
         return transactionsWithCoins.entrySet().stream()
                 .filter(entry -> entry.getValue().absolute().isPositive())
@@ -116,7 +120,7 @@ public class OwnershipCommands {
         if (addressModel.isInvalid()) {
             return CliAddress.ERROR_MESSAGE;
         }
-        addressOwnershipService.setAddressAsOwned(addressModel, description);
+        addressOwnershipService.setAddressAsOwned(addressModel, selectedChain.getChain(), description);
         return "OK";
     }
 
@@ -145,11 +149,11 @@ public class OwnershipCommands {
         return "OK";
     }
 
-    private void preloadAddressTransactions(Set<AddressWithDescription> addressesWithDescription) {
+    private void preloadAddressTransactions(Set<AddressWithDescription> addressesWithDescription, Chain chain) {
         Set<Address> ownedAddresses = addressesWithDescription.stream()
                 .map(AddressWithDescription::getAddress)
                 .collect(toSet());
-        addressTransactionsService.getTransactionsForAddresses(ownedAddresses);
+        addressTransactionsService.getTransactionsForAddresses(ownedAddresses, chain);
     }
 
     private String formatAddressWithPrice(
@@ -169,7 +173,8 @@ public class OwnershipCommands {
 
     private boolean hasAtLeastOneTransaction(AddressWithDescription addressWithDescription) {
         Address address = addressWithDescription.getAddress();
-        AddressTransactions transactions = addressTransactionsService.getTransactions(address);
+        Chain chain = selectedChain.getChain();
+        AddressTransactions transactions = addressTransactionsService.getTransactions(address, chain);
         return !transactions.getTransactionHashes().isEmpty();
     }
 }

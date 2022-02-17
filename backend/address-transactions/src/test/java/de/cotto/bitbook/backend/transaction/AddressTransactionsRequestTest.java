@@ -3,6 +3,9 @@ package de.cotto.bitbook.backend.transaction;
 import de.cotto.bitbook.backend.model.Address;
 import org.junit.jupiter.api.Test;
 
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.Chain.BCH;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
@@ -10,6 +13,7 @@ import static de.cotto.bitbook.backend.transaction.TransactionsRequestKeyFixture
 import static de.cotto.bitbook.backend.transaction.TransactionsRequestKeyFixtures.ADDRESS_TRANSACTIONS_REQUEST;
 import static de.cotto.bitbook.backend.transaction.TransactionsRequestKeyFixtures.TRANSACTIONS_REQUEST_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
 class AddressTransactionsRequestTest {
     @Test
@@ -45,8 +49,16 @@ class AddressTransactionsRequestTest {
 
     @Test
     void testEquals_different_address() {
-        TransactionsRequestKey key = new TransactionsRequestKey(new Address("xxx"), BLOCK_HEIGHT);
+        TransactionsRequestKey key = new TransactionsRequestKey(new Address("xxx"), BTC, BLOCK_HEIGHT);
         assertThat(ADDRESS_TRANSACTIONS_REQUEST).isNotEqualTo(AddressTransactionsRequest.create(key, STANDARD));
+    }
+
+    @Test
+    void testEquals_different_chain() {
+        assumeThat(AddressTransactionsRequest.create(new TransactionsRequestKey(ADDRESS, BTC, BLOCK_HEIGHT), STANDARD))
+                .isEqualTo(ADDRESS_TRANSACTIONS_REQUEST);
+        assertThat(AddressTransactionsRequest.create(new TransactionsRequestKey(ADDRESS, BCH, BLOCK_HEIGHT), STANDARD))
+                .isNotEqualTo(ADDRESS_TRANSACTIONS_REQUEST);
     }
 
     @Test

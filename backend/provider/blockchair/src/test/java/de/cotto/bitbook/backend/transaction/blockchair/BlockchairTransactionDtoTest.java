@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_VALUE_1;
@@ -71,7 +72,7 @@ class BlockchairTransactionDtoTest {
                 OUTPUT_VALUE_2.getSatoshis(), OUTPUT_ADDRESS_2);
         BlockchairTransactionDto blockchairTransactionDto =
                 objectMapper.readValue(json, BlockchairTransactionDto.class);
-        assertThat(blockchairTransactionDto.toModel()).isEqualTo(TRANSACTION);
+        assertThat(blockchairTransactionDto.toModel(BTC)).isEqualTo(TRANSACTION);
     }
 
     @Test
@@ -101,7 +102,7 @@ class BlockchairTransactionDtoTest {
                 OUTPUT_VALUE_1.getSatoshis(), OUTPUT_ADDRESS_1);
         BlockchairTransactionDto blockchairTransactionDto =
                 objectMapper.readValue(json, BlockchairTransactionDto.class);
-        assertThat(blockchairTransactionDto.toModel().getOutputs()).hasSize(1);
+        assertThat(blockchairTransactionDto.toModel(BTC).getOutputs()).hasSize(1);
     }
 
     @Test
@@ -130,7 +131,7 @@ class BlockchairTransactionDtoTest {
                 TRANSACTION_HASH, BLOCK_HEIGHT, TRANSACTION_HASH, FEES.getSatoshis(),
                 OUTPUT_VALUE_1.getSatoshis(), OUTPUT_ADDRESS_1);
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                objectMapper.readValue(json, BlockchairTransactionDto.class).toModel()
+                objectMapper.readValue(json, BlockchairTransactionDto.class).toModel(BTC)
         );
     }
 
@@ -191,6 +192,6 @@ class BlockchairTransactionDtoTest {
                 }""";
         BlockchairTransactionDto blockchairTransactionDto =
                 objectMapper.readValue(json, BlockchairTransactionDto.class);
-        assertThat(blockchairTransactionDto.toModel().getOutputs()).isEmpty();
+        assertThat(blockchairTransactionDto.toModel(BTC).getOutputs()).isEmpty();
     }
 }

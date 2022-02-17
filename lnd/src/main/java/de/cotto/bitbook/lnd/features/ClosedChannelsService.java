@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 
 @Component
@@ -70,7 +71,7 @@ public class ClosedChannelsService {
 
     private void setForSettlementAddress(ClosedChannel closedChannel) {
         closedChannel.getSettlementAddress().ifPresent(address -> {
-            addressOwnershipService.setAddressAsOwned(address);
+            addressOwnershipService.setAddressAsOwned(address, BTC);
             addressDescriptionService.set(address, DEFAULT_ADDRESS_DESCRIPTION);
         });
     }
@@ -98,7 +99,7 @@ public class ClosedChannelsService {
 
     private void setChannelAddressOwnership(Address channelAddress, Initiator openInitiator) {
         if (openInitiator.equals(Initiator.LOCAL)) {
-            addressOwnershipService.setAddressAsOwned(channelAddress);
+            addressOwnershipService.setAddressAsOwned(channelAddress, BTC);
         } else if (openInitiator.equals(Initiator.REMOTE)) {
             OwnershipStatus ownershipStatus = addressOwnershipService.getOwnershipStatus(channelAddress);
             if (!OWNED.equals(ownershipStatus)) {

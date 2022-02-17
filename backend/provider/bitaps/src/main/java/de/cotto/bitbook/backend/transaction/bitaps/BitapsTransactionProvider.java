@@ -1,17 +1,21 @@
 package de.cotto.bitbook.backend.transaction.bitaps;
 
+import de.cotto.bitbook.backend.model.HashAndChain;
 import de.cotto.bitbook.backend.model.Provider;
+import de.cotto.bitbook.backend.model.ProviderException;
 import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.model.TransactionHash;
-import de.cotto.bitbook.backend.transaction.deserialization.TransactionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
+
 @Component
-public class BitapsTransactionProvider implements Provider<TransactionHash, Transaction> {
+@SuppressWarnings("CPD-START")
+public class BitapsTransactionProvider implements Provider<HashAndChain, Transaction> {
     private final BitapsClient bitapsClient;
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -25,8 +29,15 @@ public class BitapsTransactionProvider implements Provider<TransactionHash, Tran
     }
 
     @Override
-    public Optional<Transaction> get(TransactionHash transactionHash) {
-        return getTransactionFromApi(transactionHash).map(TransactionDto::toModel);
+    public boolean isSupported(HashAndChain key) {
+        return key.chain() == BTC;
+    }
+
+    @Override
+    public Optional<Transaction> get(HashAndChain hashAndChain) throws ProviderException {
+        throwIfUnsupported(hashAndChain);
+        return getTransactionFromApi(hashAndChain.hash())
+                .map(dto -> dto.toModel(BTC));
     }
 
     private Optional<BitapsTransactionDto> getTransactionFromApi(TransactionHash transactionHash) {

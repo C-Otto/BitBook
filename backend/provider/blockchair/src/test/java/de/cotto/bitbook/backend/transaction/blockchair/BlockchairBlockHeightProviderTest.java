@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static de.cotto.bitbook.backend.model.Chain.BCH;
+import static de.cotto.bitbook.backend.model.Chain.BSV;
 import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.Chain.BTG;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
@@ -37,6 +38,11 @@ class BlockchairBlockHeightProviderTest {
     @Test
     void isSupported_bch() {
         assertThat(provider.isSupported(BCH)).isTrue();
+    }
+
+    @Test
+    void isSupported_bsv() {
+        assertThat(provider.isSupported(BSV)).isTrue();
     }
 
     @Test
@@ -68,6 +74,13 @@ class BlockchairBlockHeightProviderTest {
         when(blockchairClient.getBlockHeight("bitcoin-cash"))
                 .thenReturn(Optional.of(new BlockchairBlockHeightDto(BLOCK_HEIGHT)));
         assertThat(provider.get(BCH)).contains(BLOCK_HEIGHT);
+    }
+
+    @Test
+    void get_bsv() throws Exception {
+        when(blockchairClient.getBlockHeight("bitcoin-sv"))
+                .thenReturn(Optional.of(new BlockchairBlockHeightDto(BLOCK_HEIGHT)));
+        assertThat(provider.get(BSV)).contains(BLOCK_HEIGHT);
     }
 
     @Test

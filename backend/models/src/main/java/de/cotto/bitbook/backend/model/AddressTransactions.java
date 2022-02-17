@@ -8,19 +8,25 @@ import java.util.Set;
 public class AddressTransactions {
     private static final int MAX_SHOWN_TRANSACTION_HASHES = 10;
 
-    public static final AddressTransactions UNKNOWN = new AddressTransactions(Address.NONE, Collections.emptySet(), 0);
     private final Address address;
     private final Set<TransactionHash> transactionHashes;
     private final int lastCheckedAtBlockHeight;
+    private final Chain chain;
 
     public AddressTransactions(
             Address address,
             Set<TransactionHash> transactionHashes,
-            int lastCheckedAtBlockHeight
+            int lastCheckedAtBlockHeight,
+            Chain chain
     ) {
         this.address = address;
         this.transactionHashes = new LinkedHashSet<>(transactionHashes);
         this.lastCheckedAtBlockHeight = lastCheckedAtBlockHeight;
+        this.chain = chain;
+    }
+
+    public static AddressTransactions unknown(Chain chain) {
+        return new AddressTransactions(Address.NONE, Set.of(), 0, chain);
     }
 
     public Address getAddress() {
@@ -35,11 +41,16 @@ public class AddressTransactions {
         return lastCheckedAtBlockHeight;
     }
 
+    public Chain getChain() {
+        return chain;
+    }
+
     public boolean isValid() {
         return address.isValid();
     }
 
     public AddressTransactions getCombined(AddressTransactions update) {
+        throwIfDifferentChain(update);
         Set<TransactionHash> combinedTransactionHashes = new HashSet<>();
         combinedTransactionHashes.addAll(transactionHashes);
         combinedTransactionHashes.addAll(update.transactionHashes);
@@ -47,7 +58,8 @@ public class AddressTransactions {
         return new AddressTransactions(
                 address,
                 combinedTransactionHashes,
-                newLastCheckedAtBlockHeight
+                newLastCheckedAtBlockHeight,
+                chain
         );
     }
 
@@ -68,6 +80,9 @@ public class AddressTransactions {
         if (!address.equals(that.address)) {
             return false;
         }
+        if (!chain.equals(that.chain)) {
+            return false;
+        }
         return transactionHashes.equals(that.transactionHashes);
     }
 
@@ -76,6 +91,7 @@ public class AddressTransactions {
         int result = address.hashCode();
         result = 31 * result + transactionHashes.hashCode();
         result = 31 * result + lastCheckedAtBlockHeight;
+        result = 31 * result + chain.hashCode();
         return result;
     }
 
@@ -91,6 +107,13 @@ public class AddressTransactions {
                "address='" + address + '\'' +
                ", transactionHashes='" + hashes + '\'' +
                ", lastCheckedAtBlockHeight='" + lastCheckedAtBlockHeight + '\'' +
+               ", chain='" + chain + '\'' +
                '}';
+    }
+
+    private void throwIfDifferentChain(AddressTransactions update) {
+        if (!update.chain.equals(chain)) {
+            throw new IllegalArgumentException();
+        }
     }
 }

@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.AMBIGUOUS_SETTLEMENT_ADDRESS;
@@ -81,13 +82,13 @@ class ClosedChannelsServiceTest {
     @Test
     void marks_channel_address_as_owned_for_initiator_local() {
         load(CLOSED_CHANNEL.toBuilder().withOpenInitiator(LOCAL).build());
-        verify(addressOwnershipService).setAddressAsOwned(CLOSED_CHANNEL.getChannelAddress());
+        verify(addressOwnershipService).setAddressAsOwned(CLOSED_CHANNEL.getChannelAddress(), BTC);
     }
 
     @Test
     void does_not_set_channel_ownership_for_initiator_unknown() {
         load(CLOSED_CHANNEL.toBuilder().withOpenInitiator(Initiator.UNKNOWN).build());
-        verify(addressOwnershipService, never()).setAddressAsOwned(CLOSED_CHANNEL.getChannelAddress());
+        verify(addressOwnershipService, never()).setAddressAsOwned(CLOSED_CHANNEL.getChannelAddress(), BTC);
         verify(addressOwnershipService, never()).setAddressAsForeign(CLOSED_CHANNEL.getChannelAddress());
     }
 
@@ -138,7 +139,7 @@ class ClosedChannelsServiceTest {
     @Test
     void marks_settlement_address_as_owned() {
         load(CLOSED_CHANNEL);
-        verify(addressOwnershipService).setAddressAsOwned(CLOSED_CHANNEL.getSettlementAddress().orElseThrow());
+        verify(addressOwnershipService).setAddressAsOwned(CLOSED_CHANNEL.getSettlementAddress().orElseThrow(), BTC);
     }
 
     @Test
@@ -175,7 +176,7 @@ class ClosedChannelsServiceTest {
     @Test
     void does_not_mark_settlement_address_as_owned_if_not_unique() {
         load(CLOSED_CHANNEL.toBuilder().withClosingTransaction(TRANSACTION).build());
-        verify(addressOwnershipService, never()).setAddressAsOwned(any());
+        verify(addressOwnershipService, never()).setAddressAsOwned(any(), any());
     }
 
     @Test

@@ -27,10 +27,17 @@ import java.util.stream.Stream;
 
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
+import static de.cotto.bitbook.backend.model.Chain.BTG;
+import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
+import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
+import static de.cotto.bitbook.backend.request.RequestPriority.MEDIUM;
+import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
@@ -53,27 +60,27 @@ class TransactionUpdateHeuristicsTest {
                     .map(TransactionHash::new)
                     .collect(toSet());
     private static final AddressTransactions FEW_TRANSACTIONS =
-            new AddressTransactions(ADDRESS, FEW_TRANSACTION_HASHES, LAST_CHECKED_AT_BLOCK_HEIGHT);
+            new AddressTransactions(ADDRESS, FEW_TRANSACTION_HASHES, LAST_CHECKED_AT_BLOCK_HEIGHT, BTC);
 
     private static final Set<TransactionHash> MANY_TRANSACTION_HASHES =
             Stream.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11")
                     .map(TransactionHash::new)
                     .collect(toSet());
     private static final AddressTransactions MANY_TRANSACTIONS =
-            new AddressTransactions(ADDRESS, MANY_TRANSACTION_HASHES, LAST_CHECKED_AT_BLOCK_HEIGHT);
+            new AddressTransactions(ADDRESS, MANY_TRANSACTION_HASHES, LAST_CHECKED_AT_BLOCK_HEIGHT, BTC);
 
     private static final AddressTransactions WITH_RECENT_TRANSACTIONS =
-            new AddressTransactions(ADDRESS, Set.of(new TransactionHash("recent")), LAST_CHECKED_AT_BLOCK_HEIGHT);
+            new AddressTransactions(ADDRESS, Set.of(new TransactionHash("recent")), LAST_CHECKED_AT_BLOCK_HEIGHT, BTC);
     private static final AddressTransactions WITH_OLD_TRANSACTIONS =
-            new AddressTransactions(ADDRESS, Set.of(new TransactionHash("old")), LAST_CHECKED_AT_BLOCK_HEIGHT);
+            new AddressTransactions(ADDRESS, Set.of(new TransactionHash("old")), LAST_CHECKED_AT_BLOCK_HEIGHT, BTC);
 
     private static final AddressTransactions ONE_HASH =
-            new AddressTransactions(ADDRESS, Set.of(new TransactionHash("foo")), LAST_CHECKED_AT_BLOCK_HEIGHT);
+            new AddressTransactions(ADDRESS, Set.of(new TransactionHash("foo")), LAST_CHECKED_AT_BLOCK_HEIGHT, BTC);
     private static final AddressTransactions TWO_HASHES = ADDRESS_TRANSACTIONS;
 
     private static final TransactionHash SWEEP_TX_HASH = new TransactionHash("sweep-tx");
     private static final AddressTransactions WITH_SWEEP_TRANSACTION =
-            new AddressTransactions(ADDRESS, Set.of(SWEEP_TX_HASH), LAST_CHECKED_AT_BLOCK_HEIGHT);
+            new AddressTransactions(ADDRESS, Set.of(SWEEP_TX_HASH), LAST_CHECKED_AT_BLOCK_HEIGHT, BTC);
 
     @InjectMocks
     private TransactionUpdateHeuristics transactionUpdateHeuristics;
@@ -95,22 +102,24 @@ class TransactionUpdateHeuristicsTest {
 
     @BeforeEach
     void setUp() {
-        lenient().when(transactionDao.getTransaction(any())).thenReturn(Transaction.UNKNOWN);
-        lenient().when(transactionDao.getTransaction(new TransactionHash("recent"))).thenReturn(new Transaction(
+        lenient().when(transactionDao.getTransaction(any(), eq(BTC))).thenReturn(Transaction.unknown(BTC));
+        lenient().when(transactionDao.getTransaction(new TransactionHash("recent"), BTC)).thenReturn(new Transaction(
                 TRANSACTION.getHash(),
                 TRANSACTION.getBlockHeight(),
                 LocalDateTime.now(ZoneOffset.UTC).minusDays(6).minusHours(12),
                 Coins.NONE,
                 List.of(),
-                List.of()
+                List.of(),
+                BTC
         ));
-        lenient().when(transactionDao.getTransaction(new TransactionHash("old"))).thenReturn(new Transaction(
+        lenient().when(transactionDao.getTransaction(new TransactionHash("old"), BTC)).thenReturn(new Transaction(
                 TRANSACTION.getHash(),
                 TRANSACTION.getBlockHeight(),
                 LocalDateTime.now(ZoneOffset.UTC).minusDays(7).minusHours(12),
                 Coins.NONE,
                 List.of(),
-                List.of()
+                List.of(),
+                BTC
         ));
         lenient().when(addressDescriptionService.getDescription(any())).thenReturn("");
         lenient().when(transactionDescriptionService.getDescription(any())).thenReturn("");
@@ -216,6 +225,16 @@ class TransactionUpdateHeuristicsTest {
     }
 
     @Test
+    void single_use_input_of_sweep_transaction_recent_but_wrong_chain() {
+        when(blockHeightService.getBlockHeight(BTG)).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT + LIMITED_USE_AGE_LIMIT);
+        mockBalance(BTG);
+        mockSweepTransaction(ADDRESS, new Address("output-btg"), BTG);
+        AddressTransactions withSweepTransactionBtg =
+                new AddressTransactions(ADDRESS, Set.of(SWEEP_TX_HASH), LAST_CHECKED_AT_BLOCK_HEIGHT, BTG);
+        assertThat(transactionUpdateHeuristics.isRecentEnough(withSweepTransactionBtg)).isFalse();
+    }
+
+    @Test
     void wrong_description_for_sweep_transaction() {
         mockAge(LIMITED_USE_AGE_LIMIT);
         mockBalance();
@@ -272,11 +291,32 @@ class TransactionUpdateHeuristicsTest {
         assertThat(transactionUpdateHeuristics.isRecentEnough(TWO_HASHES)).isFalse();
     }
 
+    @Test
+    void getRequestWithTweakedPriority_lowest_remains_lowest() {
+        TransactionsRequestKey transactionsRequestKey = new TransactionsRequestKey(ADDRESS, BTC, BLOCK_HEIGHT);
+        AddressTransactionsRequest request = AddressTransactionsRequest.create(transactionsRequestKey, LOWEST);
+        assertThat(transactionUpdateHeuristics.getRequestWithTweakedPriority(request))
+                .isEqualTo(request);
+    }
+
+    @Test
+    void getRequestWithTweakedPriority_standard_is_downgraded_to_medium_priority() {
+        TransactionsRequestKey transactionsRequestKey = new TransactionsRequestKey(ADDRESS, BTC, BLOCK_HEIGHT);
+        AddressTransactionsRequest request = AddressTransactionsRequest.create(transactionsRequestKey, STANDARD);
+        AddressTransactionsRequest requestMedium = AddressTransactionsRequest.create(transactionsRequestKey, MEDIUM);
+        assertThat(transactionUpdateHeuristics.getRequestWithTweakedPriority(request))
+                .isEqualTo(requestMedium);
+    }
+
     private void mockAge(int age) {
-        when(blockHeightService.getBlockHeight(Chain.BTC)).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT + age);
+        when(blockHeightService.getBlockHeight(BTC)).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT + age);
     }
 
     private void mockBalance() {
+        mockBalance(BTC);
+    }
+
+    private void mockBalance(Chain chain) {
         List<Input> inputs = List.of(new Input(Coins.ofSatoshis(1), new Address("xxx")));
         List<Output> outputs = List.of(new Output(Coins.ofSatoshis(1), ADDRESS));
         Transaction transaction = new Transaction(
@@ -285,26 +325,32 @@ class TransactionUpdateHeuristicsTest {
                 TRANSACTION.getTime(),
                 Coins.NONE,
                 inputs,
-                outputs
+                outputs,
+                chain
         );
-        lenient().when(transactionService.getTransactionDetails(ADDRESS_TRANSACTIONS.getTransactionHashes()))
+        lenient().when(transactionService.getTransactionDetails(ADDRESS_TRANSACTIONS.getTransactionHashes(), chain))
                 .thenReturn(Set.of(transaction));
     }
 
     private void mockEmptyBalance() {
-        lenient().when(transactionService.getTransactionDetails(ADDRESS_TRANSACTIONS.getTransactionHashes()))
+        lenient().when(transactionService.getTransactionDetails(ADDRESS_TRANSACTIONS.getTransactionHashes(), BTC))
                 .thenReturn(Set.of());
     }
 
     private void mockSweepTransaction(Address inputAddress, Address outputAddress) {
-        when(transactionDescriptionService.getDescription(SWEEP_TX_HASH)).thenReturn("lnd sweep transaction");
-        when(transactionDao.getTransaction(SWEEP_TX_HASH)).thenReturn(new Transaction(
+        mockSweepTransaction(inputAddress, outputAddress, BTC);
+    }
+
+    private void mockSweepTransaction(Address inputAddress, Address outputAddress, Chain chain) {
+        lenient().when(transactionDescriptionService.getDescription(SWEEP_TX_HASH)).thenReturn("lnd sweep transaction");
+        when(transactionDao.getTransaction(SWEEP_TX_HASH, chain)).thenReturn(new Transaction(
                 TRANSACTION.getHash(),
                 TRANSACTION.getBlockHeight(),
                 TRANSACTION.getTime(),
                 Coins.NONE,
                 List.of(new Input(Coins.ofSatoshis(1), inputAddress)),
-                List.of(new Output(Coins.ofSatoshis(1), outputAddress))
+                List.of(new Output(Coins.ofSatoshis(1), outputAddress)),
+                chain
         ));
     }
 }

@@ -4,6 +4,7 @@ import com.google.common.base.Functions;
 import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.model.Address;
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.price.PriceService;
@@ -63,7 +64,8 @@ public class TransactionsCommands {
         if (transactionHash.getTransactionHash().isInvalid()) {
             return CliTransactionHash.ERROR_MESSAGE;
         }
-        Transaction transaction = transactionService.getTransactionDetails(transactionHash.getTransactionHash());
+        Chain chain = selectedChain.getChain();
+        Transaction transaction = transactionService.getTransactionDetails(transactionHash.getTransactionHash(), chain);
         return transactionFormatter.format(transaction);
     }
 
@@ -76,7 +78,9 @@ public class TransactionsCommands {
             return "Expected base58 or bech32 address";
         }
         String description = addressDescriptionService.getDescription(addressModel);
-        Set<TransactionHash> hashes = addressTransactionsService.getTransactions(addressModel).getTransactionHashes();
+        Chain chain = selectedChain.getChain();
+        Set<TransactionHash> hashes =
+                addressTransactionsService.getTransactions(addressModel, chain).getTransactionHashes();
         String result = """
                 Address: %s %s
                 Description: %s
@@ -124,7 +128,8 @@ public class TransactionsCommands {
     }
 
     private String formattedAndSortedHashes(Set<TransactionHash> hashes, Address address) {
-        Set<Transaction> transactions = transactionService.getTransactionDetails(hashes);
+        Chain chain = selectedChain.getChain();
+        Set<Transaction> transactions = transactionService.getTransactionDetails(hashes, chain);
         preloadPrices(transactions);
         String details = transactions.parallelStream()
                 .filter(Transaction::isValid)
@@ -135,7 +140,7 @@ public class TransactionsCommands {
                 .sorted(transactionSorter.getComparator())
                 .map(entry -> transactionFormatter.formatSingleLineForAddress(entry.getKey(), address))
                 .collect(Collectors.joining("\n"));
-        if (transactions.size() != hashes.size() || transactions.contains(Transaction.UNKNOWN)) {
+        if (transactions.size() != hashes.size() || transactions.contains(Transaction.unknown(chain))) {
             return details + "\n[Details for at least one transaction could not be downloaded]";
         }
         return details;

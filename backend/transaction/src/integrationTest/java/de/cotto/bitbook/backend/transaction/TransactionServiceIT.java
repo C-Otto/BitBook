@@ -1,6 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
-import de.cotto.bitbook.backend.model.Chain;
+import de.cotto.bitbook.backend.model.HashAndChain;
 import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.request.PrioritizedRequestWithResult;
@@ -18,6 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -55,22 +56,22 @@ class TransactionServiceIT {
         ResultFuture<Transaction> resultFuture = new ResultFuture<>();
         resultFuture.provideResult(TRANSACTION);
         when(transactionProvider.getTransaction(any())).thenReturn(resultFuture);
-        when(blockHeightProvider.getBlockHeight(Chain.BTC)).thenReturn(BLOCK_HEIGHT);
+        when(blockHeightProvider.getBlockHeight(BTC)).thenReturn(BLOCK_HEIGHT);
 
-        Transaction transaction = transactionService.getTransactionDetails(TRANSACTION_HASH);
+        Transaction transaction = transactionService.getTransactionDetails(TRANSACTION_HASH, BTC);
 
         assertThat(transaction).isEqualTo(TRANSACTION);
     }
 
     @Test
     void async_request_results_are_persisted() {
-        when(blockHeightProvider.getBlockHeight(Chain.BTC)).thenReturn(BLOCK_HEIGHT);
+        when(blockHeightProvider.getBlockHeight(BTC)).thenReturn(BLOCK_HEIGHT);
         mockResult();
 
-        transactionService.requestInBackground(Set.of(TRANSACTION_HASH));
+        transactionService.requestInBackground(Set.of(TRANSACTION_HASH), BTC);
 
         await().atMost(1, SECONDS).untilAsserted(
-                () -> assertThat(transactionDao.getTransaction(TRANSACTION_HASH)).isEqualTo(TRANSACTION)
+                () -> assertThat(transactionDao.getTransaction(TRANSACTION_HASH, BTC)).isEqualTo(TRANSACTION)
         );
     }
 
@@ -89,7 +90,7 @@ class TransactionServiceIT {
                 .collect(toSet());
         AtomicReference<Set<Transaction>> results = new AtomicReference<>();
         await().atMost(10, SECONDS).until(() -> {
-            results.set(transactionService.getTransactionDetails(hashes));
+            results.set(transactionService.getTransactionDetails(hashes, BTC));
             return true;
         });
         assertThat(results.get()).isNotEmpty();
@@ -107,7 +108,7 @@ class TransactionServiceIT {
     private void mockResult() {
         when(transactionProvider.getTransaction(any())).then((Answer<ResultFuture<Transaction>>) invocation -> {
             TransactionRequest request = invocation.getArgument(0);
-            PrioritizedRequestWithResult<TransactionHash, Transaction> resultFuture = request.getWithResultFuture();
+            PrioritizedRequestWithResult<HashAndChain, Transaction> resultFuture = request.getWithResultFuture();
             resultFuture.provideResult(TRANSACTION);
             return resultFuture;
         });

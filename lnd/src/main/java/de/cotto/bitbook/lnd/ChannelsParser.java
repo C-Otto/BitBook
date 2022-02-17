@@ -11,6 +11,8 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
+
 @Component
 public class ChannelsParser {
     private final TransactionService transactionService;
@@ -38,11 +40,11 @@ public class ChannelsParser {
         for (JsonNode channelNode : channels) {
             hashes.add(getOpeningTransactionHash(channelNode));
         }
-        transactionService.getTransactionDetails(hashes);
+        transactionService.getTransactionDetails(hashes, BTC);
     }
 
     private Optional<Channel> parseChannel(JsonNode channelNode) {
-        Transaction transaction = transactionService.getTransactionDetails(getOpeningTransactionHash(channelNode));
+        Transaction transaction = transactionService.getTransactionDetails(getOpeningTransactionHash(channelNode), BTC);
         if (transaction.isInvalid()) {
             return Optional.empty();
         }

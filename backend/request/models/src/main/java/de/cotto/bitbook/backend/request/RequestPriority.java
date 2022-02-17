@@ -1,7 +1,9 @@
 package de.cotto.bitbook.backend.request;
 
 public enum RequestPriority {
-    LOWEST(1), STANDARD(0);
+    LOWEST(2),
+    MEDIUM(1),
+    STANDARD(0);
 
     private final int integerForComparison;
 

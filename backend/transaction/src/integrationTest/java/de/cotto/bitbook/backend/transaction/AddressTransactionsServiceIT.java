@@ -1,7 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.model.AddressTransactions;
-import de.cotto.bitbook.backend.model.Chain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,22 +39,22 @@ class AddressTransactionsServiceIT {
 
     @Test
     void getAddressTransactions() {
-        when(blockHeightProvider.getBlockHeight(Chain.BTC)).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
-        TransactionsRequestKey request = new TransactionsRequestKey(ADDRESS, LAST_CHECKED_AT_BLOCK_HEIGHT);
+        when(blockHeightProvider.getBlockHeight(BTC)).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
+        TransactionsRequestKey request = new TransactionsRequestKey(ADDRESS, BTC, LAST_CHECKED_AT_BLOCK_HEIGHT);
         when(transactionAddressClient.get(request)).thenReturn(Optional.of(ADDRESS_TRANSACTIONS));
 
-        AddressTransactions addressTransactions = addressTransactionsService.getTransactions(ADDRESS);
+        AddressTransactions addressTransactions = addressTransactionsService.getTransactions(ADDRESS, BTC);
 
         assertThat(addressTransactions).isEqualTo(ADDRESS_TRANSACTIONS);
     }
 
     @Test
     void getAddressTransactions_from_persistence() {
-        TransactionsRequestKey request = new TransactionsRequestKey(ADDRESS, LAST_CHECKED_AT_BLOCK_HEIGHT);
+        TransactionsRequestKey request = new TransactionsRequestKey(ADDRESS, BTC, LAST_CHECKED_AT_BLOCK_HEIGHT);
         when(transactionAddressClient.get(request)).thenReturn(Optional.of(ADDRESS_TRANSACTIONS));
 
-        AddressTransactions addressTransactions1 = addressTransactionsService.getTransactions(ADDRESS);
-        AddressTransactions addressTransactions2 = addressTransactionsService.getTransactions(ADDRESS);
+        AddressTransactions addressTransactions1 = addressTransactionsService.getTransactions(ADDRESS, BTC);
+        AddressTransactions addressTransactions2 = addressTransactionsService.getTransactions(ADDRESS, BTC);
 
         assertThat(addressTransactions1).isEqualTo(addressTransactions2);
         Optional<AddressTransactions> spotbugsWorkaround = verify(transactionAddressClient, atMostOnce()).get(any());
@@ -63,13 +63,13 @@ class AddressTransactionsServiceIT {
 
     @Test
     void requestTransactionsInBackground() {
-        TransactionsRequestKey request = new TransactionsRequestKey(ADDRESS, LAST_CHECKED_AT_BLOCK_HEIGHT);
+        TransactionsRequestKey request = new TransactionsRequestKey(ADDRESS, BTC, LAST_CHECKED_AT_BLOCK_HEIGHT);
         when(transactionAddressClient.get(request)).then(invocation -> {
             Thread.sleep(1_000);
             return Optional.empty();
         });
         await().atMost(200, TimeUnit.MILLISECONDS).until(() -> {
-            addressTransactionsService.requestTransactionsInBackground(ADDRESS);
+            addressTransactionsService.requestTransactionsInBackground(ADDRESS, BTC);
             return true;
         });
     }

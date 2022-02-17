@@ -41,7 +41,7 @@ public class AddressCommands {
         if (addressModel.isInvalid()) {
             return CliAddress.ERROR_MESSAGE;
         }
-        Coins balance = balanceService.getBalance(addressModel);
+        Coins balance = balanceService.getBalance(addressModel, selectedChain.getChain());
         Price price = priceService.getCurrentPrice(selectedChain.getChain());
         return "%s [%s]".formatted(balance, priceFormatter.format(balance, price));
     }

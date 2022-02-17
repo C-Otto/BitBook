@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction;
 
 import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.request.RequestPriority;
 import de.cotto.bitbook.backend.request.ResultFuture;
 import org.springframework.scheduling.annotation.Async;
@@ -11,7 +12,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
-import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static java.util.stream.Collectors.toSet;
 
 @Component
@@ -37,31 +37,39 @@ public class AddressTransactionsService {
     }
 
     @Async
-    public void requestTransactionsInBackground(Address address) {
-        ResultFuture.getOrElse(getTransactions(address, RequestPriority.LOWEST), AddressTransactions.UNKNOWN);
+    public void requestTransactionsInBackground(Address address, Chain chain) {
+        ResultFuture.getOrElse(
+                getTransactions(address, chain, RequestPriority.LOWEST),
+                AddressTransactions.unknown(chain)
+        );
     }
 
-    public Set<AddressTransactions> getTransactionsForAddresses(Set<Address> addresses) {
+    public Set<AddressTransactions> getTransactionsForAddresses(Set<Address> addresses, Chain chain) {
         Set<Future<AddressTransactions>> futures = addresses.stream()
-                .map(address -> getTransactions(address, RequestPriority.STANDARD))
+                .map(address -> getTransactions(address, chain, RequestPriority.STANDARD))
                 .collect(toSet());
         return futures.stream()
-                .map(future -> ResultFuture.getOrElse(future, AddressTransactions.UNKNOWN))
+                .map(future -> ResultFuture.getOrElse(future, AddressTransactions.unknown(chain)))
                 .collect(toSet());
     }
 
-    public AddressTransactions getTransactions(Address address) {
-        return ResultFuture.getOrElse(getTransactions(address, RequestPriority.STANDARD), AddressTransactions.UNKNOWN);
+    public AddressTransactions getTransactions(Address address, Chain chain) {
+        return ResultFuture.getOrElse(
+                getTransactions(address, chain, RequestPriority.STANDARD),
+                AddressTransactions.unknown(chain)
+        );
     }
 
-    private Future<AddressTransactions> getTransactions(Address address, RequestPriority requestPriority) {
-        int currentBlockHeight = blockHeightService.getBlockHeight(BTC);
-        AddressTransactions persistedAddressTransactions = addressTransactionsDao.getAddressTransactions(address);
+    private Future<AddressTransactions> getTransactions(Address address, Chain chain, RequestPriority requestPriority) {
+        int currentBlockHeight = blockHeightService.getBlockHeight(chain);
+        AddressTransactions persistedAddressTransactions =
+                addressTransactionsDao.getAddressTransactions(address, chain);
         if (isValid(persistedAddressTransactions)) {
             return getUpdatedIfNecessary(persistedAddressTransactions, currentBlockHeight, requestPriority);
         }
-        TransactionsRequestKey transactionsRequestKey = new TransactionsRequestKey(address, currentBlockHeight);
-        return getResultFuture(transactionsRequestKey, requestPriority);
+        TransactionsRequestKey transactionsRequestKey = new TransactionsRequestKey(address, chain, currentBlockHeight);
+        AddressTransactionsRequest request = AddressTransactionsRequest.create(transactionsRequestKey, requestPriority);
+        return getResultFuture(request);
     }
 
     private Future<AddressTransactions> getUpdatedIfNecessary(
@@ -74,15 +82,12 @@ public class AddressTransactionsService {
         }
         TransactionsRequestKey transactionsRequestKey =
                 new TransactionsRequestKey(addressTransactions, currentBlockHeight);
-        return getResultFuture(transactionsRequestKey, requestPriority);
+        AddressTransactionsRequest request = AddressTransactionsRequest.create(transactionsRequestKey, requestPriority);
+        AddressTransactionsRequest tweakedRequest = transactionUpdateHeuristics.getRequestWithTweakedPriority(request);
+        return getResultFuture(tweakedRequest);
     }
 
-    private Future<AddressTransactions> getResultFuture(
-            TransactionsRequestKey transactionsRequestKey,
-            RequestPriority requestPriority
-    ) {
-        AddressTransactionsRequest request =
-                AddressTransactionsRequest.create(transactionsRequestKey, requestPriority);
+    private Future<AddressTransactions> getResultFuture(AddressTransactionsRequest request) {
         return addressTransactionsProvider.getAddressTransactions(request).getFuture()
                 .thenApply(transactions -> {
                     requestTransactionDetailsAndPersist(transactions);
@@ -96,7 +101,10 @@ public class AddressTransactionsService {
 
     private void requestTransactionDetailsAndPersist(AddressTransactions addressTransactions) {
         if (addressTransactions.isValid()) {
-            transactionService.requestInBackground(addressTransactions.getTransactionHashes());
+            transactionService.requestInBackground(
+                    addressTransactions.getTransactionHashes(),
+                    addressTransactions.getChain()
+            );
             addressTransactionsDao.saveAddressTransactions(addressTransactions);
         }
     }

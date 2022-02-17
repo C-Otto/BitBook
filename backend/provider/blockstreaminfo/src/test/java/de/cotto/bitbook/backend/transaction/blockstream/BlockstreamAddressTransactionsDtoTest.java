@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_2;
 import static de.cotto.bitbook.backend.transaction.blockstream.BlockstreamAddressTransactionsFixtures.BLOCKSTREAM_ADDRESS_DETAILS;
@@ -19,7 +20,7 @@ class BlockstreamAddressTransactionsDtoTest {
 
     @Test
     void toModel() {
-        assertThat(BLOCKSTREAM_ADDRESS_DETAILS.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS))
+        assertThat(BLOCKSTREAM_ADDRESS_DETAILS.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS, BTC))
                 .isEqualTo(ADDRESS_TRANSACTIONS);
     }
 
@@ -42,7 +43,7 @@ class BlockstreamAddressTransactionsDtoTest {
                 ]""".formatted(TRANSACTION_HASH, TRANSACTION_HASH_2);
         BlockstreamAddressTransactionsDto addressTransactionsDto =
                 objectMapper.readValue(json, BlockstreamAddressTransactionsDto.class);
-        assertThat(addressTransactionsDto.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS))
+        assertThat(addressTransactionsDto.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS, BTC))
                 .isEqualTo(ADDRESS_TRANSACTIONS);
     }
 
@@ -71,7 +72,7 @@ class BlockstreamAddressTransactionsDtoTest {
                 ]""".formatted(TRANSACTION_HASH, TRANSACTION_HASH_2);
         BlockstreamAddressTransactionsDto addressTransactionsDto =
                 objectMapper.readValue(json, BlockstreamAddressTransactionsDto.class);
-        assertThat(addressTransactionsDto.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS))
+        assertThat(addressTransactionsDto.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS, BTC))
                 .isEqualTo(ADDRESS_TRANSACTIONS);
     }
 
@@ -143,7 +144,7 @@ class BlockstreamAddressTransactionsDtoTest {
                 ]""";
         BlockstreamAddressTransactionsDto addressTransactionsDto =
                 objectMapper.readValue(json, BlockstreamAddressTransactionsDto.class);
-        assertThat(addressTransactionsDto.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS).getTransactionHashes())
+        assertThat(addressTransactionsDto.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS, BTC).getTransactionHashes())
                 .hasSize(24);
     }
 }

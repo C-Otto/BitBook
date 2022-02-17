@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_2;
 import static de.cotto.bitbook.backend.transaction.bitaps.BitapsAddressTransactionDtoFixtures.BITAPS_ADDRESS_TRANSACTIONS;
@@ -18,7 +19,7 @@ class BitapsAddressTransactionsDtoTest {
 
     @Test
     void toModel() {
-        assertThat(BITAPS_ADDRESS_TRANSACTIONS.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS))
+        assertThat(BITAPS_ADDRESS_TRANSACTIONS.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS, BTC))
                 .isEqualTo(ADDRESS_TRANSACTIONS);
     }
 
@@ -40,7 +41,7 @@ class BitapsAddressTransactionsDtoTest {
                 }""".formatted(TRANSACTION_HASH, TRANSACTION_HASH_2);
         BitapsAddressTransactionsDto bitapsAddressTransactionsDto =
                 objectMapper.readValue(json, BitapsAddressTransactionsDto.class);
-        assertThat(bitapsAddressTransactionsDto.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS))
+        assertThat(bitapsAddressTransactionsDto.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS, BTC))
                 .isEqualTo(ADDRESS_TRANSACTIONS);
     }
 

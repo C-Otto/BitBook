@@ -15,7 +15,7 @@ class PriceWithContextTest {
 
     private static final Price PRICE = Price.of(10);
     private static final LocalDate DATE = LocalDate.of(2020, 1, 2);
-    public static final PriceContext PRICE_CONTEXT = new PriceContext(DATE, BTC);
+    private static final PriceContext PRICE_CONTEXT = new PriceContext(DATE, BTC);
     private static final PriceWithContext PRICE_WITH_CONTEXT = new PriceWithContext(PRICE, PRICE_CONTEXT);
 
     @Test

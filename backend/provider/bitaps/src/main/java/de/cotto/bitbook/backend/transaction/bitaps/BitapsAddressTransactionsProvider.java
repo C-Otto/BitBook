@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
+
 @Component
 public class BitapsAddressTransactionsProvider extends SimpleAddressTransactionsProvider {
     private final BitapsClient bitapsClient;
@@ -30,6 +32,6 @@ public class BitapsAddressTransactionsProvider extends SimpleAddressTransactions
         Address address = transactionsRequestKey.getAddress();
         logger.debug("Contacting Bitaps API for transactions for address {}", address);
         return bitapsClient.getAddressTransactions(address)
-                .map(dto -> dto.toModel(transactionsRequestKey.getBlockHeight(), address));
+                .map(dto -> dto.toModel(transactionsRequestKey.getBlockHeight(), address, BTC));
     }
 }

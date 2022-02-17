@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
+
 @Component
 public class UnspentOutputsService {
     private static final String DEFAULT_ADDRESS_DESCRIPTION = "lnd";
@@ -23,7 +25,7 @@ public class UnspentOutputsService {
     }
 
     public long addFromUnspentOutputs(Set<Address> addresses) {
-        addresses.forEach(addressOwnershipService::setAddressAsOwned);
+        addresses.forEach(address -> addressOwnershipService.setAddressAsOwned(address, BTC));
         addresses.forEach(address -> addressDescriptionService.set(address, DEFAULT_ADDRESS_DESCRIPTION));
         return addresses.size();
     }

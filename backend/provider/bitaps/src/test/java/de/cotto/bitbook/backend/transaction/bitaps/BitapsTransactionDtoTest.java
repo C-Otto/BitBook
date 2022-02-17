@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.ZoneOffset;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_VALUE_1;
@@ -67,7 +68,7 @@ class BitapsTransactionDtoTest {
         );
         BitapsTransactionDto bitapsTransactionDto =
                 objectMapper.readValue(json, BitapsTransactionDto.class);
-        assertThat(bitapsTransactionDto.toModel()).isEqualTo(TRANSACTION);
+        assertThat(bitapsTransactionDto.toModel(BTC)).isEqualTo(TRANSACTION);
     }
 
     @Test
@@ -97,7 +98,7 @@ class BitapsTransactionDtoTest {
                   }""".formatted(TRANSACTION_HASH, formattedDateTime, BLOCK_HEIGHT);
         BitapsTransactionDto bitapsTransactionDto =
                 objectMapper.readValue(json, BitapsTransactionDto.class);
-        assertThat(bitapsTransactionDto.toModel().getOutputs()).hasSize(1);
+        assertThat(bitapsTransactionDto.toModel(BTC).getOutputs()).hasSize(1);
     }
 
     @Test
@@ -126,7 +127,7 @@ class BitapsTransactionDtoTest {
                   }
                   }""".formatted(TRANSACTION_HASH, formattedDateTime, BLOCK_HEIGHT);
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                objectMapper.readValue(json, BitapsTransactionDto.class).toModel()
+                objectMapper.readValue(json, BitapsTransactionDto.class).toModel(BTC)
         );
     }
 }

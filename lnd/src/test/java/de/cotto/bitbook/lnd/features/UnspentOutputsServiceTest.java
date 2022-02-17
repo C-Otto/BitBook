@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
@@ -42,8 +43,8 @@ class UnspentOutputsServiceTest {
 
         unspentOutputsService.addFromUnspentOutputs(Set.of(address1, address2));
 
-        verify(addressOwnershipService).setAddressAsOwned(address1);
-        verify(addressOwnershipService).setAddressAsOwned(address2);
+        verify(addressOwnershipService).setAddressAsOwned(address1, BTC);
+        verify(addressOwnershipService).setAddressAsOwned(address2, BTC);
     }
 
     @Test

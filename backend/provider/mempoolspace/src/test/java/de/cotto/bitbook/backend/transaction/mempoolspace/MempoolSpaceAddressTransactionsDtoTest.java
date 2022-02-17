@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.ADDRESS_TRANSACTIONS;
 import static de.cotto.bitbook.backend.model.AddressTransactionsFixtures.LAST_CHECKED_AT_BLOCK_HEIGHT;
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_2;
 import static de.cotto.bitbook.backend.transaction.mempoolspace.MempoolSpaceAddressTransactionsFixtures.MEMPOOLSPACE_ADDRESS_DETAILS;
@@ -18,7 +19,7 @@ class MempoolSpaceAddressTransactionsDtoTest {
 
     @Test
     void toModel() {
-        assertThat(MEMPOOLSPACE_ADDRESS_DETAILS.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS))
+        assertThat(MEMPOOLSPACE_ADDRESS_DETAILS.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS, BTC))
                 .isEqualTo(ADDRESS_TRANSACTIONS);
     }
 
@@ -35,7 +36,7 @@ class MempoolSpaceAddressTransactionsDtoTest {
                 ]""".formatted(TRANSACTION_HASH, TRANSACTION_HASH_2);
         MempoolSpaceAddressTransactionsDto mempoolspaceTransactionDto =
                 objectMapper.readValue(json, MempoolSpaceAddressTransactionsDto.class);
-        assertThat(mempoolspaceTransactionDto.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS))
+        assertThat(mempoolspaceTransactionDto.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS, BTC))
                 .isEqualTo(ADDRESS_TRANSACTIONS);
     }
 

@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PriceServiceTest {
     private static final LocalDate DATE = LocalDate.of(2013, 11, 12);
-    public static final PriceContext PRICE_CONTEXT = new PriceContext(DATE, BTC);
+    private static final PriceContext PRICE_CONTEXT = new PriceContext(DATE, BTC);
     private static final LocalDate DATE_2 = LocalDate.of(2015, 2, 3);
 
     @InjectMocks

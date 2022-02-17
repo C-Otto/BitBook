@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
+
 @Component
 public class ElectrsAddressTransactionsProvider extends SimpleAddressTransactionsProvider {
     private final ElectrsClient electrsClient;
@@ -28,6 +30,11 @@ public class ElectrsAddressTransactionsProvider extends SimpleAddressTransaction
     }
 
     @Override
+    public boolean isSupported(TransactionsRequestKey key) {
+        return key.getChain() == BTC; // TODO
+    }
+
+    @Override
     protected Optional<AddressTransactions> getFromApi(TransactionsRequestKey transactionsRequestKey) {
         Address address = transactionsRequestKey.getAddress();
         logger.debug("Contacting Electrs for transactions for address {}", address);
@@ -35,6 +42,6 @@ public class ElectrsAddressTransactionsProvider extends SimpleAddressTransaction
         if (hashes == null) {
             return Optional.empty();
         }
-        return Optional.of(new AddressTransactions(address, hashes, transactionsRequestKey.getBlockHeight()));
+        return Optional.of(new AddressTransactions(address, hashes, transactionsRequestKey.getBlockHeight(), BTC));
     }
 }

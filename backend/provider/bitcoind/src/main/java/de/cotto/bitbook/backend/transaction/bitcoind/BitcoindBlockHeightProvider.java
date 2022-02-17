@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
+
 @Component
 public class BitcoindBlockHeightProvider implements BlockHeightProvider {
     private final BitcoinCliWrapper bitcoinCliWrapper;
@@ -29,6 +31,6 @@ public class BitcoindBlockHeightProvider implements BlockHeightProvider {
 
     @Override
     public boolean isSupported(Chain chain) {
-        return chain == Chain.BTC;
+        return chain == BTC;
     }
 }

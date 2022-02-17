@@ -6,6 +6,7 @@ import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 import org.junit.jupiter.api.Test;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_VALUE_1;
@@ -62,7 +63,7 @@ class TransactionDtoDeserializerTest {
         );
         TestableTransactionDto transactionDto =
                 objectMapper.readValue(json, TestableTransactionDto.class);
-        assertThat(transactionDto.toModel()).isEqualTo(TRANSACTION);
+        assertThat(transactionDto.toModel(BTC)).isEqualTo(TRANSACTION);
     }
 
     @Test
@@ -93,7 +94,7 @@ class TransactionDtoDeserializerTest {
                 objectMapper.readValue(json, TestableTransactionDto.class);
         Input input1 = new Input(Coins.ofSatoshis(100), new Address("xxx"));
         Input input2 = new Input(Coins.ofSatoshis(100), new Address("xxx"));
-        assertThat(transactionDto.toModel().getInputs()).containsExactly(input1, input2);
+        assertThat(transactionDto.toModel(BTC).getInputs()).containsExactly(input1, input2);
     }
 
     @Test
@@ -149,7 +150,7 @@ class TransactionDtoDeserializerTest {
                 }""".formatted(BLOCK_HEIGHT, TRANSACTION_HASH, DATE_TIME_EPOCH_SECONDS);
         TestableTransactionDto transactionDto =
                 objectMapper.readValue(json, TestableTransactionDto.class);
-        assertThat(transactionDto.toModel().getOutputs()).hasSize(1);
+        assertThat(transactionDto.toModel(BTC).getOutputs()).hasSize(1);
     }
 
     @Test
@@ -178,7 +179,7 @@ class TransactionDtoDeserializerTest {
                 }""".formatted(BLOCK_HEIGHT, TRANSACTION_HASH, DATE_TIME_EPOCH_SECONDS);
         TestableTransactionDto transactionDto =
                 objectMapper.readValue(json, TestableTransactionDto.class);
-        assertThat(transactionDto.toModel().getOutputs()).hasSize(1);
+        assertThat(transactionDto.toModel(BTC).getOutputs()).hasSize(1);
     }
 
     @Test
@@ -208,6 +209,6 @@ class TransactionDtoDeserializerTest {
         );
         TestableTransactionDto transactionDto =
                 objectMapper.readValue(json, TestableTransactionDto.class);
-        assertThat(transactionDto.toModel().getInputs()).hasSize(1);
+        assertThat(transactionDto.toModel(BTC).getInputs()).hasSize(1);
     }
 }

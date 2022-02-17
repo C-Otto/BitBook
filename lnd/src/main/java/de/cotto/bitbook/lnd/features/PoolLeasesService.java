@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
 
 @Component
@@ -41,7 +42,7 @@ public class PoolLeasesService {
 
     public long addFromLeases(Set<PoolLease> leases) {
         Set<PoolLease> validLeases = leases.stream()
-                .filter(lease -> transactionService.getTransactionDetails(lease.getTransactionHash()).isValid())
+                .filter(lease -> transactionService.getTransactionDetails(lease.getTransactionHash(), BTC).isValid())
                 .collect(Collectors.toSet());
         validLeases.forEach(lease -> {
             setTransactionDescription(lease);
@@ -61,24 +62,24 @@ public class PoolLeasesService {
     private void setChannelAddressDescriptionAndOwnership(PoolLease poolLease) {
         Address channelAddress = getChannelAddress(poolLease);
         addressDescriptionService.set(channelAddress, "Lightning Channel with " + poolLease.getPubKey());
-        addressOwnershipService.setAddressAsOwned(channelAddress);
+        addressOwnershipService.setAddressAsOwned(channelAddress, BTC);
     }
 
     private void setChangeAddressDescriptionAndOwnership(PoolLease poolLease) {
         getChangeAddress(poolLease).ifPresent(changeAddress -> {
-            Transaction transaction = transactionService.getTransactionDetails(poolLease.getTransactionHash());
+            Transaction transaction = transactionService.getTransactionDetails(poolLease.getTransactionHash(), BTC);
             String description = transaction.getInputAddresses().stream()
                     .map(addressDescriptionService::getDescription)
                     .filter(inputDescription -> inputDescription.startsWith(DEFAULT_DESCRIPTION))
                     .findFirst()
                     .orElse(DEFAULT_DESCRIPTION);
             addressDescriptionService.set(changeAddress, description);
-            addressOwnershipService.setAddressAsOwned(changeAddress);
+            addressOwnershipService.setAddressAsOwned(changeAddress, BTC);
         });
     }
 
     private Address getChannelAddress(PoolLease poolLease) {
-        Transaction transaction = transactionService.getTransactionDetails(poolLease.getTransactionHash());
+        Transaction transaction = transactionService.getTransactionDetails(poolLease.getTransactionHash(), BTC);
         return getChannelOutput(poolLease, transaction).getAddress();
     }
 
@@ -87,7 +88,7 @@ public class PoolLeasesService {
     }
 
     private Optional<Address> getChangeAddress(PoolLease poolLease) {
-        Transaction transaction = transactionService.getTransactionDetails(poolLease.getTransactionHash());
+        Transaction transaction = transactionService.getTransactionDetails(poolLease.getTransactionHash(), BTC);
         Coins ownedInputs = transaction.getInputs().stream()
                 .filter(input -> OWNED.equals(addressOwnershipService.getOwnershipStatus(input.getAddress())))
                 .map(InputOutput::getValue)

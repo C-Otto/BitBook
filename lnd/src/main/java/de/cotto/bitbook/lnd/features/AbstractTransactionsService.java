@@ -6,6 +6,8 @@ import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.transaction.TransactionService;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
+
 public class AbstractTransactionsService {
     protected static final String DEFAULT_DESCRIPTION = "lnd";
     protected final AddressOwnershipService addressOwnershipService;
@@ -26,7 +28,7 @@ public class AbstractTransactionsService {
     }
 
     protected void setAddressAsOwnedWithDescription(Address address) {
-        addressOwnershipService.setAddressAsOwned(address);
+        addressOwnershipService.setAddressAsOwned(address, BTC);
         addressDescriptionService.set(address, DEFAULT_DESCRIPTION);
     }
 }

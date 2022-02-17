@@ -32,7 +32,7 @@ import static uk.org.lidalia.slf4jtest.LoggingEvent.warn;
 
 @ExtendWith(MockitoExtension.class)
 class RequestWorkerTest {
-    public static final String KEY = "xxx";
+    private static final String KEY = "xxx";
     private final TestLogger logger = TestLoggerFactory.getTestLogger(RequestWorker.class);
 
     private RequestWorker<String, Integer> requestWorker;

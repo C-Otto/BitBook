@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction;
 
+import de.cotto.bitbook.backend.model.HashAndChain;
 import de.cotto.bitbook.backend.model.ProviderException;
 import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.model.TransactionHash;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
@@ -85,31 +87,31 @@ class PrioritizingTransactionProviderTest {
     @Test
     void gives_unknown_transaction_if_all_providers_fail() throws Exception {
         mockAllFail();
-        assertThat(get()).isEqualTo(Transaction.UNKNOWN);
+        assertThat(get()).isEqualTo(Transaction.unknown(BTC));
     }
 
     @Test
     void clears_lowest_priority_requests_if_all_providers_fail() throws Exception {
         mockAllFail();
-        prioritizingTransactionProvider.getTransaction(new TransactionRequest(OTHER_HASH, LOWEST));
+        prioritizingTransactionProvider.getTransaction(new TransactionRequest(OTHER_HASH, BTC, LOWEST));
 
         get();
 
-        verify(transactionProvider1, never()).get(OTHER_HASH);
-        verify(transactionProvider2, never()).get(OTHER_HASH);
+        verify(transactionProvider1, never()).get(new HashAndChain(OTHER_HASH, BTC));
+        verify(transactionProvider2, never()).get(new HashAndChain(OTHER_HASH, BTC));
     }
 
     @Test
     void retains_all_but_lowest_priority_requests_if_all_providers_fail() throws Exception {
         mockAllFail();
-        prioritizingTransactionProvider.getTransaction(new TransactionRequest(OTHER_HASH, STANDARD));
-        prioritizingTransactionProvider.getTransaction(new TransactionRequest(TRANSACTION_HASH, STANDARD));
+        prioritizingTransactionProvider.getTransaction(new TransactionRequest(OTHER_HASH, BTC, STANDARD));
+        prioritizingTransactionProvider.getTransaction(new TransactionRequest(TRANSACTION_HASH, BTC, STANDARD));
         workOnRequestsInBackground();
 
-        verify(transactionProvider1, timeout(1_000)).get(TRANSACTION_HASH);
-        verify(transactionProvider1, timeout(1_000)).get(OTHER_HASH);
-        verify(transactionProvider2, timeout(1_000)).get(TRANSACTION_HASH);
-        verify(transactionProvider2, timeout(1_000)).get(OTHER_HASH);
+        verify(transactionProvider1, timeout(1_000)).get(new HashAndChain(TRANSACTION_HASH, BTC));
+        verify(transactionProvider1, timeout(1_000)).get(new HashAndChain(OTHER_HASH, BTC));
+        verify(transactionProvider2, timeout(1_000)).get(new HashAndChain(TRANSACTION_HASH, BTC));
+        verify(transactionProvider2, timeout(1_000)).get(new HashAndChain(OTHER_HASH, BTC));
     }
 
     @Test
@@ -118,10 +120,10 @@ class PrioritizingTransactionProviderTest {
     }
 
     private Transaction get() {
-        TransactionRequest request = new TransactionRequest(TRANSACTION_HASH, STANDARD);
+        TransactionRequest request = new TransactionRequest(TRANSACTION_HASH, BTC, STANDARD);
         ResultFuture<Transaction> resultFuture = prioritizingTransactionProvider.getTransaction(request);
         workOnRequestsInBackground();
-        return resultFuture.getResult().orElse(Transaction.UNKNOWN);
+        return resultFuture.getResult().orElse(Transaction.unknown(BTC));
     }
 
     private void workOnRequestsInBackground() {

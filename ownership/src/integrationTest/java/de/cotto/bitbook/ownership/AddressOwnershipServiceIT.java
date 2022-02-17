@@ -13,7 +13,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
+import static de.cotto.bitbook.backend.model.Chain.BTG;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @DataJpaTest
@@ -43,9 +46,10 @@ class AddressOwnershipServiceIT {
     @Test
     void markAsOwnedAndGet() {
         Address address = new Address("abc");
-        addressOwnershipService.setAddressAsOwned(address, "");
+        addressOwnershipService.setAddressAsOwned(address, BTG, "");
         assertThat(addressOwnershipService.getOwnedAddresses()).containsExactly(address);
-        verify(addressTransactionsService).requestTransactionsInBackground(address);
+        verify(addressTransactionsService).requestTransactionsInBackground(address, BTG);
+        verify(addressTransactionsService, never()).requestTransactionsInBackground(address, BTC);
         verify(addressDescriptionService).set(address, "");
     }
 

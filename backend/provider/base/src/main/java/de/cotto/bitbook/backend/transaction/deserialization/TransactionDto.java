@@ -1,5 +1,6 @@
 package de.cotto.bitbook.backend.transaction.deserialization;
 
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Input;
 import de.cotto.bitbook.backend.model.Output;
@@ -35,12 +36,12 @@ public class TransactionDto {
         this.outputs = outputs;
     }
 
-    public Transaction toModel() {
+    public Transaction toModel(Chain chain) {
         List<Output> outputModels = outputs.stream().map(OutputDto::toModel).collect(toList());
         if (inputs.size() == 1 && InputDto.COINBASE.equals(inputs.get(0))) {
-            return Transaction.forCoinbase(hash, blockHeight, time, Coins.ofSatoshis(fees), outputModels);
+            return Transaction.forCoinbase(hash, blockHeight, time, Coins.ofSatoshis(fees), outputModels, chain);
         }
         List<Input> inputModels = inputs.stream().map(InputDto::toModel).collect(toList());
-        return new Transaction(hash, blockHeight, time, Coins.ofSatoshis(fees), inputModels, outputModels);
+        return new Transaction(hash, blockHeight, time, Coins.ofSatoshis(fees), inputModels, outputModels, chain);
     }
 }

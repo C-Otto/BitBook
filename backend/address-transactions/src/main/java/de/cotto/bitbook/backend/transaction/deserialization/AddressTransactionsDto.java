@@ -2,6 +2,7 @@ package de.cotto.bitbook.backend.transaction.deserialization;
 
 import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.AddressTransactions;
+import de.cotto.bitbook.backend.model.Chain;
 import de.cotto.bitbook.backend.model.TransactionHash;
 
 import java.util.Set;
@@ -17,12 +18,13 @@ public class AddressTransactionsDto {
         this.transactionHashes = transactionHashes;
     }
 
-    public AddressTransactions toModel(int lastCheckedAtBlockheight, Address expectedAddress) {
+    public AddressTransactions toModel(int lastCheckedAtBlockheight, Address expectedAddress, Chain chain) {
         validateAddress(expectedAddress);
         return new AddressTransactions(
                 requireNonNull(expectedAddress),
                 requireNonNull(transactionHashes),
-                lastCheckedAtBlockheight
+                lastCheckedAtBlockheight,
+                chain
         );
     }
 

@@ -8,8 +8,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class PrioritizedRequestTest {
 
-    public static final String KEY = "key";
-    public static final RequestPriority REQUEST_PRIORITY = STANDARD;
+    private static final String KEY = "key";
+    private static final RequestPriority REQUEST_PRIORITY = STANDARD;
 
     @Test
     void getKey() {

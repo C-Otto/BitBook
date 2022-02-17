@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
+import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_VALUE_1;
@@ -73,7 +74,7 @@ class BlockcypherTransactionDtoTest {
         );
         BlockcypherTransactionDto blockcypherTransactionDto =
                 objectMapper.readValue(json, BlockcypherTransactionDto.class);
-        assertThat(blockcypherTransactionDto.toModel()).isEqualTo(TRANSACTION);
+        assertThat(blockcypherTransactionDto.toModel(BTC)).isEqualTo(TRANSACTION);
     }
 
     @Test
@@ -102,7 +103,7 @@ class BlockcypherTransactionDtoTest {
                 }""";
         BlockcypherTransactionDto blockcypherTransactionDto =
                 objectMapper.readValue(json, BlockcypherTransactionDto.class);
-        assertThat(blockcypherTransactionDto.toModel().getOutputs()).hasSize(1);
+        assertThat(blockcypherTransactionDto.toModel(BTC).getOutputs()).hasSize(1);
     }
 
     @Test
@@ -130,7 +131,7 @@ class BlockcypherTransactionDtoTest {
                   ]
                 }""";
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                objectMapper.readValue(json, BlockcypherTransactionDto.class).toModel()
+                objectMapper.readValue(json, BlockcypherTransactionDto.class).toModel(BTC)
         );
     }
 
@@ -159,7 +160,7 @@ class BlockcypherTransactionDtoTest {
                   ]
                 }""";
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                objectMapper.readValue(json, BlockcypherTransactionDto.class).toModel()
+                objectMapper.readValue(json, BlockcypherTransactionDto.class).toModel(BTC)
         );
     }
 
@@ -187,7 +188,7 @@ class BlockcypherTransactionDtoTest {
                   ]
                 }""";
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                objectMapper.readValue(json, BlockcypherTransactionDto.class).toModel()
+                objectMapper.readValue(json, BlockcypherTransactionDto.class).toModel(BTC)
         );
     }
 
@@ -215,7 +216,7 @@ class BlockcypherTransactionDtoTest {
                   ]
                 }""";
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                objectMapper.readValue(json, BlockcypherTransactionDto.class).toModel()
+                objectMapper.readValue(json, BlockcypherTransactionDto.class).toModel(BTC)
         );
     }
 
@@ -239,7 +240,7 @@ class BlockcypherTransactionDtoTest {
                   ]
                 }""";
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                objectMapper.readValue(json, BlockcypherTransactionDto.class).toModel()
+                objectMapper.readValue(json, BlockcypherTransactionDto.class).toModel(BTC)
         );
     }
 
