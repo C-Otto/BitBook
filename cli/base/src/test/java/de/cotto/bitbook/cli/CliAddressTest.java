@@ -10,6 +10,9 @@ class CliAddressTest {
 
     private static final Address VALID_ADDRESS = new Address("1QLbz7JHiBTspS962RLKV8GndWFwi5j6Qr");
     private static final Address SHORT_ADDRESS = new Address("bc1qngw83");
+    private static final Address CASHADDR_ADDRESS = new Address("qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a");
+    private static final Address CASHADDR_WITH_PREFIX_ADDRESS =
+            new Address("bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a");
 
     @Test
     void errorMessage() {
@@ -35,6 +38,16 @@ class CliAddressTest {
     @Test
     void getAddress_base58_p2pkh() {
         assertThat(new CliAddress(VALID_ADDRESS).getAddress()).isEqualTo(VALID_ADDRESS);
+    }
+
+    @Test
+    void getAddress_cashaddr() {
+        assertThat(new CliAddress(CASHADDR_ADDRESS).getAddress()).isEqualTo(CASHADDR_ADDRESS);
+    }
+
+    @Test
+    void getAddress_cashaddr_with_prefix() {
+        assertThat(new CliAddress(CASHADDR_WITH_PREFIX_ADDRESS).getAddress()).isEqualTo(CASHADDR_ADDRESS);
     }
 
     @Test
