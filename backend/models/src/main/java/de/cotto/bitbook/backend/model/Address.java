@@ -3,6 +3,10 @@ package de.cotto.bitbook.backend.model;
 public record Address(String address) implements Comparable<Address> {
     public static final Address NONE = new Address("");
 
+    public Address(String address) {
+        this.address = new CashAddrAddress(address).getLegacyAddress();
+    }
+
     public boolean isValid() {
         return !isInvalid();
     }

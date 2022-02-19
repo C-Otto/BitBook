@@ -72,4 +72,22 @@ class Base58AddressTest {
     void isValid_bech32() {
         assertThat(new Base58Address(P2WPKH).isValid()).isFalse();
     }
+
+    @Test
+    void createP2Pkh() {
+        assertThat(Base58Address.createP2Pkh(new HexString("76a04053bda0a88bda5177b86a15c3b29f559873")))
+                .isEqualTo("1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu");
+    }
+
+    @Test
+    void createP2Sh() {
+        assertThat(Base58Address.createP2Sh(new HexString("cb481232299cd5743151ac4b2d63ae198e7bb0a9")))
+                .isEqualTo("3LDsS579y7sruadqu11beEJoTjdFiFCdX4");
+    }
+
+    @Test
+    void createP2Pkh_leading_zeros() {
+        assertThat(Base58Address.createP2Pkh(new HexString("000000")))
+                .isEqualTo("11114bdQda");
+    }
 }

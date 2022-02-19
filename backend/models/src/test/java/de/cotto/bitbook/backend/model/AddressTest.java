@@ -76,4 +76,16 @@ class AddressTest {
     void getScript_unsupported() {
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> new Address("foo").getScript());
     }
+
+    @Test
+    void cashaddr_with_prefix_is_converted_to_legacy() {
+        assertThat(new Address("bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a"))
+                .isEqualTo(new Address("1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu"));
+    }
+
+    @Test
+    void cashaddr_is_converted_to_legacy() {
+        assertThat(new Address("qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a"))
+                .isEqualTo(new Address("1BpEi6DfDAUFd7GtittLSdBeYJvcoaVggu"));
+    }
 }

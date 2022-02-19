@@ -3,13 +3,13 @@ package de.cotto.bitbook.backend.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
-public class Bech32Address {
+public class Bech32Address extends Bech32Base {
     private static final int WITNESS_VERSION_0 = 0;
     private static final int WITNESS_VERSION_1 = 1;
     private static final int BECH32M_CONST = 0x2bc830a3;
-    private static final String CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
     private static final Pattern PATTERN = Pattern.compile("bc1[" + CHARSET + "]{1,87}");
     private static final int HUMAN_READABLE_PART_END_INDEX = 2;
     private static final int[] GENERATOR = {0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3};
@@ -18,15 +18,12 @@ public class Bech32Address {
     private static final byte DATA_LENGTH_P2TR_WIT = 32;
     private static final HexString OP_0_HEX = new HexString((byte) 0);
     private static final HexString OP_1_HEX = new HexString((byte) 81);
-    private static final int CHECKSUM_BYTES = 6;
-    private static final int BITS_FOR_BECH32_CHAR = 5;
-    private static final int BITS_IN_BYTE = 8;
 
     private final String addressString;
     private final String lowerCase;
-    private final byte[] payloadWithChecksum;
 
     Bech32Address(String addressString) {
+        super();
         this.addressString = addressString;
         lowerCase = addressString.toLowerCase(Locale.US);
         payloadWithChecksum = getPayloadWithChecksum();
@@ -84,6 +81,7 @@ public class Bech32Address {
         }
         String humanReadablePart = lowerCase.substring(0, HUMAN_READABLE_PART_END_INDEX);
         byte[] expandedHumanReadablePart = getExpandedHumanReadablePart(humanReadablePart);
+        Objects.requireNonNull(payloadWithChecksum);
         byte[] dataToHash = new byte[expandedHumanReadablePart.length + payloadWithChecksum.length];
         System.arraycopy(expandedHumanReadablePart, 0, dataToHash, 0, expandedHumanReadablePart.length);
         System.arraycopy(
@@ -144,30 +142,28 @@ public class Bech32Address {
 
     private HexString getDecoded() {
         boolean isFirst = true;
-        int fromBits = BITS_FOR_BECH32_CHAR;
-        int toBits = BITS_IN_BYTE;
         int acc = 0;
         int bits = 0;
         List<Byte> resultList = new ArrayList<>();
-        int maxV = (1 << toBits) - 1;
-        int maxAcc = (1 << (fromBits + toBits - 1)) - 1;
+        int maxV = 255;
+        int maxAcc = 4095;
         for (int value : getPayload()) {
             if (isFirst) {
                 isFirst = false;
                 continue;
             }
-            if (value < 0 || value >> fromBits != 0) {
+            if (value < 0 || value >> BITS_FOR_BECH32_CHAR != 0) {
                 return HexString.EMPTY;
             }
-            acc = ((acc << fromBits) | value) & maxAcc;
-            bits += fromBits;
-            while (bits >= toBits) {
-                bits -= toBits;
+            acc = ((acc << BITS_FOR_BECH32_CHAR) | value) & maxAcc;
+            bits += BITS_FOR_BECH32_CHAR;
+            while (bits >= 8) {
+                bits -= 8;
                 resultList.add((byte) ((acc >> bits) & maxV));
             }
         }
-        int bitDifference = toBits - bits;
-        if (bits >= fromBits || (acc << bitDifference & maxV) != 0) {
+        int bitDifference = 8 - bits;
+        if (bits >= BITS_FOR_BECH32_CHAR || (acc << bitDifference & maxV) != 0) {
             return HexString.EMPTY;
         }
         return new HexString(resultList);
@@ -179,12 +175,6 @@ public class Bech32Address {
         for (int position = offset; position < lowerCase.length(); position++) {
             payload[position - offset] = (byte) CHARSET.indexOf(lowerCase.charAt(position));
         }
-        return payload;
-    }
-
-    private byte[] getPayload() {
-        byte[] payload = new byte[payloadWithChecksum.length - CHECKSUM_BYTES];
-        System.arraycopy(payloadWithChecksum, 0, payload, 0, payload.length);
         return payload;
     }
 }
