@@ -2,23 +2,17 @@ package de.cotto.bitbook.backend.model;
 
 public class Base58Encoder {
     private static final String ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-    private final HexString input;
+    private final byte[] byteArray;
 
     public Base58Encoder(HexString input) {
-        this.input = input;
+        byteArray = input.getByteArray();
     }
 
     public String encode() {
-        byte[] byteArray = input.getByteArray();
-        int zeros = 0;
-        for (byte b : byteArray) {
-            if (b == 0) {
-                zeros++;
-            }
-        }
+        int leadingZeros = getNumberOfLeadingZeros();
         char[] encoded = new char[byteArray.length * 2];
         int outputStart = encoded.length;
-        int inputStart = zeros;
+        int inputStart = leadingZeros;
         while (inputStart < byteArray.length) {
             outputStart--;
             encoded[outputStart] = ALPHABET.charAt(divmod(byteArray, inputStart));
@@ -29,8 +23,8 @@ public class Base58Encoder {
         while (outputStart < encoded.length && encoded[outputStart] == '1') {
             outputStart++;
         }
-        while (zeros > 0) {
-            zeros--;
+        while (leadingZeros > 0) {
+            leadingZeros--;
             outputStart--;
             encoded[outputStart] = '1';
         }
@@ -46,5 +40,17 @@ public class Base58Encoder {
             remainder = temp % 58;
         }
         return (byte) remainder;
+    }
+
+    private int getNumberOfLeadingZeros() {
+        int result = 0;
+        for (byte b : byteArray) {
+            if (b == 0) {
+                result++;
+            } else {
+                break;
+            }
+        }
+        return result;
     }
 }
