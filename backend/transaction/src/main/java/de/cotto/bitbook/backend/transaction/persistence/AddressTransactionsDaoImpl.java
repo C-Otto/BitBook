@@ -21,9 +21,6 @@ public class AddressTransactionsDaoImpl implements AddressTransactionsDao {
 
     @Override
     public void saveAddressTransactions(AddressTransactions addressTransactions) {
-        if (addressTransactions.getTransactionHashes().isEmpty()) {
-            return;
-        }
         addressTransactionsRepository.save(AddressTransactionsJpaDto.fromModel(addressTransactions));
     }
 

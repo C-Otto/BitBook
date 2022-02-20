@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -21,7 +22,6 @@ import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -62,9 +62,19 @@ class AddressTransactionsDaoImplTest {
     }
 
     @Test
-    void saveAddressTransactions_not_for_zero_transactions() {
+    void saveAddressTransactions_also_for_zero_transactions() {
+        // we know that there are no known transactions for the address, which is useful information!
+        // with this, we don't need to check this address again for a while
         addressTransactionsDao.saveAddressTransactions(new AddressTransactions(ADDRESS, Set.of(), 123));
-        verifyNoInteractions(repository);
+        verify(repository).save(argThat(
+                dto -> ADDRESS.equals(new Address(dto.getAddress()))
+        ));
+        verify(repository).save(argThat(
+                dto -> 123 == dto.getLastCheckedAtBlockheight()
+        ));
+        verify(repository).save(argThat(
+                dto -> Collections.emptySet().equals(hashes(dto))
+        ));
     }
 
     @Test
