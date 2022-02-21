@@ -14,7 +14,6 @@ import org.springframework.data.repository.Repository;
 import java.util.regex.Pattern;
 
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ArchUnitIT {
 
@@ -31,7 +30,6 @@ class ArchUnitIT {
                 .haveSimpleNameEndingWith("Dto").or().haveSimpleNameEndingWith("DTO")
                 .should()
                 .onlyHaveDependentClassesThat().haveSimpleNameNotEndingWith("Service");
-        assertThat(importedClasses).isNotEmpty();
         rule.check(importedClasses);
     }
 
@@ -41,14 +39,12 @@ class ArchUnitIT {
                 .areAssignableTo(Repository.class)
                 .should()
                 .onlyHaveDependentClassesThat().haveSimpleNameNotEndingWith("Service");
-        assertThat(importedClasses).isNotEmpty();
         rule.check(importedClasses);
     }
 
     @Test
     void no_package_cycle() {
         SliceRule rule = slices().matching("de.cotto.bitbook.(**)").should().beFreeOfCycles();
-        assertThat(importedClasses).isNotEmpty();
         rule.check(importedClasses);
     }
 
@@ -61,7 +57,6 @@ class ArchUnitIT {
                 .orShould()
                 .beAnnotatedWith("org.springframework.transaction.annotation.Transactional");
         // https://stackoverflow.com/q/26387399/947526
-        assertThat(importedClasses).isNotEmpty();
         rule.check(importedClasses);
     }
 
