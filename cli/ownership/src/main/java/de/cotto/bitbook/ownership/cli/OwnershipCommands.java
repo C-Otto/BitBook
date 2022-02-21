@@ -2,6 +2,7 @@ package de.cotto.bitbook.ownership.cli;
 
 import com.google.common.base.Functions;
 import de.cotto.bitbook.backend.model.Address;
+import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Transaction;
@@ -75,6 +76,7 @@ public class OwnershipCommands {
                 addressOwnershipService.getOwnedAddressesWithDescription();
         preloadAddressTransactions(ownedAddressesWithDescription);
         return ownedAddressesWithDescription.parallelStream()
+                .filter(this::hasAtLeastOneTransaction)
                 .collect(Collectors.toMap(
                         Functions.identity(),
                         addressWithDescription -> balanceService.getBalance(addressWithDescription.getAddress())
@@ -163,5 +165,11 @@ public class OwnershipCommands {
     private void preloadPrices(Set<Transaction> transactions) {
         priceService.getPrices(transactions.stream()
                 .map(Transaction::getTime).collect(toSet()), selectedChain.getChain());
+    }
+
+    private boolean hasAtLeastOneTransaction(AddressWithDescription addressWithDescription) {
+        Address address = addressWithDescription.getAddress();
+        AddressTransactions transactions = addressTransactionsService.getTransactions(address);
+        return !transactions.getTransactionHashes().isEmpty();
     }
 }

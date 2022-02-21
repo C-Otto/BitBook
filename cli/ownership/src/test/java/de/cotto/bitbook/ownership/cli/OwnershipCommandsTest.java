@@ -1,6 +1,7 @@
 package de.cotto.bitbook.ownership.cli;
 
 import de.cotto.bitbook.backend.model.Address;
+import de.cotto.bitbook.backend.model.AddressTransactions;
 import de.cotto.bitbook.backend.model.AddressWithDescription;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.price.PriceService;
@@ -101,6 +102,8 @@ class OwnershipCommandsTest {
                 new AddressWithDescription(address1),
                 new AddressWithDescription(address2)
         ));
+        when(addressTransactionsService.getTransactions(any()))
+                .thenReturn(new AddressTransactions(ADDRESS, Set.of(TRANSACTION_HASH), 123));
         assertThat(ownershipCommands.getOwnedAddresses()).matches(
                 ANYTHING + address1 + ANYTHING + 123 + ANYTHING + "\n" +
                 ANYTHING + address2 + ANYTHING + 234 + ANYTHING
@@ -114,6 +117,8 @@ class OwnershipCommandsTest {
                 new AddressWithDescription(ADDRESS),
                 new AddressWithDescription(ADDRESS_2)
         ));
+        when(addressTransactionsService.getTransactions(any()))
+                .thenReturn(new AddressTransactions(ADDRESS, Set.of(TRANSACTION_HASH), 123));
 
         ownershipCommands.getOwnedAddresses();
 
@@ -127,6 +132,8 @@ class OwnershipCommandsTest {
         AddressWithDescription address1 = new AddressWithDescription(new Address("xxx"), "b-DESCRIPTION");
         AddressWithDescription address2 = new AddressWithDescription(new Address("yyy"), "a-DESCRIPTION");
         AddressWithDescription address3 = new AddressWithDescription(new Address("zzz"), "c-DESCRIPTION");
+        when(addressTransactionsService.getTransactions(any()))
+                .thenReturn(new AddressTransactions(ADDRESS, Set.of(TRANSACTION_HASH), 123));
         when(balanceService.getBalance(address1.getAddress())).thenReturn(Coins.ofSatoshis(123));
         when(balanceService.getBalance(address2.getAddress())).thenReturn(Coins.ofSatoshis(100));
         when(balanceService.getBalance(address3.getAddress())).thenReturn(Coins.ofSatoshis(1000));
@@ -136,6 +143,17 @@ class OwnershipCommandsTest {
                 .matches(".*a-DESCRIPTION" + ANYTHING + "\n" +
                          ANYTHING + "b-DESCRIPTION" + ANYTHING + "\n" +
                          ANYTHING + "c-DESCRIPTION" + ANYTHING);
+    }
+
+    @Test
+    void getOwnedAddresses_ignores_addresses_without_transaction() {
+        Address address = new Address("abc");
+        when(addressTransactionsService.getTransactions(address))
+                .thenReturn(new AddressTransactions(address, Set.of(), 123));
+        when(addressOwnershipService.getOwnedAddressesWithDescription()).thenReturn(Set.of(
+                new AddressWithDescription(address)
+        ));
+        assertThat(ownershipCommands.getOwnedAddresses()).isEmpty();
     }
 
     @Nested

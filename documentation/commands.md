@@ -118,6 +118,7 @@ BitBook₿ get-owned-addresses
 
 Note that the list of transaction hashes associated with each owned address is updated as part of this computation,
 which might cause a delay (see [Get Address Transactions](#get-address-transactions)).
+Furthermore, the list only includes addresses where at least one transaction is known.
 
 ### Get Balance
 The commands `get-balance` and `get-balance-for-address` can be used to get the balance, either aggregated over all
