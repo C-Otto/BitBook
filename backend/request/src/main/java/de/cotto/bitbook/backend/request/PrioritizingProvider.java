@@ -70,6 +70,9 @@ public class PrioritizingProvider<K, R> {
                     request::provideResult,
                     request::stopWithoutResult
             );
+        } catch (NotSupportedByAnyProviderException e) {
+            logger.debug("There is no provider that supports the request " + request);
+            request.stopWithoutResult();
         } catch (AllProvidersFailedException e) {
             logger.warn("All providers failed, removing lowest priority requests from queue");
             requestQueue.removeIf(queuedRequest -> queuedRequest.getPriority() == RequestPriority.LOWEST);

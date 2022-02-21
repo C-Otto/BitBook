@@ -54,6 +54,14 @@ class PrioritizingProviderTest {
     }
 
     @Test
+    void not_supported_by_any_provider() {
+        workOnExpectedRequests(1);
+        when(provider.isSupported(any())).thenReturn(false);
+        Optional<Integer> result = prioritizingProvider.getForRequestBlocking(request("xyz", STANDARD));
+        assertThat(result).isEmpty();
+    }
+
+    @Test
     void all_providers_fail_removes_low_priority_requests_from_queue() throws Exception {
         workOnExpectedRequests(2);
         when(provider.get(any())).thenThrow(mock(FeignException.class));

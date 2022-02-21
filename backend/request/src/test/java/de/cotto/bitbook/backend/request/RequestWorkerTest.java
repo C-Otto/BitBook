@@ -72,6 +72,15 @@ class RequestWorkerTest {
     }
 
     @Test
+    void not_supported_by_any_provider() {
+        when(provider1.isSupported(any())).thenReturn(false);
+        when(provider2.isSupported(any())).thenReturn(false);
+        assertThatExceptionOfType(NotSupportedByAnyProviderException.class).isThrownBy(() ->
+                requestWorker.getNow("xyz")
+        );
+    }
+
+    @Test
     void uses_second_provider_on_request_not_permitted_exception() throws Exception {
         when(provider1.get(any())).thenThrow(mock(RequestNotPermitted.class));
         when(provider2.get(any())).thenCallRealMethod();
@@ -296,7 +305,7 @@ class RequestWorkerTest {
     private void get() {
         try {
             requestWorker.getNow(KEY);
-        } catch (AllProvidersFailedException exception) {
+        } catch (AllProvidersFailedException | NotSupportedByAnyProviderException exception) {
             // ignored
         }
     }

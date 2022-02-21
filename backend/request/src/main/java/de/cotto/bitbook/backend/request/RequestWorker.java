@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,8 +30,13 @@ public class RequestWorker<K, R> {
         providers.forEach(provider -> providerScores.put(provider, Score.DEFAULT));
     }
 
-    public Optional<R> getNow(K key) throws AllProvidersFailedException {
-        for (Provider<K, R> provider : getSortedProviders(key)) {
+    public Optional<R> getNow(K key) throws NotSupportedByAnyProviderException, AllProvidersFailedException {
+        Collection<? extends Provider<K, R>> providers = getSortedProviders(key);
+        if (providers.isEmpty()) {
+            throw new NotSupportedByAnyProviderException();
+        }
+        for (Provider<K, R> provider : providers) {
+
             ResultFromProvider<R> resultFromProvider = getWithProvider(key, provider);
             if (resultFromProvider.isSuccessful()) {
                 return resultFromProvider.getAsOptional();
@@ -77,7 +83,7 @@ public class RequestWorker<K, R> {
         providerScores.compute(provider, (key, currentValue) -> requireNonNull(currentValue).add(update));
     }
 
-    private Iterable<? extends Provider<K, R>> getSortedProviders(K key) {
+    private Collection<? extends Provider<K, R>> getSortedProviders(K key) {
         synchronized (providerScores) {
             return providerScores.entrySet().stream()
                     .sorted(comparingByValue())
