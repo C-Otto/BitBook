@@ -31,7 +31,7 @@ public class ElectrsAddressTransactionsProvider extends SimpleAddressTransaction
 
     @Override
     public boolean isSupported(TransactionsRequestKey key) {
-        return key.getChain() == BTC; // TODO
+        return key.getChain() == BTC;
     }
 
     @Override
