@@ -279,3 +279,23 @@ As an example, you can use `set-transaction-sort-order BY_DATE_THEN_COINS_ABSOLU
 (and then by absolute coin value if two transactions have the same date).
 Please use [tab completion](#tab-completion) (type `set-transaction-sort-order` and press TAB twice) to see all
 available sort orders.
+
+## Forks
+You can also select the BCH (Bitcoin Cash) and BSV (Bitcoin SV) chains, enabling you to track coins in these chains.
+To do that, run `select-chain BCH` or `select-chain BSV` and use BitBook as before:
+
+```
+BitBook₿ select-chain BCH
+BitBook(BCH)₿
+```
+
+You can switch chains arbitrarily. The selected chain is shown in the prompt and used for all future commands, most
+notably `get-neighbour-transactions`.
+
+Existing information for transactions also valid in the selected chain (because they were confirmed before the fork)
+is retained and reused.
+Ownership information for addresses is considered irrespectively of any chain, based on the assumption that you know the
+private keys.
+
+Note that, currently, there is no price information available for non-BTC coins, although prices are shown for blocks up
+to the fork date.
