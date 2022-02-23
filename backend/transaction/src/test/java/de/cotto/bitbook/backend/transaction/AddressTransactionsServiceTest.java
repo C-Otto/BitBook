@@ -208,6 +208,20 @@ class AddressTransactionsServiceTest {
         }
 
         @Test
+        void returns_known_transaction_addresses_if_update_fails() {
+            when(addressTransactionsProvider.getAddressTransactions(argIsRequest(requestKey, STANDARD)))
+                    .then(invocation -> {
+                        AddressTransactionsRequest request = invocation.getArgument(0);
+                        PrioritizedRequestWithResult<TransactionsRequestKey, AddressTransactions> resultFuture =
+                                request.getWithResultFuture();
+                        resultFuture.stopWithoutResult();
+                        return resultFuture;
+                    });
+            AddressTransactions addressTransactions = addressTransactionsService.getTransactions(ADDRESS, BTC);
+            assertThat(addressTransactions).isEqualTo(ADDRESS_TRANSACTIONS);
+        }
+
+        @Test
         void persists_transaction_addresses() {
             mockAddressTransactionsFromProvider(
                     requestKey, STANDARD, ADDRESS_TRANSACTIONS_UPDATED

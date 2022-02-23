@@ -65,14 +65,26 @@ public class AddressTransactionsService {
         AddressTransactions persistedAddressTransactions =
                 addressTransactionsDao.getAddressTransactions(address, chain);
         if (isValid(persistedAddressTransactions)) {
-            return getUpdatedIfNecessary(persistedAddressTransactions, currentBlockHeight, requestPriority);
+            return getUpdatedAddresses(persistedAddressTransactions, currentBlockHeight, requestPriority);
         }
         TransactionsRequestKey transactionsRequestKey = new TransactionsRequestKey(address, chain, currentBlockHeight);
         AddressTransactionsRequest request = AddressTransactionsRequest.create(transactionsRequestKey, requestPriority);
         return getResultFuture(request);
     }
 
-    private Future<AddressTransactions> getUpdatedIfNecessary(
+    private CompletableFuture<AddressTransactions> getUpdatedAddresses(
+            AddressTransactions persistedAddressTransactions,
+            int currentBlockHeight,
+            RequestPriority requestPriority
+    ) {
+        AddressTransactions updatedOrPersisted = ResultFuture.getOrElse(
+                getUpdatedIfNecessary(persistedAddressTransactions, currentBlockHeight, requestPriority),
+                persistedAddressTransactions
+        );
+        return CompletableFuture.completedFuture(updatedOrPersisted);
+    }
+
+    private CompletableFuture<AddressTransactions> getUpdatedIfNecessary(
             AddressTransactions addressTransactions,
             int currentBlockHeight,
             RequestPriority requestPriority
@@ -87,7 +99,7 @@ public class AddressTransactionsService {
         return getResultFuture(tweakedRequest);
     }
 
-    private Future<AddressTransactions> getResultFuture(AddressTransactionsRequest request) {
+    private CompletableFuture<AddressTransactions> getResultFuture(AddressTransactionsRequest request) {
         return addressTransactionsProvider.getAddressTransactions(request).getFuture()
                 .thenApply(transactions -> {
                     requestTransactionDetailsAndPersist(transactions);
