@@ -246,12 +246,12 @@ class AddressTransactionsServiceTest {
                         return resultFuture;
                     })
                     .then(invocation -> {
-                        AddressTransactionsRequest request1 = invocation.getArgument(0);
-                        PrioritizedRequestWithResult<TransactionsRequestKey, AddressTransactions> resultFuture1 =
-                                request1.getWithResultFuture();
-                        resultFuture1.stopWithoutResult();
+                        AddressTransactionsRequest request = invocation.getArgument(0);
+                        PrioritizedRequestWithResult<TransactionsRequestKey, AddressTransactions> resultFuture =
+                                request.getWithResultFuture();
+                        resultFuture.stopWithoutResult();
                         secondRequestReceived.set(true);
-                        return resultFuture1;
+                        return resultFuture;
                     });
 
             await().atMost(timeout).untilAsserted(
