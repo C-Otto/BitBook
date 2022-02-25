@@ -11,7 +11,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Duration;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
 import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS_2;
@@ -25,12 +29,14 @@ import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.request.RequestPriority.LOWEST;
 import static de.cotto.bitbook.backend.request.RequestPriority.STANDARD;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -219,6 +225,41 @@ class AddressTransactionsServiceTest {
                     });
             AddressTransactions addressTransactions = addressTransactionsService.getTransactions(ADDRESS, BTC);
             assertThat(addressTransactions).isEqualTo(ADDRESS_TRANSACTIONS);
+        }
+
+        @Test
+        @SuppressWarnings("FutureReturnValueIgnored")
+        void returns_known_transaction_without_delay() {
+            ExecutorService executor = Executors.newCachedThreadPool();
+            Duration timeout = Duration.ofSeconds(2);
+            AtomicBoolean secondRequestReceived = new AtomicBoolean(false);
+            when(addressTransactionsDao.getAddressTransactions(ADDRESS_2, BTC)).thenReturn(ADDRESS_TRANSACTIONS);
+            when(addressTransactionsProvider.getAddressTransactions(argIsRequest(requestKey, STANDARD)))
+                    .then(invocation -> {
+                        AddressTransactionsRequest request = invocation.getArgument(0);
+                        PrioritizedRequestWithResult<TransactionsRequestKey, AddressTransactions> resultFuture =
+                                request.getWithResultFuture();
+                        executor.submit(() -> {
+                            await().atMost(timeout.plusSeconds(1)).untilTrue(secondRequestReceived);
+                            resultFuture.provideResult(ADDRESS_TRANSACTIONS_UPDATED);
+                        });
+                        return resultFuture;
+                    })
+                    .then(invocation -> {
+                        AddressTransactionsRequest request1 = invocation.getArgument(0);
+                        PrioritizedRequestWithResult<TransactionsRequestKey, AddressTransactions> resultFuture1 =
+                                request1.getWithResultFuture();
+                        resultFuture1.stopWithoutResult();
+                        secondRequestReceived.set(true);
+                        return resultFuture1;
+                    });
+
+            await().atMost(timeout).untilAsserted(
+                    () -> {
+                        addressTransactionsService.getTransactionsForAddresses(Set.of(ADDRESS, ADDRESS_2), BTC);
+                        verify(addressTransactionsProvider, times(2)).getAddressTransactions(any());
+                    }
+            );
         }
 
         @Test

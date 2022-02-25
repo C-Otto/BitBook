@@ -77,11 +77,8 @@ public class AddressTransactionsService {
             int currentBlockHeight,
             RequestPriority requestPriority
     ) {
-        AddressTransactions updatedOrPersisted = ResultFuture.getOrElse(
-                getUpdatedIfNecessary(persistedAddressTransactions, currentBlockHeight, requestPriority),
-                persistedAddressTransactions
-        );
-        return CompletableFuture.completedFuture(updatedOrPersisted);
+        return getUpdatedIfNecessary(persistedAddressTransactions, currentBlockHeight, requestPriority)
+                .exceptionally(error -> persistedAddressTransactions);
     }
 
     private CompletableFuture<AddressTransactions> getUpdatedIfNecessary(
