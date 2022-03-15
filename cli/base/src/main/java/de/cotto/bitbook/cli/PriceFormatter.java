@@ -26,7 +26,7 @@ public class PriceFormatter {
         if (price.equals(Price.UNKNOWN)) {
             return " Price unknown";
         }
-        BigDecimal valueAtPrice = BigDecimal.valueOf(coins.getSatoshis())
+        BigDecimal valueAtPrice = BigDecimal.valueOf(coins.satoshis())
                 .multiply(price.getAsBigDecimal())
                 .divide(Coins.SATOSHIS_IN_COIN, RoundingMode.HALF_UP)
                 .setScale(2, RoundingMode.HALF_UP);

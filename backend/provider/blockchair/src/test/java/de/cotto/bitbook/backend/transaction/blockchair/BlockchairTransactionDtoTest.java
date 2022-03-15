@@ -65,11 +65,11 @@ class BlockchairTransactionDtoTest {
                     }
                   }
                 }""".formatted(
-                TRANSACTION_HASH, BLOCK_HEIGHT, TRANSACTION_HASH, formattedDateTime, FEES.getSatoshis(),
-                INPUT_VALUE_1.getSatoshis(), INPUT_ADDRESS_1,
-                INPUT_VALUE_2.getSatoshis(), INPUT_ADDRESS_2,
-                OUTPUT_VALUE_1.getSatoshis(), OUTPUT_ADDRESS_1,
-                OUTPUT_VALUE_2.getSatoshis(), OUTPUT_ADDRESS_2);
+                TRANSACTION_HASH, BLOCK_HEIGHT, TRANSACTION_HASH, formattedDateTime, FEES.satoshis(),
+                INPUT_VALUE_1.satoshis(), INPUT_ADDRESS_1,
+                INPUT_VALUE_2.satoshis(), INPUT_ADDRESS_2,
+                OUTPUT_VALUE_1.satoshis(), OUTPUT_ADDRESS_1,
+                OUTPUT_VALUE_2.satoshis(), OUTPUT_ADDRESS_2);
         BlockchairTransactionDto blockchairTransactionDto =
                 objectMapper.readValue(json, BlockchairTransactionDto.class);
         assertThat(blockchairTransactionDto.toModel(BTC)).isEqualTo(TRANSACTION);
@@ -98,8 +98,8 @@ class BlockchairTransactionDtoTest {
                     }
                   }
                 }""".formatted(
-                TRANSACTION_HASH, BLOCK_HEIGHT, TRANSACTION_HASH, FEES.getSatoshis(),
-                OUTPUT_VALUE_1.getSatoshis(), OUTPUT_ADDRESS_1);
+                TRANSACTION_HASH, BLOCK_HEIGHT, TRANSACTION_HASH, FEES.satoshis(),
+                OUTPUT_VALUE_1.satoshis(), OUTPUT_ADDRESS_1);
         BlockchairTransactionDto blockchairTransactionDto =
                 objectMapper.readValue(json, BlockchairTransactionDto.class);
         assertThat(blockchairTransactionDto.toModel(BTC).getOutputs()).hasSize(1);
@@ -128,8 +128,8 @@ class BlockchairTransactionDtoTest {
                     }
                   }
                 }""".formatted(
-                TRANSACTION_HASH, BLOCK_HEIGHT, TRANSACTION_HASH, FEES.getSatoshis(),
-                OUTPUT_VALUE_1.getSatoshis(), OUTPUT_ADDRESS_1);
+                TRANSACTION_HASH, BLOCK_HEIGHT, TRANSACTION_HASH, FEES.satoshis(),
+                OUTPUT_VALUE_1.satoshis(), OUTPUT_ADDRESS_1);
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
                 objectMapper.readValue(json, BlockchairTransactionDto.class).toModel(BTC)
         );

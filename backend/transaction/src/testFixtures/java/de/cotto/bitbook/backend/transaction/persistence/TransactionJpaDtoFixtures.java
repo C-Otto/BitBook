@@ -21,7 +21,7 @@ public class TransactionJpaDtoFixtures {
         TRANSACTION_JPA_DTO.setHash(TRANSACTION_HASH.toString());
         TRANSACTION_JPA_DTO.setBlockHeight(BLOCK_HEIGHT);
         TRANSACTION_JPA_DTO.setTime(DATE_TIME.toEpochSecond(ZoneOffset.UTC));
-        TRANSACTION_JPA_DTO.setFees(FEES.getSatoshis());
+        TRANSACTION_JPA_DTO.setFees(FEES.satoshis());
         TRANSACTION_JPA_DTO.setInputs(List.of(INPUT_JPA_DTO_1, INPUT_JPA_DTO_2));
         TRANSACTION_JPA_DTO.setOutputs(List.of(OUTPUT_JPA_DTO_1, OUTPUT_JPA_DTO_2));
         TRANSACTION_JPA_DTO.setChain(BTC.toString());

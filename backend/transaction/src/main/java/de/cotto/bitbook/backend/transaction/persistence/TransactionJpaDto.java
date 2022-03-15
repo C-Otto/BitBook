@@ -58,7 +58,7 @@ class TransactionJpaDto {
         dto.setHash(transaction.getHash().toString());
         dto.setBlockHeight(transaction.getBlockHeight());
         dto.setTime(transaction.getTime().toEpochSecond(ZoneOffset.UTC));
-        dto.setFees(transaction.getFees().getSatoshis());
+        dto.setFees(transaction.getFees().satoshis());
         dto.setInputs(transaction.getInputs().stream().map(InputJpaDto::fromModel).collect(toList()));
         dto.setOutputs(transaction.getOutputs().stream().map(OutputJpaDto::fromModel).collect(toList()));
         dto.setChain(transaction.getChain().toString());

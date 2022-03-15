@@ -66,11 +66,11 @@ class BlockcypherTransactionDtoTest {
                     }
                   ]
                 }""".formatted(
-                BLOCK_HEIGHT, TRANSACTION_HASH, FEES.getSatoshis(), formattedDateTime,
-                INPUT_VALUE_1.getSatoshis(), INPUT_ADDRESS_1,
-                INPUT_VALUE_2.getSatoshis(), INPUT_ADDRESS_2,
-                OUTPUT_VALUE_1.getSatoshis(), OUTPUT_ADDRESS_1,
-                OUTPUT_VALUE_2.getSatoshis(), OUTPUT_ADDRESS_2
+                BLOCK_HEIGHT, TRANSACTION_HASH, FEES.satoshis(), formattedDateTime,
+                INPUT_VALUE_1.satoshis(), INPUT_ADDRESS_1,
+                INPUT_VALUE_2.satoshis(), INPUT_ADDRESS_2,
+                OUTPUT_VALUE_1.satoshis(), OUTPUT_ADDRESS_1,
+                OUTPUT_VALUE_2.satoshis(), OUTPUT_ADDRESS_2
         );
         BlockcypherTransactionDto blockcypherTransactionDto =
                 objectMapper.readValue(json, BlockcypherTransactionDto.class);

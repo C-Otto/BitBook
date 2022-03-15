@@ -42,7 +42,7 @@ class ClosedChannelsParserTest {
     private static final String RESOLUTION_WITH_HASH =
             "{" +
             "\"sweep_txid\": \"" + SWEEP_TRANSACTION_HASH + "\"" +
-            ", \"amount_sat\": \"" + RESOLUTION_AMOUNT.getSatoshis() + "\"" +
+            ", \"amount_sat\": \"" + RESOLUTION_AMOUNT.satoshis() + "\"" +
             ", \"resolution_type\": \"COMMIT\"" +
             ", \"outcome\": \"CLAIMED\"" +
             "}";
@@ -178,7 +178,7 @@ class ClosedChannelsParserTest {
                "\"closing_tx_hash\": \"" + TRANSACTION_HASH_2 + "\"," +
                "\"remote_pubkey\": \"pubkey\"," +
                "\"chain_hash\": \"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\"," +
-               "\"settled_balance\": \"" + settledBalance.getSatoshis() + "\"," +
+               "\"settled_balance\": \"" + settledBalance.satoshis() + "\"," +
                "\"close_height\": 601164," +
                "\"close_type\": \"COOPERATIVE_CLOSE\"," +
                "\"open_initiator\": \"INITIATOR_REMOTE\"," +

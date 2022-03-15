@@ -94,7 +94,7 @@ class CoinsTest {
     @Test
     void getSatoshis() {
         long satoshis = 1_234L;
-        assertThat(Coins.ofSatoshis(satoshis).getSatoshis()).isEqualTo(satoshis);
+        assertThat(Coins.ofSatoshis(satoshis).satoshis()).isEqualTo(satoshis);
     }
 
     @Test

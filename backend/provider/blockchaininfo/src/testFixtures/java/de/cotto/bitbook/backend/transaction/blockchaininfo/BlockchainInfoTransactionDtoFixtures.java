@@ -17,7 +17,7 @@ public class BlockchainInfoTransactionDtoFixtures {
                     TRANSACTION_HASH,
                     BLOCK_HEIGHT,
                     DATE_TIME,
-                    FEES.getSatoshis(),
+                    FEES.satoshis(),
                     List.of(INPUT_DTO_1, INPUT_DTO_2),
                     List.of(OUTPUT_DTO_1, OUTPUT_DTO_2)
             );

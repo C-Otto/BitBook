@@ -40,8 +40,8 @@ public class Transaction {
         this.blockHeight = blockHeight;
         this.time = time.withNano(0);
         this.fees = fees;
-        this.inputs = inputs.stream().filter(input -> input.getValue().getSatoshis() > 0).collect(toList());
-        this.outputs = outputs.stream().filter(output -> output.getValue().getSatoshis() > 0).collect(toList());
+        this.inputs = inputs.stream().filter(input -> input.getValue().satoshis() > 0).collect(toList());
+        this.outputs = outputs.stream().filter(output -> output.getValue().satoshis() > 0).collect(toList());
         this.chain = chain;
         validateCoinsSum(hash, fees, inputs, outputs);
     }
@@ -70,10 +70,10 @@ public class Transaction {
     }
 
     public List<InputOutput> getIncomingToAndOutgoingFromAddress(Address address) {
-        if (getIncomingCoins(address).getSatoshis() > 0) {
+        if (getIncomingCoins(address).satoshis() > 0) {
             return new ArrayList<>(inputs);
         }
-        if (getOutgoingCoins(address).getSatoshis() > 0) {
+        if (getOutgoingCoins(address).satoshis() > 0) {
             return new ArrayList<>(outputs);
         }
         return List.of();

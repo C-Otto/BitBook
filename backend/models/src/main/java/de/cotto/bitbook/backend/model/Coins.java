@@ -6,23 +6,13 @@ import org.springframework.boot.ansi.AnsiOutput;
 import java.math.BigDecimal;
 import java.util.Locale;
 
-public class Coins implements Comparable<Coins> {
+public record Coins(long satoshis) implements Comparable<Coins> {
     private static final int COIN_SCALE = 8;
     public static final BigDecimal SATOSHIS_IN_COIN = BigDecimal.valueOf(1, -COIN_SCALE);
     public static final Coins NONE = Coins.ofSatoshis(0);
 
-    private final long satoshis;
-
-    protected Coins(long satoshis) {
-        this.satoshis = satoshis;
-    }
-
     public static Coins ofSatoshis(long satoshis) {
         return new Coins(satoshis);
-    }
-
-    public long getSatoshis() {
-        return satoshis;
     }
 
     public Coins add(Coins summand) {
@@ -90,24 +80,5 @@ public class Coins implements Comparable<Coins> {
 
     private String withoutLastCharacter(String string) {
         return string.substring(0, string.length() - 1);
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-        if (other == null || getClass() != other.getClass()) {
-            return false;
-        }
-
-        Coins coins = (Coins) other;
-
-        return satoshis == coins.satoshis;
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (satoshis ^ (satoshis >>> 32));
     }
 }

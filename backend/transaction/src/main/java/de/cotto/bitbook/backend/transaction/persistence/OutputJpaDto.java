@@ -34,7 +34,7 @@ public class OutputJpaDto implements InputOutputJpaDto {
     public static OutputJpaDto fromModel(Output output) {
         OutputJpaDto dto = new OutputJpaDto();
         dto.setTargetAddress(output.getAddress().toString());
-        dto.setValue(output.getValue().getSatoshis());
+        dto.setValue(output.getValue().satoshis());
         return dto;
     }
 

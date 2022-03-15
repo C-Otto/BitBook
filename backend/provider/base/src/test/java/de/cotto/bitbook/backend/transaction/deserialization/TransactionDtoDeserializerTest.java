@@ -55,11 +55,11 @@ class TransactionDtoDeserializerTest {
                     }
                   ]
                 }""".formatted(
-                BLOCK_HEIGHT, TRANSACTION_HASH, FEES.getSatoshis(), DATE_TIME_EPOCH_SECONDS,
-                INPUT_VALUE_1.getSatoshis(), INPUT_ADDRESS_1,
-                INPUT_VALUE_2.getSatoshis(), INPUT_ADDRESS_2,
-                OUTPUT_VALUE_1.getSatoshis(), OUTPUT_ADDRESS_1,
-                OUTPUT_VALUE_2.getSatoshis(), OUTPUT_ADDRESS_2
+                BLOCK_HEIGHT, TRANSACTION_HASH, FEES.satoshis(), DATE_TIME_EPOCH_SECONDS,
+                INPUT_VALUE_1.satoshis(), INPUT_ADDRESS_1,
+                INPUT_VALUE_2.satoshis(), INPUT_ADDRESS_2,
+                OUTPUT_VALUE_1.satoshis(), OUTPUT_ADDRESS_1,
+                OUTPUT_VALUE_2.satoshis(), OUTPUT_ADDRESS_2
         );
         TestableTransactionDto transactionDto =
                 objectMapper.readValue(json, TestableTransactionDto.class);
@@ -203,9 +203,9 @@ class TransactionDtoDeserializerTest {
                       ]
                     }
                 }""".formatted(
-                BLOCK_HEIGHT, TRANSACTION_HASH, FEES.getSatoshis(), DATE_TIME_EPOCH_SECONDS,
-                OUTPUT_VALUE_1.getSatoshis(), OUTPUT_ADDRESS_1,
-                OUTPUT_VALUE_2.getSatoshis(), OUTPUT_ADDRESS_2
+                BLOCK_HEIGHT, TRANSACTION_HASH, FEES.satoshis(), DATE_TIME_EPOCH_SECONDS,
+                OUTPUT_VALUE_1.satoshis(), OUTPUT_ADDRESS_1,
+                OUTPUT_VALUE_2.satoshis(), OUTPUT_ADDRESS_2
         );
         TestableTransactionDto transactionDto =
                 objectMapper.readValue(json, TestableTransactionDto.class);

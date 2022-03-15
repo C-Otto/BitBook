@@ -7,7 +7,7 @@ public class InputOutput {
     protected final Address address;
 
     protected InputOutput(Coins value, Address targetAddress) {
-        Preconditions.checkArgument(value.getSatoshis() >= 0);
+        Preconditions.checkArgument(value.satoshis() >= 0);
         this.value = value;
         this.address = targetAddress;
     }

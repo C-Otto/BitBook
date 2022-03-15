@@ -73,11 +73,11 @@ class BtcComTransactionDtoTest {
                     ]
                   }
                 }""".formatted(
-                BLOCK_HEIGHT, formattedDateTime, FEES.getSatoshis(), TRANSACTION_HASH,
-                INPUT_ADDRESS_1, INPUT_VALUE_1.getSatoshis(),
-                INPUT_ADDRESS_2, INPUT_VALUE_2.getSatoshis(),
-                OUTPUT_ADDRESS_1, OUTPUT_VALUE_1.getSatoshis(),
-                OUTPUT_ADDRESS_2, OUTPUT_VALUE_2.getSatoshis());
+                BLOCK_HEIGHT, formattedDateTime, FEES.satoshis(), TRANSACTION_HASH,
+                INPUT_ADDRESS_1, INPUT_VALUE_1.satoshis(),
+                INPUT_ADDRESS_2, INPUT_VALUE_2.satoshis(),
+                OUTPUT_ADDRESS_1, OUTPUT_VALUE_1.satoshis(),
+                OUTPUT_ADDRESS_2, OUTPUT_VALUE_2.satoshis());
         BtcComTransactionDto btcComTransactionDto =
                 objectMapper.readValue(json, BtcComTransactionDto.class);
         assertThat(btcComTransactionDto.toModel(BTC)).isEqualTo(TRANSACTION);
@@ -181,11 +181,11 @@ class BtcComTransactionDtoTest {
                     ]
                   }
                 }""".formatted(
-                BLOCK_HEIGHT, formattedDateTime, FEES.getSatoshis(), TRANSACTION_HASH,
-                INPUT_ADDRESS_1, INPUT_VALUE_1.getSatoshis(),
-                INPUT_ADDRESS_2, INPUT_VALUE_2.getSatoshis(),
-                OUTPUT_ADDRESS_1, OUTPUT_VALUE_1.getSatoshis(),
-                OUTPUT_ADDRESS_2, OUTPUT_VALUE_2.getSatoshis());
+                BLOCK_HEIGHT, formattedDateTime, FEES.satoshis(), TRANSACTION_HASH,
+                INPUT_ADDRESS_1, INPUT_VALUE_1.satoshis(),
+                INPUT_ADDRESS_2, INPUT_VALUE_2.satoshis(),
+                OUTPUT_ADDRESS_1, OUTPUT_VALUE_1.satoshis(),
+                OUTPUT_ADDRESS_2, OUTPUT_VALUE_2.satoshis());
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() ->
                 objectMapper.readValue(json, BtcComTransactionDto.class)
         );

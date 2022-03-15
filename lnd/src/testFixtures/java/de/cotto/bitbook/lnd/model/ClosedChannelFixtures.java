@@ -58,7 +58,7 @@ public class ClosedChannelFixtures {
                     BLOCK_HEIGHT,
                     DATE_TIME,
                     Coins.NONE,
-                    List.of(new Input(Coins.ofSatoshis(2 * SETTLED_BALANCE.getSatoshis()), CHANNEL_ADDRESS)),
+                    List.of(new Input(Coins.ofSatoshis(2 * SETTLED_BALANCE.satoshis()), CHANNEL_ADDRESS)),
                     List.of(
                             new Output(SETTLED_BALANCE, SETTLEMENT_ADDRESS),
                             new Output(SETTLED_BALANCE, OUTPUT_ADDRESS_2)
