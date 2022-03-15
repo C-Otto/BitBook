@@ -31,17 +31,17 @@ public class ElectrsAddressTransactionsProvider extends SimpleAddressTransaction
 
     @Override
     public boolean isSupported(TransactionsRequestKey key) {
-        return key.getChain() == BTC;
+        return key.chain() == BTC;
     }
 
     @Override
     protected Optional<AddressTransactions> getFromApi(TransactionsRequestKey transactionsRequestKey) {
-        Address address = transactionsRequestKey.getAddress();
+        Address address = transactionsRequestKey.address();
         logger.debug("Contacting Electrs for transactions for address {}", address);
         Set<TransactionHash> hashes = electrsClient.getTransactionHashes(address).orElse(null);
         if (hashes == null) {
             return Optional.empty();
         }
-        return Optional.of(new AddressTransactions(address, hashes, transactionsRequestKey.getBlockHeight(), BTC));
+        return Optional.of(new AddressTransactions(address, hashes, transactionsRequestKey.blockHeight(), BTC));
     }
 }

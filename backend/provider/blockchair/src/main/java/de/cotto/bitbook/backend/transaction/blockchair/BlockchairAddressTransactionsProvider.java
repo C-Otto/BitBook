@@ -27,7 +27,7 @@ public class BlockchairAddressTransactionsProvider extends SimpleAddressTransact
 
     @Override
     public boolean isSupported(TransactionsRequestKey key) {
-        Chain chain = key.getChain();
+        Chain chain = key.chain();
         return chain == BTC || chain == BCH || chain == BSV;
     }
 
@@ -38,11 +38,11 @@ public class BlockchairAddressTransactionsProvider extends SimpleAddressTransact
 
     @Override
     protected Optional<AddressTransactions> getFromApi(TransactionsRequestKey transactionsRequestKey) {
-        Address address = transactionsRequestKey.getAddress();
-        Chain chain = transactionsRequestKey.getChain();
+        Address address = transactionsRequestKey.address();
+        Chain chain = transactionsRequestKey.chain();
         String chainName = BlockchairChainName.get(chain);
         logger.debug("Contacting Blockchair API for transactions for address {} in chain {}", address, chain);
         return blockchairClient.getAddressDetails(chainName, address)
-                .map(dto -> dto.toModel(transactionsRequestKey.getBlockHeight(), address, chain));
+                .map(dto -> dto.toModel(transactionsRequestKey.blockHeight(), address, chain));
     }
 }

@@ -29,9 +29,9 @@ public class BtcComAddressTransactionsProvider extends SimpleAddressTransactions
 
     @Override
     protected Optional<AddressTransactions> getFromApi(TransactionsRequestKey transactionsRequestKey) {
-        Address address = transactionsRequestKey.getAddress();
+        Address address = transactionsRequestKey.address();
         logger.debug("Contacting btc.com API for transactions for address {}", address);
         return btcComClient.getAddressDetails(address)
-                .map(dto -> dto.toModel(transactionsRequestKey.getBlockHeight(), address, BTC));
+                .map(dto -> dto.toModel(transactionsRequestKey.blockHeight(), address, BTC));
     }
 }

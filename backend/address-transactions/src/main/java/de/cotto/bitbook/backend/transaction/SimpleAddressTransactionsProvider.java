@@ -26,13 +26,13 @@ public abstract class SimpleAddressTransactionsProvider
 
     @Override
     public boolean isSupported(TransactionsRequestKey key) {
-        return key.getChain() == BTC;
+        return key.chain() == BTC;
     }
 
     protected abstract Optional<AddressTransactions> getFromApi(TransactionsRequestKey transactionsRequestKey);
 
     private Optional<AddressTransactions> getCombined(TransactionsRequestKey transactionsRequestKey) {
-        AddressTransactions knownTransactions = transactionsRequestKey.getAddressTransactions();
+        AddressTransactions knownTransactions = transactionsRequestKey.addressTransactions();
         return getFromApi(transactionsRequestKey)
                 .map(knownTransactions::getCombined)
                 .or(() -> Optional.of(knownTransactions));

@@ -29,9 +29,9 @@ public class BitapsAddressTransactionsProvider extends SimpleAddressTransactions
 
     @Override
     protected Optional<AddressTransactions> getFromApi(TransactionsRequestKey transactionsRequestKey) {
-        Address address = transactionsRequestKey.getAddress();
+        Address address = transactionsRequestKey.address();
         logger.debug("Contacting Bitaps API for transactions for address {}", address);
         return bitapsClient.getAddressTransactions(address)
-                .map(dto -> dto.toModel(transactionsRequestKey.getBlockHeight(), address, BTC));
+                .map(dto -> dto.toModel(transactionsRequestKey.blockHeight(), address, BTC));
     }
 }
