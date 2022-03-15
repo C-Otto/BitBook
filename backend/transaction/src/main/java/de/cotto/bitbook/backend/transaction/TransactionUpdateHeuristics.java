@@ -53,12 +53,12 @@ public class TransactionUpdateHeuristics {
     }
 
     public boolean isRecentEnough(AddressTransactions addressTransactions) {
-        int currentBlockHeight = blockHeightService.getBlockHeight(addressTransactions.getChain());
-        int age = currentBlockHeight - addressTransactions.getLastCheckedAtBlockHeight();
+        int currentBlockHeight = blockHeightService.getBlockHeight(addressTransactions.chain());
+        int age = currentBlockHeight - addressTransactions.lastCheckedAtBlockHeight();
         if (age <= MANY_TRANSACTIONS_AGE_LIMIT) {
             return true;
         }
-        boolean hasManyTransactions = addressTransactions.getTransactionHashes().size() > MANY_TRANSACTION_COUNT_LIMIT;
+        boolean hasManyTransactions = addressTransactions.transactionHashes().size() > MANY_TRANSACTION_COUNT_LIMIT;
         if (hasManyTransactions) {
             return false;
         }
@@ -86,10 +86,10 @@ public class TransactionUpdateHeuristics {
     }
 
     private boolean hasRecentTransaction(AddressTransactions addressTransactions) {
-        Chain chain = addressTransactions.getChain();
+        Chain chain = addressTransactions.chain();
         LocalDateTime cutoffDate = LocalDateTime.now(ZoneOffset.UTC)
                 .minus(RECENT_TRANSACTION_DAY_LIMIT, ChronoUnit.DAYS);
-        return addressTransactions.getTransactionHashes().stream()
+        return addressTransactions.transactionHashes().stream()
                 .map(transactionHash -> transactionDao.getTransaction(transactionHash, chain))
                 .filter(Transaction::isValid)
                 .map(Transaction::getTime)
@@ -97,9 +97,9 @@ public class TransactionUpdateHeuristics {
     }
 
     private boolean hasEmptyBalance(AddressTransactions addressTransactions) {
-        Address address = addressTransactions.getAddress();
-        Set<TransactionHash> transactionHashes = addressTransactions.getTransactionHashes();
-        Chain chain = addressTransactions.getChain();
+        Address address = addressTransactions.address();
+        Set<TransactionHash> transactionHashes = addressTransactions.transactionHashes();
+        Chain chain = addressTransactions.chain();
         Coins balance = transactionService.getTransactionDetails(transactionHashes, chain).stream()
                 .map(transactionDetails -> transactionDetails.getDifferenceForAddress(address))
                 .reduce(Coins.NONE, Coins::add);
@@ -107,23 +107,23 @@ public class TransactionUpdateHeuristics {
     }
 
     private boolean isUsedLimitedUseAddress(AddressTransactions addressTransactions) {
-        int numberOfHashes = addressTransactions.getTransactionHashes().size();
+        int numberOfHashes = addressTransactions.transactionHashes().size();
         if (numberOfHashes == 1 && containsSweepTransaction(addressTransactions)) {
             return true;
         }
-        return numberOfHashes == 2 && addressDescriptionService.getDescription(addressTransactions.getAddress())
+        return numberOfHashes == 2 && addressDescriptionService.getDescription(addressTransactions.address())
                 .startsWith("Lightning-Channel with");
     }
 
     private boolean containsSweepTransaction(AddressTransactions addressTransactions) {
-        Chain chain = addressTransactions.getChain();
+        Chain chain = addressTransactions.chain();
         if (chain != BTC) {
             return false;
         }
-        return addressTransactions.getTransactionHashes().stream()
+        return addressTransactions.transactionHashes().stream()
                 .filter(hash -> LND_SWEEP_TRANSACTION.equals(transactionDescriptionService.getDescription(hash)))
                 .map(transactionHash -> transactionDao.getTransaction(transactionHash, chain))
-                .anyMatch(transaction -> transaction.getInputAddresses().contains(addressTransactions.getAddress()));
+                .anyMatch(transaction -> transaction.getInputAddresses().contains(addressTransactions.address()));
 
     }
 }

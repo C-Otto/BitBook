@@ -111,7 +111,7 @@ public class AddressOwnershipService {
     private Set<Transaction> getMyTransactions(Chain chain) {
         Set<TransactionHash> hashes =
                 addressTransactionsService.getTransactionsForAddresses(getOwnedAddresses(), chain).stream()
-                        .map(AddressTransactions::getTransactionHashes)
+                        .map(AddressTransactions::transactionHashes)
                         .flatMap(Set::stream)
                         .collect(toSet());
         return transactionService.getTransactionDetails(hashes, chain);

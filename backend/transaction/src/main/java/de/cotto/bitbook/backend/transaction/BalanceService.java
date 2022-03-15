@@ -24,7 +24,7 @@ public class BalanceService {
 
     public Coins getBalance(Address address, Chain chain) {
         AddressTransactions transactions = addressTransactionsService.getTransactions(address, chain);
-        Set<TransactionHash> transactionHashes = transactions.getTransactionHashes();
+        Set<TransactionHash> transactionHashes = transactions.transactionHashes();
         return transactionService.getTransactionDetails(transactionHashes, chain).stream()
                 .map(transactionDetails -> transactionDetails.getDifferenceForAddress(address))
                 .reduce(Coins.NONE, Coins::add);

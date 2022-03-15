@@ -53,13 +53,13 @@ class AddressTransactionsDaoImplTest {
     void saveAddressTransactions() {
         addressTransactionsDao.saveAddressTransactions(ADDRESS_TRANSACTIONS);
         verify(repository).save(argThat(
-                dto -> ADDRESS_TRANSACTIONS.getAddress().equals(new Address(dto.getAddress()))
+                dto -> ADDRESS_TRANSACTIONS.address().equals(new Address(dto.getAddress()))
         ));
         verify(repository).save(argThat(
-                dto -> ADDRESS_TRANSACTIONS.getLastCheckedAtBlockHeight() == dto.getLastCheckedAtBlockheight()
+                dto -> ADDRESS_TRANSACTIONS.lastCheckedAtBlockHeight() == dto.getLastCheckedAtBlockheight()
         ));
         verify(repository).save(argThat(
-                dto -> ADDRESS_TRANSACTIONS.getTransactionHashes().equals(hashes(dto))
+                dto -> ADDRESS_TRANSACTIONS.transactionHashes().equals(hashes(dto))
         ));
     }
 

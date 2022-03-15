@@ -175,6 +175,6 @@ public class OwnershipCommands {
         Address address = addressWithDescription.getAddress();
         Chain chain = selectedChain.getChain();
         AddressTransactions transactions = addressTransactionsService.getTransactions(address, chain);
-        return !transactions.getTransactionHashes().isEmpty();
+        return !transactions.transactionHashes().isEmpty();
     }
 }

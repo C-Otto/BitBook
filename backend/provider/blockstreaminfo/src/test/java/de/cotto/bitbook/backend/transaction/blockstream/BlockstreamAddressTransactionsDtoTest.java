@@ -144,7 +144,7 @@ class BlockstreamAddressTransactionsDtoTest {
                 ]""";
         BlockstreamAddressTransactionsDto addressTransactionsDto =
                 objectMapper.readValue(json, BlockstreamAddressTransactionsDto.class);
-        assertThat(addressTransactionsDto.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS, BTC).getTransactionHashes())
+        assertThat(addressTransactionsDto.toModel(LAST_CHECKED_AT_BLOCK_HEIGHT, ADDRESS, BTC).transactionHashes())
                 .hasSize(24);
     }
 }

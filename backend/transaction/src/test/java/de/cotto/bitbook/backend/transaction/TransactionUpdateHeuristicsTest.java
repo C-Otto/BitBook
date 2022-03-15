@@ -53,7 +53,7 @@ class TransactionUpdateHeuristicsTest {
     private static final int LIMITED_USE_AGE_LIMIT = 7 * 24 * ONE_HOUR;
     @SuppressWarnings("CPD-END")
 
-    private static final Address ADDRESS = ADDRESS_TRANSACTIONS.getAddress();
+    private static final Address ADDRESS = ADDRESS_TRANSACTIONS.address();
 
     private static final Set<TransactionHash> FEW_TRANSACTION_HASHES =
             Stream.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
@@ -328,12 +328,12 @@ class TransactionUpdateHeuristicsTest {
                 outputs,
                 chain
         );
-        lenient().when(transactionService.getTransactionDetails(ADDRESS_TRANSACTIONS.getTransactionHashes(), chain))
+        lenient().when(transactionService.getTransactionDetails(ADDRESS_TRANSACTIONS.transactionHashes(), chain))
                 .thenReturn(Set.of(transaction));
     }
 
     private void mockEmptyBalance() {
-        lenient().when(transactionService.getTransactionDetails(ADDRESS_TRANSACTIONS.getTransactionHashes(), BTC))
+        lenient().when(transactionService.getTransactionDetails(ADDRESS_TRANSACTIONS.transactionHashes(), BTC))
                 .thenReturn(Set.of());
     }
 

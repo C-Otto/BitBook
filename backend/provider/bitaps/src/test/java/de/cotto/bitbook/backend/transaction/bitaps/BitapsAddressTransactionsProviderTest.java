@@ -58,7 +58,7 @@ class BitapsAddressTransactionsProviderTest {
         when(bitapsClient.getAddressTransactions(ADDRESS)).thenReturn(Optional.of(BITAPS_TRANSACTIONS_UPDATED));
         TransactionsRequestKey transactionsRequestKey = new TransactionsRequestKey(
                 ADDRESS_TRANSACTIONS,
-                ADDRESS_TRANSACTIONS_UPDATED.getLastCheckedAtBlockHeight()
+                ADDRESS_TRANSACTIONS_UPDATED.lastCheckedAtBlockHeight()
         );
         Optional<AddressTransactions> updated =
                 provider.get(transactionsRequestKey);

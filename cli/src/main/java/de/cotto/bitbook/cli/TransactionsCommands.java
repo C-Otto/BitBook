@@ -80,7 +80,7 @@ public class TransactionsCommands {
         String description = addressDescriptionService.getDescription(addressModel);
         Chain chain = selectedChain.getChain();
         Set<TransactionHash> hashes =
-                addressTransactionsService.getTransactions(addressModel, chain).getTransactionHashes();
+                addressTransactionsService.getTransactions(addressModel, chain).transactionHashes();
         String result = """
                 Address: %s %s
                 Description: %s

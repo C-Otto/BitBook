@@ -111,8 +111,8 @@ public class AddressTransactionsService {
     private void requestTransactionDetailsAndPersist(AddressTransactions addressTransactions) {
         if (addressTransactions.isValid()) {
             transactionService.requestInBackground(
-                    addressTransactions.getTransactionHashes(),
-                    addressTransactions.getChain()
+                    addressTransactions.transactionHashes(),
+                    addressTransactions.chain()
             );
             addressTransactionsDao.saveAddressTransactions(addressTransactions);
         }

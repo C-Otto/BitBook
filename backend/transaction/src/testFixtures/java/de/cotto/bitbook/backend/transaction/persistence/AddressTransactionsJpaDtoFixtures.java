@@ -13,12 +13,12 @@ public class AddressTransactionsJpaDtoFixtures {
 
     static {
         ADDRESS_TRANSACTIONS_JPA_DTO = new AddressTransactionsJpaDto();
-        ADDRESS_TRANSACTIONS_JPA_DTO.setAddress(ADDRESS_TRANSACTIONS.getAddress().toString());
+        ADDRESS_TRANSACTIONS_JPA_DTO.setAddress(ADDRESS_TRANSACTIONS.address().toString());
         ADDRESS_TRANSACTIONS_JPA_DTO.setChain(BTC.toString());
-        Set<String> hashes = ADDRESS_TRANSACTIONS.getTransactionHashes().stream()
+        Set<String> hashes = ADDRESS_TRANSACTIONS.transactionHashes().stream()
                 .map(TransactionHash::toString)
                 .collect(Collectors.toSet());
         ADDRESS_TRANSACTIONS_JPA_DTO.setTransactionHashes(hashes);
-        ADDRESS_TRANSACTIONS_JPA_DTO.setLastCheckedAtBlockheight(ADDRESS_TRANSACTIONS.getLastCheckedAtBlockHeight());
+        ADDRESS_TRANSACTIONS_JPA_DTO.setLastCheckedAtBlockheight(ADDRESS_TRANSACTIONS.lastCheckedAtBlockHeight());
     }
 }

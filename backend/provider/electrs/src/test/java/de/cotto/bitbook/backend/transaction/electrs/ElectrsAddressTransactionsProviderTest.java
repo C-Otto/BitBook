@@ -73,7 +73,7 @@ class ElectrsAddressTransactionsProviderTest {
         )));
         TransactionsRequestKey transactionsRequestKey = new TransactionsRequestKey(
                 ADDRESS_TRANSACTIONS,
-                ADDRESS_TRANSACTIONS_UPDATED.getLastCheckedAtBlockHeight()
+                ADDRESS_TRANSACTIONS_UPDATED.lastCheckedAtBlockHeight()
         );
         assertThat(provider.get(transactionsRequestKey)).contains(ADDRESS_TRANSACTIONS_UPDATED);
     }

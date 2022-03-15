@@ -57,7 +57,7 @@ class BlockstreamAddressTransactionsProviderTest {
         when(blockstreamInfoClient.getAddressDetails(ADDRESS)).thenReturn(Optional.of(BLOCKSTREAM_ADDRESS_UPDATED));
         TransactionsRequestKey transactionsRequestKey = new TransactionsRequestKey(
                 ADDRESS_TRANSACTIONS,
-                ADDRESS_TRANSACTIONS_UPDATED.getLastCheckedAtBlockHeight()
+                ADDRESS_TRANSACTIONS_UPDATED.lastCheckedAtBlockHeight()
         );
         Optional<AddressTransactions> updated =
                 provider.get(transactionsRequestKey);

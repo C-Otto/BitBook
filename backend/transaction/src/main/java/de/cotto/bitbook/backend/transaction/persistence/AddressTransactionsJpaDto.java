@@ -41,14 +41,14 @@ public class AddressTransactionsJpaDto {
 
     public static AddressTransactionsJpaDto fromModel(AddressTransactions addressTransactions) {
         AddressTransactionsJpaDto dto = new AddressTransactionsJpaDto();
-        dto.setAddress(addressTransactions.getAddress().toString());
-        dto.setChain(addressTransactions.getChain().toString());
+        dto.setAddress(addressTransactions.address().toString());
+        dto.setChain(addressTransactions.chain().toString());
         dto.setTransactionHashes(
-                addressTransactions.getTransactionHashes().stream()
+                addressTransactions.transactionHashes().stream()
                         .map(TransactionHash::toString)
                         .collect(toSet())
         );
-        dto.setLastCheckedAtBlockheight(addressTransactions.getLastCheckedAtBlockHeight());
+        dto.setLastCheckedAtBlockheight(addressTransactions.lastCheckedAtBlockHeight());
         return dto;
     }
 

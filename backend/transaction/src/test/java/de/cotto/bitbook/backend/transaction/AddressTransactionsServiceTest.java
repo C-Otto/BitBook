@@ -138,7 +138,7 @@ class AddressTransactionsServiceTest {
             when(blockHeightService.getBlockHeight(BTC)).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
             mockAddressTransactionsFromProvider(requestKey, STANDARD, ADDRESS_TRANSACTIONS);
             AddressTransactions addressTransactions = addressTransactionsService.getTransactions(ADDRESS, BTC);
-            verify(transactionService).requestInBackground(addressTransactions.getTransactionHashes(), BTC);
+            verify(transactionService).requestInBackground(addressTransactions.transactionHashes(), BTC);
         }
 
         @Test
@@ -146,7 +146,7 @@ class AddressTransactionsServiceTest {
             when(blockHeightService.getBlockHeight(BTC)).thenReturn(LAST_CHECKED_AT_BLOCK_HEIGHT);
             mockAddressTransactionsFromProvider(requestKey, LOWEST, ADDRESS_TRANSACTIONS);
             addressTransactionsService.requestTransactionsInBackground(ADDRESS, BTC);
-            verify(transactionService).requestInBackground(ADDRESS_TRANSACTIONS.getTransactionHashes(), BTC);
+            verify(transactionService).requestInBackground(ADDRESS_TRANSACTIONS.transactionHashes(), BTC);
         }
 
         @Test
@@ -175,7 +175,7 @@ class AddressTransactionsServiceTest {
         @BeforeEach
         void setUp() {
             when(addressTransactionsDao.getAddressTransactions(ADDRESS, BTC)).thenReturn(ADDRESS_TRANSACTIONS);
-            updateBlockHeight = ADDRESS_TRANSACTIONS_UPDATED.getLastCheckedAtBlockHeight();
+            updateBlockHeight = ADDRESS_TRANSACTIONS_UPDATED.lastCheckedAtBlockHeight();
             requestKey = new TransactionsRequestKey(ADDRESS_TRANSACTIONS, updateBlockHeight);
             when(blockHeightService.getBlockHeight(BTC)).thenReturn(updateBlockHeight);
         }
@@ -276,7 +276,7 @@ class AddressTransactionsServiceTest {
             mockAddressTransactionsFromProvider(requestKey, STANDARD, ADDRESS_TRANSACTIONS_UPDATED);
             addressTransactionsService.getTransactions(ADDRESS, BTC);
             verify(addressTransactionsDao).saveAddressTransactions(
-                    argThat(transactions -> transactions.getLastCheckedAtBlockHeight() == updateBlockHeight)
+                    argThat(transactions -> transactions.lastCheckedAtBlockHeight() == updateBlockHeight)
             );
         }
 
@@ -293,14 +293,14 @@ class AddressTransactionsServiceTest {
                     requestKey, STANDARD, ADDRESS_TRANSACTIONS_UPDATED
             );
             AddressTransactions addressTransactions = addressTransactionsService.getTransactions(ADDRESS, BTC);
-            verify(transactionService).requestInBackground(addressTransactions.getTransactionHashes(), BTC);
+            verify(transactionService).requestInBackground(addressTransactions.transactionHashes(), BTC);
         }
 
         @Test
         void requestTransactionsInBackground_requests_transaction_details_in_background() {
             mockAddressTransactionsFromProvider(requestKey, LOWEST, ADDRESS_TRANSACTIONS_UPDATED);
             addressTransactionsService.requestTransactionsInBackground(ADDRESS, BTC);
-            verify(transactionService).requestInBackground(ADDRESS_TRANSACTIONS_UPDATED.getTransactionHashes(), BTC);
+            verify(transactionService).requestInBackground(ADDRESS_TRANSACTIONS_UPDATED.transactionHashes(), BTC);
         }
 
         @Test

@@ -16,11 +16,11 @@ public record TransactionsRequestKey(
     }
 
     public TransactionsRequestKey(AddressTransactions addressTransactions, int blockHeight) {
-        this(addressTransactions.getAddress(), addressTransactions.getChain(), blockHeight, addressTransactions);
+        this(addressTransactions.address(), addressTransactions.chain(), blockHeight, addressTransactions);
     }
 
     public boolean hasKnownAddressTransactions() {
-        return !AddressTransactions.unknown(addressTransactions.getChain()).equals(addressTransactions);
+        return !AddressTransactions.unknown(addressTransactions.chain()).equals(addressTransactions);
     }
 
     @Override

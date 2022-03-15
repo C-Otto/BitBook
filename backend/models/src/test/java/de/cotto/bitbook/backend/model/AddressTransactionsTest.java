@@ -18,7 +18,6 @@ import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_3;
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH_4;
 import static java.util.Collections.emptySet;
-import static nl.jqno.equalsverifier.Warning.NULL_FIELDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -36,7 +35,9 @@ class AddressTransactionsTest {
 
     @Test
     void testEquals() {
-        EqualsVerifier.configure().suppress(NULL_FIELDS).forClass(AddressTransactions.class).usingGetClass().verify();
+        EqualsVerifier.configure().forClass(AddressTransactions.class)
+                .withNonnullFields("transactionHashes")
+                .verify();
     }
 
     @Test
@@ -57,7 +58,7 @@ class AddressTransactionsTest {
         assertThat(addressTransactions).hasToString(
                 "AddressTransactions{" +
                 "address='" + ADDRESS + "'" +
-                ", transactionHashes='" + addressTransactions.getTransactionHashes() + "'" +
+                ", transactionHashes='" + addressTransactions.transactionHashes() + "'" +
                 ", lastCheckedAtBlockHeight='678123'" +
                 ", chain='" + BTC + "'" +
                 "}");
@@ -78,18 +79,19 @@ class AddressTransactionsTest {
 
     @Test
     void getTransactionHashes() {
-        assertThat(ADDRESS_TRANSACTIONS.getTransactionHashes()).contains(TRANSACTION_HASH, TRANSACTION_HASH_2);
+        assertThat(ADDRESS_TRANSACTIONS.transactionHashes()).contains(TRANSACTION_HASH, TRANSACTION_HASH_2);
     }
 
     @Test
     void getChain() {
-        assertThat(ADDRESS_TRANSACTIONS.getChain()).isEqualTo(BTC);
+        assertThat(ADDRESS_TRANSACTIONS.chain()).isEqualTo(BTC);
     }
 
     @Test
     void transactionHashes_are_unmodifiable() {
+        //noinspection ConstantConditions
         assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() ->
-                ADDRESS_TRANSACTIONS.getTransactionHashes().clear()
+                ADDRESS_TRANSACTIONS.transactionHashes().clear()
         );
     }
 
@@ -99,17 +101,17 @@ class AddressTransactionsTest {
         transactionHashes.add(TRANSACTION_HASH);
         AddressTransactions addressTransactions = new AddressTransactions(ADDRESS, transactionHashes, 456, BTC);
         transactionHashes.clear();
-        assertThat(addressTransactions.getTransactionHashes()).contains(TRANSACTION_HASH);
+        assertThat(addressTransactions.transactionHashes()).contains(TRANSACTION_HASH);
     }
 
     @Test
     void getAddress() {
-        assertThat(ADDRESS_TRANSACTIONS.getAddress()).isEqualTo(ADDRESS);
+        assertThat(ADDRESS_TRANSACTIONS.address()).isEqualTo(ADDRESS);
     }
 
     @Test
     void getLastCheckedAtBlockHeight() {
-        assertThat(ADDRESS_TRANSACTIONS.getLastCheckedAtBlockHeight()).isEqualTo(LAST_CHECKED_AT_BLOCK_HEIGHT);
+        assertThat(ADDRESS_TRANSACTIONS.lastCheckedAtBlockHeight()).isEqualTo(LAST_CHECKED_AT_BLOCK_HEIGHT);
     }
 
     @Test
@@ -128,7 +130,7 @@ class AddressTransactionsTest {
         AddressTransactions update = new AddressTransactions(
                 ADDRESS,
                 transactionHashes,
-                ADDRESS_TRANSACTIONS_UPDATED.getLastCheckedAtBlockHeight(),
+                ADDRESS_TRANSACTIONS_UPDATED.lastCheckedAtBlockHeight(),
                 BTC
         );
         assertThat(ADDRESS_TRANSACTIONS.getCombined(update)).isEqualTo(ADDRESS_TRANSACTIONS_UPDATED);
