@@ -13,7 +13,7 @@ import java.util.Set;
 
 import static de.cotto.bitbook.backend.model.Chain.BTC;
 
-public class ClosedChannel {
+public final class ClosedChannel {
     private static final String BITCOIN_GENESIS_BLOCK_HASH
             = "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f";
 
