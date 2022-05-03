@@ -21,22 +21,18 @@ public class AddressFormatter {
     }
 
     private AnsiColor getColor(OwnershipStatus ownershipStatus) {
-        //noinspection EnhancedSwitchMigration
-        switch (ownershipStatus) {
-            case UNKNOWN: return AnsiColor.BRIGHT_BLACK;
-            case OWNED: return AnsiColor.BRIGHT_GREEN;
-            case FOREIGN: return AnsiColor.BRIGHT_RED;
-            default: throw new IllegalArgumentException();
-        }
+        return switch (ownershipStatus) {
+            case UNKNOWN -> AnsiColor.BRIGHT_BLACK;
+            case OWNED -> AnsiColor.BRIGHT_GREEN;
+            case FOREIGN -> AnsiColor.BRIGHT_RED;
+        };
     }
 
     private String getCharacter(OwnershipStatus ownershipStatus) {
-        //noinspection EnhancedSwitchMigration
-        switch (ownershipStatus) {
-            case UNKNOWN: return "?";
-            case OWNED: return "✓";
-            case FOREIGN: return "✗";
-            default: throw new IllegalArgumentException();
-        }
+        return switch (ownershipStatus) {
+            case UNKNOWN -> "?";
+            case OWNED -> "✓";
+            case FOREIGN -> "✗";
+        };
     }
 }

@@ -99,15 +99,11 @@ public class Bech32Address extends Bech32Base {
         HexString decoded = getDecoded();
         int numberOfBytes = decoded.getNumberOfBytes();
         byte witnessVersion = getWitnessVersion();
-        //noinspection EnhancedSwitchMigration
-        switch (witnessVersion) {
-            case 0:
-                return numberOfBytes == DATA_LENGTH_P2PKH_WIT || numberOfBytes == DATA_LENGTH_P2SH_WIT;
-            case 1:
-                return numberOfBytes == DATA_LENGTH_P2TR_WIT;
-            default:
-                return false;
-        }
+        return switch (witnessVersion) {
+            case 0 -> numberOfBytes == DATA_LENGTH_P2PKH_WIT || numberOfBytes == DATA_LENGTH_P2SH_WIT;
+            case 1 -> numberOfBytes == DATA_LENGTH_P2TR_WIT;
+            default -> false;
+        };
     }
 
     private byte getWitnessVersion() {

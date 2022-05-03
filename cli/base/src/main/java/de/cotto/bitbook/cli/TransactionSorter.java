@@ -54,35 +54,16 @@ public class TransactionSorter {
     }
 
     public void setOrder(TransactionSortOrder transactionSortOrder) {
-        //noinspection EnhancedSwitchMigration
         switch (transactionSortOrder) {
-            case BY_HASH:
-                comparator = BY_HASH;
-                break;
-            case BY_DATE_THEN_COINS_THEN_HASH:
-                comparator = BY_DATE_THEN_COINS_HASH;
-                break;
-            case BY_DATE_THEN_COINS_ABSOLUTE_THEN_HASH:
-                comparator = BY_DATE_THEN_COINS_ABSOLUTE_HASH;
-                break;
-            case BY_COINS_THEN_HASH:
-                comparator = BY_COINS_THEN_HASH;
-                break;
-            case BY_COINS_THEN_DATE_THEN_HASH:
-                comparator = BY_COINS_THEN_DATE_HASH;
-                break;
-            case BY_COINS_ABSOLUTE_THEN_DATE_THEN_HASH:
-                comparator = BY_COINS_ABSOLUTE_THEN_DATE_HASH;
-                break;
-            case BY_DATE_THEN_HASH:
-                comparator = BY_DATE_THEN_HASH;
-                break;
-            case BY_COINS_ABSOLUTE_THEN_HASH:
-                comparator = BY_COINS_ABSOLUTE_THEN_HASH;
-                break;
-            default:
-                comparator = DEFAULT_COMPARATOR;
-                break;
+            case BY_HASH -> comparator = BY_HASH;
+            case BY_DATE_THEN_COINS_THEN_HASH -> comparator = BY_DATE_THEN_COINS_HASH;
+            case BY_DATE_THEN_COINS_ABSOLUTE_THEN_HASH -> comparator = BY_DATE_THEN_COINS_ABSOLUTE_HASH;
+            case BY_COINS_THEN_HASH -> comparator = BY_COINS_THEN_HASH;
+            case BY_COINS_THEN_DATE_THEN_HASH -> comparator = BY_COINS_THEN_DATE_HASH;
+            case BY_COINS_ABSOLUTE_THEN_DATE_THEN_HASH -> comparator = BY_COINS_ABSOLUTE_THEN_DATE_HASH;
+            case BY_DATE_THEN_HASH -> comparator = BY_DATE_THEN_HASH;
+            case BY_COINS_ABSOLUTE_THEN_HASH -> comparator = BY_COINS_ABSOLUTE_THEN_HASH;
+            default -> comparator = DEFAULT_COMPARATOR;
         }
     }
 

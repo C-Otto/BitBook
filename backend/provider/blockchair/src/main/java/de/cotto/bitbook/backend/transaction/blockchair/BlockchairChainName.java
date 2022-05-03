@@ -8,16 +8,11 @@ public final class BlockchairChainName {
     }
 
     static String get(Chain chain) {
-        //noinspection EnhancedSwitchMigration
-        switch (chain) {
-            case BTC:
-                return "bitcoin";
-            case BCH:
-                return "bitcoin-cash";
-            case BSV:
-                return "bitcoin-sv";
-            default:
-                throw new IllegalArgumentException();
-        }
+        return switch (chain) {
+            case BTC -> "bitcoin";
+            case BCH -> "bitcoin-cash";
+            case BSV -> "bitcoin-sv";
+            default -> throw new IllegalArgumentException();
+        };
     }
 }
