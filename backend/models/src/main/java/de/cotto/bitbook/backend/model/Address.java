@@ -34,6 +34,6 @@ public record Address(String address) implements Comparable<Address> {
         if (bech32Address.isValid()) {
             return bech32Address.getScript();
         }
-        throw new IllegalStateException("unsupported address type");
+        throw new IllegalStateException("unsupported address type for address " + address);
     }
 }
