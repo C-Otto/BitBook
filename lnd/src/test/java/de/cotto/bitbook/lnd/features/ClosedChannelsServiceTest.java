@@ -6,7 +6,6 @@ import de.cotto.bitbook.lnd.model.CloseType;
 import de.cotto.bitbook.lnd.model.ClosedChannel;
 import de.cotto.bitbook.lnd.model.Initiator;
 import de.cotto.bitbook.ownership.AddressOwnershipService;
-import de.cotto.bitbook.ownership.OwnershipStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,9 +15,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Set;
 
 import static de.cotto.bitbook.backend.model.Chain.BTC;
+import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_1;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_ADDRESS_2;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.TRANSACTION;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.AMBIGUOUS_SETTLEMENT_ADDRESS;
+import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.CHANNEL_ADDRESS;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.CLOSED_CHANNEL;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.SWEEP_TRANSACTION_HASH;
 import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.WITH_RESOLUTION;
@@ -28,6 +29,7 @@ import static de.cotto.bitbook.lnd.model.ClosedChannelFixtures.WITH_RESOLUTION_T
 import static de.cotto.bitbook.lnd.model.Initiator.LOCAL;
 import static de.cotto.bitbook.lnd.model.Initiator.REMOTE;
 import static de.cotto.bitbook.ownership.OwnershipStatus.OWNED;
+import static de.cotto.bitbook.ownership.OwnershipStatus.UNKNOWN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -73,7 +75,7 @@ class ClosedChannelsServiceTest {
 
     @Test
     void does_not_change_channel_address_ownership_if_already_marked_as_owned() {
-        when(addressOwnershipService.getOwnershipStatus(any())).thenReturn(OwnershipStatus.UNKNOWN);
+        when(addressOwnershipService.getOwnershipStatus(any())).thenReturn(UNKNOWN);
         when(addressOwnershipService.getOwnershipStatus(CLOSED_CHANNEL.getChannelAddress())).thenReturn(OWNED);
         load(CLOSED_CHANNEL.toBuilder().withOpenInitiator(REMOTE).build());
         verify(addressOwnershipService, never()).setAddressAsForeign(CLOSED_CHANNEL.getChannelAddress());
@@ -149,13 +151,27 @@ class ClosedChannelsServiceTest {
     }
 
     @Test
-    void for_force_close_does_not_mark_other_output_address_as_foreign() {
-        load(CLOSED_CHANNEL.toBuilder().withCloseType(CloseType.FORCE_REMOTE).build());
+    void for_force_close_marks_other_output_addresses_as_foreign() {
+        when(addressOwnershipService.getOwnershipStatus(CHANNEL_ADDRESS)).thenReturn(UNKNOWN);
+        when(addressOwnershipService.getOwnershipStatus(OUTPUT_ADDRESS_1)).thenReturn(OWNED);
+        when(addressOwnershipService.getOwnershipStatus(OUTPUT_ADDRESS_2)).thenReturn(UNKNOWN);
+        load(WITH_RESOLUTION);
+        verify(addressOwnershipService).setAddressAsForeign(OUTPUT_ADDRESS_2);
+    }
+
+    @Test
+    void for_force_close_marks_other_output_addresses_as_foreign_only_if_not_owned() {
+        when(addressOwnershipService.getOwnershipStatus(CHANNEL_ADDRESS)).thenReturn(UNKNOWN);
+        when(addressOwnershipService.getOwnershipStatus(OUTPUT_ADDRESS_1)).thenReturn(OWNED);
+        when(addressOwnershipService.getOwnershipStatus(OUTPUT_ADDRESS_2)).thenReturn(OWNED);
+        load(WITH_RESOLUTION);
         verify(addressOwnershipService, never()).setAddressAsForeign(OUTPUT_ADDRESS_2);
     }
 
     @Test
     void for_cooperative_close_does_not_mark_other_output_address_as_foreign_if_already_marked_as_owned() {
+        when(addressOwnershipService.getOwnershipStatus(CHANNEL_ADDRESS)).thenReturn(UNKNOWN);
+        when(addressOwnershipService.getOwnershipStatus(OUTPUT_ADDRESS_1)).thenReturn(OWNED);
         when(addressOwnershipService.getOwnershipStatus(OUTPUT_ADDRESS_2)).thenReturn(OWNED);
         load(CLOSED_CHANNEL);
         verify(addressOwnershipService, never()).setAddressAsForeign(OUTPUT_ADDRESS_2);

@@ -53,10 +53,10 @@ public class ClosedChannelsService {
         setTransactionDescriptions(closedChannel);
         if (closedChannel.getCloseType().isCooperative()) {
             setForSettlementAddressForCooperativeClose(closedChannel);
-            setOtherOutputAsForeignForCooperativeClose(closedChannel);
         }
         setChannelAddressOwnershipAndDescription(channelAddress, closedChannel.getOpenInitiator(), remotePubkey);
         addFromSweepTransactions(closedChannel);
+        setOtherOutputAsForeign(closedChannel);
     }
 
     private void setTransactionDescriptions(ClosedChannel closedChannel) {
@@ -78,7 +78,7 @@ public class ClosedChannelsService {
         });
     }
 
-    private void setOtherOutputAsForeignForCooperativeClose(ClosedChannel closedChannel) {
+    private void setOtherOutputAsForeign(ClosedChannel closedChannel) {
         closedChannel.getClosingTransaction().getOutputAddresses().stream()
                 .filter(address -> !OWNED.equals(addressOwnershipService.getOwnershipStatus(address)))
                 .forEach(addressOwnershipService::setAddressAsForeign);
