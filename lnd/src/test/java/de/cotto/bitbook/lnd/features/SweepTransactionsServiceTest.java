@@ -21,6 +21,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Set;
 
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS;
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS_2;
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS_3;
 import static de.cotto.bitbook.backend.model.Chain.BTC;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.BLOCK_HEIGHT;
 import static de.cotto.bitbook.backend.model.TransactionFixtures.DATE_TIME;
@@ -63,6 +66,49 @@ class SweepTransactionsServiceTest {
     void not_sweep_because_of_two_outputs() {
         when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH), BTC)).thenReturn(Set.of(TRANSACTION_2));
         assertFailure(Set.of(TRANSACTION_HASH));
+    }
+
+    @Test
+    void rejects_two_outputs_if_no_input_output_pair_is_unchanged() {
+        Transaction transaction = new Transaction(
+                TRANSACTION_HASH,
+                BLOCK_HEIGHT,
+                DATE_TIME,
+                Coins.ofSatoshis(2),
+                List.of(new Input(Coins.ofSatoshis(200), ADDRESS), new Input(Coins.ofSatoshis(1_000), ADDRESS)),
+                List.of(new Output(Coins.ofSatoshis(999), ADDRESS), new Output(Coins.ofSatoshis(199), ADDRESS)),
+                BTC
+        );
+        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH), BTC))
+                .thenReturn(Set.of(transaction));
+        assertFailure(Set.of(TRANSACTION_HASH));
+    }
+
+    @Test
+    void accepts_several_inputs_and_outputs_if_one_input_output_pair_is_unchanged() {
+        int fees = 250;
+        // one input (B) is transferred 1:1 while the other inputs (A, C) contribute the fees
+        Input inputA = new Input(Coins.ofSatoshis(200), ADDRESS);
+        Input inputB = new Input(Coins.ofSatoshis(1_000), ADDRESS);
+        Output outputB = new Output(Coins.ofSatoshis(1_000), ADDRESS_2);
+        Input inputC = new Input(Coins.ofSatoshis(300), ADDRESS);
+        Output outputC = new Output(Coins.ofSatoshis(300 + 200 - fees), ADDRESS_3);
+        Transaction transaction = new Transaction(
+                TRANSACTION_HASH,
+                BLOCK_HEIGHT,
+                DATE_TIME,
+                Coins.ofSatoshis(fees),
+                List.of(inputA, inputB, inputC),
+                List.of(outputB, outputC),
+                BTC
+        );
+        when(transactionService.getTransactionDetails(Set.of(TRANSACTION_HASH), BTC))
+                .thenReturn(Set.of(transaction));
+        assertThat(sweepTransactionsService.addFromSweeps(Set.of(TRANSACTION_HASH))).isEqualTo(1);
+        verify(addressOwnershipService).setAddressAsOwned(ADDRESS_2, BTC);
+        verify(addressOwnershipService).setAddressAsOwned(ADDRESS_3, BTC);
+        verify(addressDescriptionService).set(ADDRESS_2, DEFAULT_DESCRIPTION);
+        verify(addressDescriptionService).set(ADDRESS_3, DEFAULT_DESCRIPTION);
     }
 
     @Nested

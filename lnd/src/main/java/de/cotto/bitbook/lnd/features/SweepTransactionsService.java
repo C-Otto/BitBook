@@ -4,6 +4,7 @@ import de.cotto.bitbook.backend.AddressDescriptionService;
 import de.cotto.bitbook.backend.TransactionDescriptionService;
 import de.cotto.bitbook.backend.model.Address;
 import de.cotto.bitbook.backend.model.Input;
+import de.cotto.bitbook.backend.model.Output;
 import de.cotto.bitbook.backend.model.Transaction;
 import de.cotto.bitbook.backend.model.TransactionHash;
 import de.cotto.bitbook.backend.transaction.TransactionService;
@@ -49,27 +50,39 @@ public class SweepTransactionsService {
         return sweepTransactions.size();
     }
 
+    @SuppressWarnings("PMD.AvoidLiteralsInIfCondition")
     private boolean isSweepTransaction(Transaction transaction) {
-        return transaction.getOutputs().size() == 1;
+        if (transaction.getOutputs().size() == 1) {
+            return true;
+        }
+        for (Input input : transaction.getInputs()) {
+            for (Output output : transaction.getOutputs()) {
+                if (input.getValue().equals(output.getValue())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void addAddressDescriptions(Transaction transaction) {
         getInputAddresses(transaction)
                 .forEach(address -> addressDescriptionService.set(address, DEFAULT_ADDRESS_DESCRIPTION));
-        addressDescriptionService.set(getOutputAddress(transaction), DEFAULT_ADDRESS_DESCRIPTION);
+        getOutputAddresses(transaction)
+                .forEach(address -> addressDescriptionService.set(address, DEFAULT_ADDRESS_DESCRIPTION));
     }
 
     private void setAddressesAsOwned(Transaction transaction) {
         getInputAddresses(transaction).forEach(address -> addressOwnershipService.setAddressAsOwned(address, BTC));
-        addressOwnershipService.setAddressAsOwned(getOutputAddress(transaction), BTC);
+        getOutputAddresses(transaction).forEach(address -> addressOwnershipService.setAddressAsOwned(address, BTC));
     }
 
     private void addTransactionDescription(Transaction transaction) {
         transactionDescriptionService.set(transaction.getHash(), SWEEP_TRANSACTION_DESCRIPTION);
     }
 
-    private Address getOutputAddress(Transaction transaction) {
-        return transaction.getOutputs().get(0).getAddress();
+    private Set<Address> getOutputAddresses(Transaction transaction) {
+        return transaction.getOutputs().stream().map(Output::getAddress).collect(toSet());
     }
 
     private Set<Address> getInputAddresses(Transaction transaction) {
