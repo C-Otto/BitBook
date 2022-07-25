@@ -14,7 +14,7 @@ testing {
         withType(JvmTestSuite) {
             dependencies {
                 implementation 'org.springframework.boot:spring-boot-starter-test'
-                implementation 'org.awaitility:awaitility:4.1.1'
+                implementation 'org.awaitility:awaitility:4.2.0'
             }
         }
     }
