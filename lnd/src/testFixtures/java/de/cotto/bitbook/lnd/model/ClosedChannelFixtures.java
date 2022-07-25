@@ -77,7 +77,7 @@ public class ClosedChannelFixtures {
             .withRemotePubkey(REMOTE_PUBKEY)
             .withSettledBalance(SETTLED_BALANCE)
             .withOpenInitiator(OPEN_INITIATOR)
-            .withCloseType(CloseType.COOPERATIVE_REMOTE)
+            .withCloseType(CloseType.FORCE_REMOTE)
             .withResolutions(Set.of(new Resolution(SWEEP_TRANSACTION_HASH, "COMMIT", "CLAIMED")))
             .build();
 
@@ -88,7 +88,7 @@ public class ClosedChannelFixtures {
             .withRemotePubkey(REMOTE_PUBKEY)
             .withSettledBalance(SETTLED_BALANCE)
             .withOpenInitiator(OPEN_INITIATOR)
-            .withCloseType(CloseType.COOPERATIVE_REMOTE)
+            .withCloseType(CloseType.FORCE_REMOTE)
             .withResolutions(Set.of(new Resolution(SWEEP_TRANSACTION_HASH, "OUTGOING_HTLC", "CLAIMED")))
             .build();
 
@@ -99,7 +99,7 @@ public class ClosedChannelFixtures {
             .withRemotePubkey(REMOTE_PUBKEY)
             .withSettledBalance(SETTLED_BALANCE)
             .withOpenInitiator(OPEN_INITIATOR)
-            .withCloseType(CloseType.COOPERATIVE_REMOTE)
+            .withCloseType(CloseType.FORCE_REMOTE)
             .withResolutions(Set.of(new Resolution(SWEEP_TRANSACTION_HASH, "INCOMING_HTLC", "TIMEOUT")))
             .build();
 
@@ -110,7 +110,7 @@ public class ClosedChannelFixtures {
             .withRemotePubkey(REMOTE_PUBKEY)
             .withSettledBalance(SETTLED_BALANCE)
             .withOpenInitiator(OPEN_INITIATOR)
-            .withCloseType(CloseType.COOPERATIVE_REMOTE)
+            .withCloseType(CloseType.FORCE_REMOTE)
             .withResolutions(Set.of(new Resolution(new TransactionHash(" "), "resolutionType", "outcome")))
             .build();
 }
