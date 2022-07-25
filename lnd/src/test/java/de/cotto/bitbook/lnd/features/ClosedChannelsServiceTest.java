@@ -137,7 +137,7 @@ class ClosedChannelsServiceTest {
     }
 
     @Test
-    void marks_settlement_address_as_owned() {
+    void marks_settlement_address_as_owned_for_cooperative_close() {
         load(CLOSED_CHANNEL);
         verify(addressOwnershipService).setAddressAsOwned(CLOSED_CHANNEL.getSettlementAddress().orElseThrow(), BTC);
     }
@@ -162,7 +162,7 @@ class ClosedChannelsServiceTest {
     }
 
     @Test
-    void adds_description_for_settlement_address() {
+    void adds_description_for_settlement_address_of_cooperative_close() {
         load(CLOSED_CHANNEL);
         verify(addressDescriptionService).set(CLOSED_CHANNEL.getSettlementAddress().orElseThrow(), DEFAULT_DESCRIPTION);
     }

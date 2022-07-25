@@ -51,10 +51,12 @@ public class ClosedChannelsService {
         String remotePubkey = closedChannel.getRemotePubkey();
 
         setTransactionDescriptions(closedChannel);
-        setForSettlementAddress(closedChannel);
-        setOtherOutputAsForeignForCooperativeClose(closedChannel);
+        if (closedChannel.getCloseType().isCooperative()) {
+            setForSettlementAddressForCooperativeClose(closedChannel);
+            setOtherOutputAsForeignForCooperativeClose(closedChannel);
+        }
         setChannelAddressOwnershipAndDescription(channelAddress, closedChannel.getOpenInitiator(), remotePubkey);
-        addFromHtlcSweepTransactions(closedChannel);
+        addFromSweepTransactions(closedChannel);
     }
 
     private void setTransactionDescriptions(ClosedChannel closedChannel) {
@@ -69,7 +71,7 @@ public class ClosedChannelsService {
         );
     }
 
-    private void setForSettlementAddress(ClosedChannel closedChannel) {
+    private void setForSettlementAddressForCooperativeClose(ClosedChannel closedChannel) {
         closedChannel.getSettlementAddress().ifPresent(address -> {
             addressOwnershipService.setAddressAsOwned(address, BTC);
             addressDescriptionService.set(address, DEFAULT_ADDRESS_DESCRIPTION);
@@ -77,11 +79,9 @@ public class ClosedChannelsService {
     }
 
     private void setOtherOutputAsForeignForCooperativeClose(ClosedChannel closedChannel) {
-        if (closedChannel.getCloseType().isCooperative()) {
-            closedChannel.getClosingTransaction().getOutputAddresses().stream()
-                    .filter(address -> !OWNED.equals(addressOwnershipService.getOwnershipStatus(address)))
-                    .forEach(addressOwnershipService::setAddressAsForeign);
-        }
+        closedChannel.getClosingTransaction().getOutputAddresses().stream()
+                .filter(address -> !OWNED.equals(addressOwnershipService.getOwnershipStatus(address)))
+                .forEach(addressOwnershipService::setAddressAsForeign);
     }
 
     private void setChannelAddressOwnershipAndDescription(
@@ -108,7 +108,7 @@ public class ClosedChannelsService {
         }
     }
 
-    private void addFromHtlcSweepTransactions(ClosedChannel closedChannel) {
+    private void addFromSweepTransactions(ClosedChannel closedChannel) {
         Set<TransactionHash> sweepTransactionHashes = closedChannel.getResolutions().stream()
                 .filter(Resolution::sweepTransactionClaimsFunds)
                 .map(Resolution::sweepTransactionHash)
