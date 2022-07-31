@@ -29,7 +29,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AddressWithOwnershipCompletionProviderTest {
-    private final String[] hints = new String[0];
+    private static final String[] EMPTY_HINTS = new String[0];
+
     @InjectMocks
     private AddressWithOwnershipCompletionProvider completionProvider;
 
@@ -61,7 +62,7 @@ class AddressWithOwnershipCompletionProviderTest {
         mockOwnership(ADDRESS, UNKNOWN);
         mockOwnership(ADDRESS_2, OWNED);
         mockOwnership(address3, FOREIGN);
-        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
+        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, EMPTY_HINTS);
 
         assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
                 new CompletionProposal(ADDRESS_2.toString()),

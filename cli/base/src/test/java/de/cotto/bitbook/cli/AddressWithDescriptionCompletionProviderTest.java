@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AddressWithDescriptionCompletionProviderTest {
-    private final String[] hints = new String[0];
+    private static final String[] EMPTY_HINTS = new String[0];
 
     @InjectMocks
     private AddressWithDescriptionCompletionProvider completionProvider;
@@ -56,7 +56,7 @@ class AddressWithDescriptionCompletionProviderTest {
         when(addressCompletionDao.completeFromAddressTransactions(input))
                 .thenReturn(Set.of(ADDRESS, ADDRESS_2, address3));
 
-        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
+        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, EMPTY_HINTS);
 
         assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
                 new CompletionProposal(ADDRESS.toString()).description(description1),

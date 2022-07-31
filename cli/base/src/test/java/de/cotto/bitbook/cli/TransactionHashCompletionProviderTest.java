@@ -30,8 +30,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class TransactionHashCompletionProviderTest {
     private static final String INPUT = "abc";
-
-    private final String[] hints = new String[0];
+    private static final String[] EMPTY_HINTS = new String[0];
 
     @InjectMocks
     private TransactionHashCompletionProvider completionProvider;
@@ -85,7 +84,7 @@ class TransactionHashCompletionProviderTest {
         when(transactionDescriptionService.getWithDescriptionInfix(INPUT))
                 .thenReturn(Set.of(new TransactionWithDescription(TRANSACTION_HASH, description)));
 
-        List<CompletionProposal> proposals = completionProvider.complete(methodParameter, context, hints);
+        List<CompletionProposal> proposals = completionProvider.complete(methodParameter, context, EMPTY_HINTS);
 
         assertThat(proposals).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(new CompletionProposal(hashWithAnsiDescription(description)));
@@ -94,7 +93,7 @@ class TransactionHashCompletionProviderTest {
     @Test
     void does_not_complete_short_hash() {
         when(context.currentWordUpToCursor()).thenReturn("ab");
-        assertThat(completionProvider.complete(methodParameter, context, hints)).isEmpty();
+        assertThat(completionProvider.complete(methodParameter, context, EMPTY_HINTS)).isEmpty();
         verifyNoInteractions(transactionCompletionDao);
     }
 
@@ -112,7 +111,7 @@ class TransactionHashCompletionProviderTest {
     }
 
     private void assertProposalsForHashes(TransactionHash... transactionHashes) {
-        List<CompletionProposal> proposals = completionProvider.complete(methodParameter, context, hints);
+        List<CompletionProposal> proposals = completionProvider.complete(methodParameter, context, EMPTY_HINTS);
         List<CompletionProposal> completionProposals =
                 Arrays.stream(transactionHashes)
                         .map(TransactionHash::toString)

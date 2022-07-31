@@ -30,6 +30,8 @@ import static org.mockito.Mockito.when;
 class AddressCompletionProviderTest {
     private static final Address BC1_ADDRESS = new Address("bc1xxx");
     private static final String PREFIX = "bc1xx";
+    private static final String[] EMPTY_HINTS = new String[0];
+
     @InjectMocks
     private AddressCompletionProvider completionProvider;
 
@@ -45,7 +47,6 @@ class AddressCompletionProviderTest {
     @Mock
     private CompletionContext context;
 
-    private final String[] hints = new String[0];
     private String input;
     private String description;
     private AddressWithDescription addressWithDescription;
@@ -64,7 +65,7 @@ class AddressCompletionProviderTest {
         when(addressDescriptionService.get(ADDRESS_2)).thenReturn(new AddressWithDescription(ADDRESS_2));
         when(addressCompletionDao.completeFromAddressTransactions(input)).thenReturn(Set.of(ADDRESS, ADDRESS_2));
 
-        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
+        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, EMPTY_HINTS);
 
         assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
                 new CompletionProposal(ADDRESS_2.toString()),
@@ -95,7 +96,7 @@ class AddressCompletionProviderTest {
         when(addressDescriptionService.get(ADDRESS)).thenReturn(addressWithDescription);
         when(addressCompletionDao.completeFromAddressTransactions(expectedInput)).thenReturn(Set.of(ADDRESS));
 
-        assertThat(completionProvider.complete(methodParameter, context, hints)).isNotEmpty();
+        assertThat(completionProvider.complete(methodParameter, context, EMPTY_HINTS)).isNotEmpty();
     }
 
     @Test
@@ -105,7 +106,7 @@ class AddressCompletionProviderTest {
         when(addressDescriptionService.get(INPUT_ADDRESS_1)).thenReturn(addressWithDescription);
         when(addressCompletionDao.completeFromInputsAndOutputs(input)).thenReturn(Set.of(INPUT_ADDRESS_1));
 
-        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
+        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, EMPTY_HINTS);
 
         assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
                 new CompletionProposal(INPUT_ADDRESS_1.toString()).description(description)
@@ -120,7 +121,7 @@ class AddressCompletionProviderTest {
         when(addressCompletionDao.completeFromAddressTransactions(input)).thenReturn(Set.of(ADDRESS));
         when(addressCompletionDao.completeFromInputsAndOutputs(input)).thenReturn(Set.of(ADDRESS));
 
-        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
+        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, EMPTY_HINTS);
 
         assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
                 new CompletionProposal(ADDRESS.toString())
@@ -133,7 +134,7 @@ class AddressCompletionProviderTest {
         when(addressDescriptionService.getWithDescriptionInfix(input))
                 .thenReturn(Set.of(addressWithDescription));
 
-        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
+        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, EMPTY_HINTS);
 
         assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
                 new CompletionProposal(addressWithAnsiDescription())
@@ -150,7 +151,7 @@ class AddressCompletionProviderTest {
         when(addressCompletionDao.completeFromAddressTransactions(input)).thenReturn(Set.of(ADDRESS_2));
         when(addressDescriptionService.get(ADDRESS_2)).thenReturn(new AddressWithDescription(ADDRESS_2));
 
-        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
+        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, EMPTY_HINTS);
 
         assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
                 new CompletionProposal(ADDRESS_2.toString()),
@@ -161,21 +162,21 @@ class AddressCompletionProviderTest {
     @Test
     void does_not_complete_short_address() {
         when(context.currentWordUpToCursor()).thenReturn("xx");
-        assertThat(completionProvider.complete(methodParameter, context, hints)).isEmpty();
+        assertThat(completionProvider.complete(methodParameter, context, EMPTY_HINTS)).isEmpty();
         verifyNoInteractions(addressCompletionDao);
     }
 
     @Test
     void ignores_whitespace_when_checking_length() {
         when(context.currentWordUpToCursor()).thenReturn("xx             ");
-        assertThat(completionProvider.complete(methodParameter, context, hints)).isEmpty();
+        assertThat(completionProvider.complete(methodParameter, context, EMPTY_HINTS)).isEmpty();
         verifyNoInteractions(addressCompletionDao);
     }
 
     @Test
     void does_not_complete_short_bech32_address() {
         when(context.currentWordUpToCursor()).thenReturn("bc1xx");
-        assertThat(completionProvider.complete(methodParameter, context, hints)).isEmpty();
+        assertThat(completionProvider.complete(methodParameter, context, EMPTY_HINTS)).isEmpty();
         verifyNoInteractions(addressCompletionDao);
     }
 

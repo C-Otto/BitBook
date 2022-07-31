@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionWithDescriptionCompletionProviderTest {
-    private final String[] hints = new String[0];
+    private static final String[] EMPTY_HINTS = new String[0];
 
     @InjectMocks
     private TransactionWithDescriptionCompletionProvider completionProvider;
@@ -58,7 +58,7 @@ class TransactionWithDescriptionCompletionProviderTest {
         when(transactionCompletionDao.completeFromTransactionDetails(input))
                 .thenReturn(Set.of(TRANSACTION_HASH, TRANSACTION_HASH_2, TRANSACTION_HASH_3));
 
-        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, hints);
+        List<CompletionProposal> complete = completionProvider.complete(methodParameter, context, EMPTY_HINTS);
 
         assertThat(complete).usingRecursiveFieldByFieldElementComparator().containsExactly(
                 new CompletionProposal(TRANSACTION_HASH_3.toString()).description(description3),
