@@ -1,7 +1,6 @@
 package de.cotto.bitbook.lnd.model;
 
 import de.cotto.bitbook.backend.model.Coins;
-import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import static de.cotto.bitbook.backend.model.TransactionHashFixtures.TRANSACTION_HASH;
@@ -12,12 +11,12 @@ class OnchainTransactionTest {
 
     @Test
     void getTransactionHash() {
-        assertThat(ONCHAIN_TRANSACTION.getTransactionHash()).isEqualTo(TRANSACTION_HASH);
+        assertThat(ONCHAIN_TRANSACTION.transactionHash()).isEqualTo(TRANSACTION_HASH);
     }
 
     @Test
     void getLabel() {
-        assertThat(ONCHAIN_TRANSACTION.getLabel()).isEqualTo("label");
+        assertThat(ONCHAIN_TRANSACTION.label()).isEqualTo("label");
     }
 
     @Test
@@ -37,12 +36,12 @@ class OnchainTransactionTest {
 
     @Test
     void getAmount() {
-        assertThat(ONCHAIN_TRANSACTION.getAmount()).isEqualTo(Coins.ofSatoshis(500));
+        assertThat(ONCHAIN_TRANSACTION.amount()).isEqualTo(Coins.ofSatoshis(500));
     }
 
     @Test
     void getFees() {
-        assertThat(ONCHAIN_TRANSACTION.getFees()).isEqualTo(Coins.ofSatoshis(100));
+        assertThat(ONCHAIN_TRANSACTION.fees()).isEqualTo(Coins.ofSatoshis(100));
     }
 
     @Test
@@ -68,21 +67,5 @@ class OnchainTransactionTest {
                 Coins.ofSatoshis(-500),
                 Coins.ofSatoshis(100)
         ).getAbsoluteAmountWithoutFees()).isEqualTo(Coins.ofSatoshis(400));
-    }
-
-    @Test
-    void testEquals() {
-        EqualsVerifier.forClass(OnchainTransaction.class).usingGetClass().verify();
-    }
-
-    @Test
-    void testToString() {
-        assertThat(ONCHAIN_TRANSACTION)
-                .hasToString("OnchainTransaction{" +
-                             "transactionHash='" + TRANSACTION_HASH + "'" +
-                             ", label='label'" +
-                             ", amount=" + Coins.ofSatoshis(500) +
-                             ", fees=" + Coins.ofSatoshis(100) +
-                             "}");
     }
 }

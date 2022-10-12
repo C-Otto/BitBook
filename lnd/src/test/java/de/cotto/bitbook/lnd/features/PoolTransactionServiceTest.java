@@ -47,7 +47,7 @@ class PoolTransactionServiceTest {
 
     @InjectMocks
     private PoolTransactionService poolTransactionService;
-    
+
     @Mock
     private TransactionService transactionService;
 
@@ -66,7 +66,7 @@ class PoolTransactionServiceTest {
 
         @BeforeEach
         void setUp() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash(), BTC))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.transactionHash(), BTC))
                     .thenReturn(POOL_ACCOUNT_CREATION_DETAILS);
         }
 
@@ -152,7 +152,7 @@ class PoolTransactionServiceTest {
 
         @Test
         void unknown_transaction_details() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash(), BTC))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.transactionHash(), BTC))
                     .thenReturn(Transaction.unknown(BTC));
             OnchainTransaction transaction = new OnchainTransaction(
                     TRANSACTION_HASH,
@@ -165,13 +165,13 @@ class PoolTransactionServiceTest {
 
         @Test
         void mismatching_amount_for_pool_address() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.getTransactionHash(), BTC))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CREATION.transactionHash(), BTC))
                     .thenReturn(POOL_ACCOUNT_CREATION_DETAILS);
             OnchainTransaction transaction = new OnchainTransaction(
-                    POOL_ACCOUNT_CREATION.getTransactionHash(),
-                    POOL_ACCOUNT_CREATION.getLabel(),
-                    POOL_ACCOUNT_CREATION.getAmount().subtract(Coins.ofSatoshis(1)),
-                    POOL_ACCOUNT_CREATION.getFees()
+                    POOL_ACCOUNT_CREATION.transactionHash(),
+                    POOL_ACCOUNT_CREATION.label(),
+                    POOL_ACCOUNT_CREATION.amount().subtract(Coins.ofSatoshis(1)),
+                    POOL_ACCOUNT_CREATION.fees()
             );
             assertFailure(transaction);
         }
@@ -183,7 +183,7 @@ class PoolTransactionServiceTest {
 
         @BeforeEach
         void setUp() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash(), BTC))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.transactionHash(), BTC))
                     .thenReturn(POOL_ACCOUNT_CLOSE_DETAILS);
         }
 
@@ -238,8 +238,8 @@ class PoolTransactionServiceTest {
         @Test
         void negative_amount() {
             OnchainTransaction transaction = new OnchainTransaction(
-                    POOL_ACCOUNT_CLOSE.getTransactionHash(),
-                    POOL_ACCOUNT_CLOSE.getLabel(),
+                    POOL_ACCOUNT_CLOSE.transactionHash(),
+                    POOL_ACCOUNT_CLOSE.label(),
                     Coins.ofSatoshis(-123),
                     Coins.NONE
             );
@@ -252,49 +252,49 @@ class PoolTransactionServiceTest {
                            + POOL_ACCOUNT_ID
                            + ", expiry=false, deposit=false, is_close=true)";
             OnchainTransaction transaction = new OnchainTransaction(
-                    POOL_ACCOUNT_CLOSE.getTransactionHash(),
+                    POOL_ACCOUNT_CLOSE.transactionHash(),
                     label,
-                    POOL_ACCOUNT_CLOSE.getAmount(),
-                    POOL_ACCOUNT_CLOSE.getFees()
+                    POOL_ACCOUNT_CLOSE.amount(),
+                    POOL_ACCOUNT_CLOSE.fees()
             );
             assertFailure(transaction);
         }
 
         @Test
         void mismatching_amount_for_pool_address() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash(), BTC))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.transactionHash(), BTC))
                     .thenReturn(POOL_ACCOUNT_CLOSE_DETAILS);
             OnchainTransaction transaction = new OnchainTransaction(
-                    POOL_ACCOUNT_CLOSE.getTransactionHash(),
-                    POOL_ACCOUNT_CLOSE.getLabel(),
-                    POOL_ACCOUNT_CLOSE.getAmount().add(Coins.ofSatoshis(1)),
-                    POOL_ACCOUNT_CLOSE.getFees()
+                    POOL_ACCOUNT_CLOSE.transactionHash(),
+                    POOL_ACCOUNT_CLOSE.label(),
+                    POOL_ACCOUNT_CLOSE.amount().add(Coins.ofSatoshis(1)),
+                    POOL_ACCOUNT_CLOSE.fees()
             );
             assertFailure(transaction);
         }
 
         @Test
         void two_outputs_sum_matches_pool_amount() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash(), BTC))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.transactionHash(), BTC))
                     .thenReturn(TRANSACTION);
             OnchainTransaction transaction = new OnchainTransaction(
-                    POOL_ACCOUNT_CLOSE.getTransactionHash(),
-                    POOL_ACCOUNT_CLOSE.getLabel(),
+                    POOL_ACCOUNT_CLOSE.transactionHash(),
+                    POOL_ACCOUNT_CLOSE.label(),
                     OUTPUT_VALUE_1.add(OUTPUT_VALUE_2),
-                    POOL_ACCOUNT_CLOSE.getFees()
+                    POOL_ACCOUNT_CLOSE.fees()
             );
             assertFailure(transaction);
         }
 
         @Test
         void two_outputs_first_matches_pool_amount() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.getTransactionHash(), BTC))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_CLOSE.transactionHash(), BTC))
                     .thenReturn(TRANSACTION);
             OnchainTransaction transaction = new OnchainTransaction(
-                    POOL_ACCOUNT_CLOSE.getTransactionHash(),
-                    POOL_ACCOUNT_CLOSE.getLabel(),
+                    POOL_ACCOUNT_CLOSE.transactionHash(),
+                    POOL_ACCOUNT_CLOSE.label(),
                     OUTPUT_VALUE_1,
-                    POOL_ACCOUNT_CLOSE.getFees()
+                    POOL_ACCOUNT_CLOSE.fees()
             );
             assertFailure(transaction);
         }
@@ -302,9 +302,9 @@ class PoolTransactionServiceTest {
         @Test
         void paid_fees() {
             OnchainTransaction transaction = new OnchainTransaction(
-                    POOL_ACCOUNT_CLOSE.getTransactionHash(),
-                    POOL_ACCOUNT_CLOSE.getLabel(),
-                    POOL_ACCOUNT_CLOSE.getAmount(),
+                    POOL_ACCOUNT_CLOSE.transactionHash(),
+                    POOL_ACCOUNT_CLOSE.label(),
+                    POOL_ACCOUNT_CLOSE.amount(),
                     Coins.ofSatoshis(1)
             );
             assertFailure(transaction);
@@ -319,7 +319,7 @@ class PoolTransactionServiceTest {
         void setUp() {
             when(addressDescriptionService.getDescription(INPUT_ADDRESS_1)).thenReturn("");
             when(addressDescriptionService.getDescription(INPUT_ADDRESS_2)).thenReturn(DEFAULT_DESCRIPTION);
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_DEPOSIT.getTransactionHash(), BTC))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_DEPOSIT.transactionHash(), BTC))
                     .thenReturn(POOL_ACCOUNT_DEPOSIT_DETAILS);
         }
 
@@ -382,8 +382,8 @@ class PoolTransactionServiceTest {
         @Test
         void non_negative_amount() {
             OnchainTransaction transaction = new OnchainTransaction(
-                    POOL_ACCOUNT_DEPOSIT.getTransactionHash(),
-                    POOL_ACCOUNT_DEPOSIT.getLabel(),
+                    POOL_ACCOUNT_DEPOSIT.transactionHash(),
+                    POOL_ACCOUNT_DEPOSIT.label(),
                     Coins.ofSatoshis(123),
                     Coins.NONE
             );
@@ -396,23 +396,23 @@ class PoolTransactionServiceTest {
                            + POOL_ACCOUNT_ID
                            + ", expiry=false, deposit=true, is_close=false)";
             OnchainTransaction transaction = new OnchainTransaction(
-                    POOL_ACCOUNT_DEPOSIT.getTransactionHash(),
+                    POOL_ACCOUNT_DEPOSIT.transactionHash(),
                     label,
-                    POOL_ACCOUNT_DEPOSIT.getAmount(),
-                    POOL_ACCOUNT_DEPOSIT.getFees()
+                    POOL_ACCOUNT_DEPOSIT.amount(),
+                    POOL_ACCOUNT_DEPOSIT.fees()
             );
             assertFailure(transaction);
         }
 
         @Test
         void mismatching_amount_for_pool_address() {
-            when(transactionService.getTransactionDetails(POOL_ACCOUNT_DEPOSIT.getTransactionHash(), BTC))
+            when(transactionService.getTransactionDetails(POOL_ACCOUNT_DEPOSIT.transactionHash(), BTC))
                     .thenReturn(POOL_ACCOUNT_DEPOSIT_DETAILS);
             OnchainTransaction transaction = new OnchainTransaction(
-                    POOL_ACCOUNT_DEPOSIT.getTransactionHash(),
-                    POOL_ACCOUNT_DEPOSIT.getLabel(),
-                    POOL_ACCOUNT_DEPOSIT.getAmount().add(Coins.ofSatoshis(1)),
-                    POOL_ACCOUNT_DEPOSIT.getFees()
+                    POOL_ACCOUNT_DEPOSIT.transactionHash(),
+                    POOL_ACCOUNT_DEPOSIT.label(),
+                    POOL_ACCOUNT_DEPOSIT.amount().add(Coins.ofSatoshis(1)),
+                    POOL_ACCOUNT_DEPOSIT.fees()
             );
             assertFailure(transaction);
         }

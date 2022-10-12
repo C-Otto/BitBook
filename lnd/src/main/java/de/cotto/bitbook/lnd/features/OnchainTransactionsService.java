@@ -56,6 +56,7 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
         Map<OnchainTransaction, Long> successes = new LinkedHashMap<>();
         for (OnchainTransaction onchainTransaction : onchainTransactions) {
             long result = 0;
+            result += handleOwnedAddresses(onchainTransaction);
             result += handleFundingTransaction(onchainTransaction);
             result += handleOpeningTransaction(onchainTransaction);
             result += handlePoolTransaction(onchainTransaction);
@@ -68,13 +69,21 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
         return successes;
     }
 
+    private long handleOwnedAddresses(OnchainTransaction onchainTransaction) {
+        Set<Address> ownedAddresses = onchainTransaction.ownedAddresses();
+        if (ownedAddresses.isEmpty()) {
+            return 0;
+        }
+        ownedAddresses.forEach(this::setAddressAsOwnedWithDescription);
+        return 1;
+    }
+
     private long handleFundingTransaction(OnchainTransaction onchainTransaction) {
         if (onchainTransaction.hasFees() || onchainTransaction.hasLabel()) {
             return 0;
         }
-        Transaction transaction =
-                transactionService.getTransactionDetails(onchainTransaction.getTransactionHash(), BTC);
-        Coins amount = onchainTransaction.getAmount();
+        Transaction transaction = transactionService.getTransactionDetails(onchainTransaction.transactionHash(), BTC);
+        Coins amount = onchainTransaction.amount();
         Address address = transaction.getOutputWithValue(amount).map(InputOutput::getAddress).orElse(null);
         if (address == null) {
             return 0;
@@ -84,13 +93,14 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
     }
 
     private long handleOpeningTransaction(OnchainTransaction onchainTransaction) {
-        boolean nonNegativeAmount = onchainTransaction.getAmount().isNonNegative();
+        boolean nonNegativeAmount = onchainTransaction.amount().isNonNegative();
         boolean notOpenChannelLabel = onchainTransaction.hasLabel()
-                                      && !onchainTransaction.getLabel().startsWith("0:openchannel:");
+                && !onchainTransaction.label().startsWith("0:openchannel:")
+                && !onchainTransaction.label().startsWith("external");
         if (nonNegativeAmount || notOpenChannelLabel) {
             return 0;
         }
-        TransactionHash transactionHash = onchainTransaction.getTransactionHash();
+        TransactionHash transactionHash = onchainTransaction.transactionHash();
         Transaction transaction = transactionService.getTransactionDetails(transactionHash, BTC);
         if (hasUnownedInput(transaction) || hasMismatchedInputDescription(transaction)) {
             return 0;
@@ -151,22 +161,22 @@ public class OnchainTransactionsService extends AbstractTransactionsService {
     }
 
     private long handleSweepTransaction(OnchainTransaction onchainTransaction) {
-        boolean amountMatchesFee = onchainTransaction.getAmount().absolute().equals(onchainTransaction.getFees());
+        boolean amountMatchesFee = onchainTransaction.amount().absolute().equals(onchainTransaction.fees());
         boolean unexpectedLabel = onchainTransaction.hasLabel()
-                                  && !onchainTransaction.getLabel().startsWith("0:sweep:");
+                && !onchainTransaction.label().startsWith("0:sweep:");
         if (unexpectedLabel || !amountMatchesFee || !onchainTransaction.hasFees()) {
             return 0;
         }
-        return sweepTransactionsService.addFromSweeps(Set.of(onchainTransaction.getTransactionHash()));
+        return sweepTransactionsService.addFromSweeps(Set.of(onchainTransaction.transactionHash()));
     }
 
     private long handleSpendTransaction(OnchainTransaction onchainTransaction) {
-        Coins amount = onchainTransaction.getAmount();
+        Coins amount = onchainTransaction.amount();
         if (onchainTransaction.hasLabel() || !onchainTransaction.hasFees() || amount.isNonNegative()) {
             return 0;
         }
         Transaction transaction =
-                transactionService.getTransactionDetails(onchainTransaction.getTransactionHash(), BTC);
+                transactionService.getTransactionDetails(onchainTransaction.transactionHash(), BTC);
         boolean unownedInput = transaction.getInputAddresses().stream()
                 .anyMatch(address -> !OWNED.equals(addressOwnershipService.getOwnershipStatus(address)));
         if (unownedInput) {

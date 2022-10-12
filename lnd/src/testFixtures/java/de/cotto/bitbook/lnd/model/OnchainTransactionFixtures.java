@@ -3,6 +3,10 @@ package de.cotto.bitbook.lnd.model;
 import de.cotto.bitbook.backend.model.Coins;
 import de.cotto.bitbook.backend.model.Transaction;
 
+import java.util.Set;
+
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS_2;
+import static de.cotto.bitbook.backend.model.AddressFixtures.ADDRESS_3;
 import static de.cotto.bitbook.backend.model.InputFixtures.INPUT_VALUE_2;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_VALUE_1;
 import static de.cotto.bitbook.backend.model.OutputFixtures.OUTPUT_VALUE_2;
@@ -27,6 +31,14 @@ public class OnchainTransactionFixtures {
     );
     public static final Transaction FUNDING_TRANSACTION_DETAILS = TRANSACTION;
 
+    public static final OnchainTransaction TRANSACTION_WITH_OWNED_ADDRESSES = new OnchainTransaction(
+            TRANSACTION_HASH,
+            "",
+            Coins.NONE,
+            Coins.NONE,
+            Set.of(ADDRESS_2, ADDRESS_3)
+    );
+
     public static final Transaction OPENING_TRANSACTION_DETAILS = TRANSACTION;
     public static final OnchainTransaction OPENING_TRANSACTION = new OnchainTransaction(
             TRANSACTION_HASH,
@@ -36,10 +48,10 @@ public class OnchainTransactionFixtures {
     );
 
     public static final OnchainTransaction OPENING_TRANSACTION_WITH_LABEL = new OnchainTransaction(
-            OPENING_TRANSACTION.getTransactionHash(),
+            OPENING_TRANSACTION.transactionHash(),
             "0:openchannel:foo",
-            OPENING_TRANSACTION.getAmount(),
-            OPENING_TRANSACTION.getFees()
+            OPENING_TRANSACTION.amount(),
+            OPENING_TRANSACTION.fees()
     );
 
     public static final String POOL_ACCOUNT_ID = "001a2021f4013201230af5013021302130f501a302130412fa1230213041030123";

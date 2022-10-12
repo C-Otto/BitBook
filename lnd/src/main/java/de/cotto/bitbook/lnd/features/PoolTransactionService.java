@@ -45,20 +45,20 @@ public class PoolTransactionService extends AbstractTransactionsService {
     }
 
     private long handlePoolCreationTransaction(OnchainTransaction onchainTransaction) {
-        if (onchainTransaction.getAmount().isNonNegative()) {
+        if (onchainTransaction.amount().isNonNegative()) {
             return 0;
         }
-        if (!onchainTransaction.getLabel().startsWith(" poold -- AccountCreation(acct_key=")) {
+        if (!onchainTransaction.label().startsWith(" poold -- AccountCreation(acct_key=")) {
             return 0;
         }
         Transaction transaction =
-                transactionService.getTransactionDetails(onchainTransaction.getTransactionHash(), BTC);
+                transactionService.getTransactionDetails(onchainTransaction.transactionHash(), BTC);
         Coins poolAmount = onchainTransaction.getAbsoluteAmountWithoutFees();
         Address poolAddress = transaction.getOutputWithValue(poolAmount).map(InputOutput::getAddress).orElse(null);
         if (poolAddress == null) {
             return 0;
         }
-        setForPoolAccountCreation(transaction, poolAddress, onchainTransaction.getLabel());
+        setForPoolAccountCreation(transaction, poolAddress, onchainTransaction.label());
         return 1;
     }
 
@@ -67,15 +67,15 @@ public class PoolTransactionService extends AbstractTransactionsService {
     }
 
     private long handlePoolDepositTransaction(OnchainTransaction onchainTransaction) {
-        if (onchainTransaction.getAmount().isNonNegative()) {
+        if (onchainTransaction.amount().isNonNegative()) {
             return 0;
         }
-        if (!POOL_ACCOUNT_DEPOSIT_PATTERN.matcher(onchainTransaction.getLabel()).matches()) {
+        if (!POOL_ACCOUNT_DEPOSIT_PATTERN.matcher(onchainTransaction.label()).matches()) {
             return 0;
         }
         Transaction transaction =
-                transactionService.getTransactionDetails(onchainTransaction.getTransactionHash(), BTC);
-        Coins subtractedAmount = Coins.NONE.subtract(onchainTransaction.getAmount());
+                transactionService.getTransactionDetails(onchainTransaction.transactionHash(), BTC);
+        Coins subtractedAmount = Coins.NONE.subtract(onchainTransaction.amount());
         Coins otherInputs = transaction.getInputs().stream()
                 .filter(input -> !DEFAULT_DESCRIPTION.equals(
                         addressDescriptionService.getDescription(input.getAddress())
@@ -87,7 +87,7 @@ public class PoolTransactionService extends AbstractTransactionsService {
         if (poolAddress == null) {
             return 0;
         }
-        setForPoolAccountDeposit(transaction, poolAddress, onchainTransaction.getLabel());
+        setForPoolAccountDeposit(transaction, poolAddress, onchainTransaction.label());
         return 1;
     }
 
@@ -113,20 +113,20 @@ public class PoolTransactionService extends AbstractTransactionsService {
     }
 
     private long handlePoolCloseTransaction(OnchainTransaction onchainTransaction) {
-        if (onchainTransaction.getAmount().isNonPositive() || onchainTransaction.hasFees()) {
+        if (onchainTransaction.amount().isNonPositive() || onchainTransaction.hasFees()) {
             return 0;
         }
-        if (!POOL_ACCOUNT_CLOSE_PATTERN.matcher(onchainTransaction.getLabel()).matches()) {
+        if (!POOL_ACCOUNT_CLOSE_PATTERN.matcher(onchainTransaction.label()).matches()) {
             return 0;
         }
         Transaction transaction =
-                transactionService.getTransactionDetails(onchainTransaction.getTransactionHash(), BTC);
+                transactionService.getTransactionDetails(onchainTransaction.transactionHash(), BTC);
         Output lndOutput = getIfExactlyOne(transaction.getOutputs()).orElse(null);
-        Coins poolAmount = onchainTransaction.getAmount();
+        Coins poolAmount = onchainTransaction.amount();
         if (lndOutput == null || !lndOutput.getValue().equals(poolAmount)) {
             return 0;
         }
-        setForPoolAccountClose(transaction, onchainTransaction.getLabel());
+        setForPoolAccountClose(transaction, onchainTransaction.label());
         return 1;
     }
 
