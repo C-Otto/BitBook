@@ -28,16 +28,16 @@ class PrioritizingProviderIT {
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
 
     @Autowired
-    private PrioritizingProviderForTest prioritizingProvider;
+    private TestablePrioritizingProviderFor prioritizingProvider;
 
     @Autowired
-    private List<ProviderForTest> providers;
+    private List<TestableProvider> providers;
 
     @Autowired
     private List<RequestWorker<?, ?>> requestWorkers;
 
-    private ProviderForTest provider1;
-    private ProviderForTest provider2;
+    private TestableProvider provider1;
+    private TestableProvider provider2;
 
     @BeforeEach
     void setUp() {
@@ -89,12 +89,12 @@ class PrioritizingProviderIT {
         assertThat(result).isEmpty();
     }
 
-    private static class ProviderForTest implements Provider<String, Integer>, Ordered {
+    private static class TestableProvider implements Provider<String, Integer>, Ordered {
         private final List<String> seenKeys = new ArrayList<>();
         private final int order;
         private boolean disabled;
 
-        private ProviderForTest(int order) {
+        private TestableProvider(int order) {
             this.order = order;
         }
 
@@ -128,23 +128,23 @@ class PrioritizingProviderIT {
     @TestConfiguration
     static class TestConfig {
         @Bean
-        public PrioritizingProviderForTest prioritizingProviderForTest(List<ProviderForTest> providers) {
-            return new PrioritizingProviderForTest(providers);
+        public TestablePrioritizingProviderFor prioritizingProviderForTest(List<TestableProvider> providers) {
+            return new TestablePrioritizingProviderFor(providers);
         }
 
         @Bean
-        public ProviderForTest providerWithLowPriority() {
-            return new ProviderForTest(Ordered.LOWEST_PRECEDENCE);
+        public TestableProvider providerWithLowPriority() {
+            return new TestableProvider(Ordered.LOWEST_PRECEDENCE);
         }
 
         @Bean
-        public ProviderForTest providerWithHighPriority() {
-            return new ProviderForTest(Ordered.HIGHEST_PRECEDENCE);
+        public TestableProvider providerWithHighPriority() {
+            return new TestableProvider(Ordered.HIGHEST_PRECEDENCE);
         }
     }
 
-    private static class PrioritizingProviderForTest extends PrioritizingProvider<String, Integer> {
-        private PrioritizingProviderForTest(List<ProviderForTest> providers) {
+    private static class TestablePrioritizingProviderFor extends PrioritizingProvider<String, Integer> {
+        private TestablePrioritizingProviderFor(List<TestableProvider> providers) {
             super(providers, "");
         }
     }

@@ -21,7 +21,8 @@ class ArchUnitIT {
 
     @BeforeAll
     static void setUp() {
-        importedClasses = new ClassFileImporter().withImportOption(new DoNotIncludeTests()).importPackages("de.cotto");
+        importedClasses =
+                new ClassFileImporter().withImportOption(new DoNotIncludeTestClasses()).importPackages("de.cotto");
     }
 
     @Test
@@ -60,7 +61,7 @@ class ArchUnitIT {
         rule.check(importedClasses);
     }
 
-    private static class DoNotIncludeTests implements ImportOption {
+    private static class DoNotIncludeTestClasses implements ImportOption {
         private static final Pattern GRADLE_PATTERN = Pattern.compile(".*/build/classes/([^/]+/)?[a-zA-Z-]*[tT]est/.*");
 
         @Override
