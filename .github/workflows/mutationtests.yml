@@ -22,4 +22,4 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
       - name: Run mutation tests
-        run: ./gradlew pitest
+        run: ./gradlew :pitest
