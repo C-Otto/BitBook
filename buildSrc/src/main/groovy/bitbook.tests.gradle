@@ -8,13 +8,13 @@ testing {
         test {
             useJUnitJupiter()
             dependencies {
-                implementation 'nl.jqno.equalsverifier:equalsverifier:3.10'
+                implementation("nl.jqno.equalsverifier:equalsverifier:3.10")
             }
         }
         withType(JvmTestSuite) {
             dependencies {
-                implementation 'org.springframework.boot:spring-boot-starter-test'
-                implementation 'org.awaitility:awaitility:4.2.0'
+                implementation("org.springframework.boot:spring-boot-starter-test")
+                implementation("org.awaitility:awaitility:4.2.0")
             }
         }
     }

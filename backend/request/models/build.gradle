@@ -1,7 +1,0 @@
-plugins {
-    id 'bitbook.java-library-conventions'
-}
-
-jar {
-    archivesBaseName = 'request-models'
-}
