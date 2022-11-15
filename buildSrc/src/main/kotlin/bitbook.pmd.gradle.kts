@@ -1,16 +1,16 @@
 plugins {
-    id 'pmd'
+    id("pmd")
 }
 
 pmd {
     ruleSetFiles = files("${rootDir}/config/pmd-ruleset.xml")
-    ruleSets = []
-    consoleOutput = true
-    toolVersion = '6.51.0'
+    ruleSets = listOf()
+    isConsoleOutput = true
 }
-tasks.withType(Test).forEach { testTask ->
-    tasks.withType(Pmd).forEach { pmdTask ->
-        String expected = ("pmd" + testTask.getName()).toLowerCase()
+
+tasks.withType<Test>().forEach { testTask ->
+    tasks.withType<Pmd>().forEach { pmdTask ->
+        val expected = ("pmd" + testTask.getName()).toLowerCase()
         if (expected == pmdTask.getName().toLowerCase()) {
             testTask.shouldRunAfter(pmdTask)
         }
@@ -18,4 +18,8 @@ tasks.withType(Test).forEach { testTask ->
             testTask.shouldRunAfter(pmdTask)
         }
     }
+}
+
+tasks.withType<Test>{
+    shouldRunAfter(tasks.withType<Pmd>())
 }

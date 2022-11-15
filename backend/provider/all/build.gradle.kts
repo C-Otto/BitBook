@@ -14,3 +14,7 @@ dependencies {
     implementation(project(":backend:provider:fullstackcash"))
     implementation(project(":backend:provider:mempoolspace"))
 }
+
+tasks.withType<Bitbook_jacoco_gradle.CheckForExecutionDataTask> {
+    enabled = false
+}
