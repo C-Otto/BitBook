@@ -11,6 +11,9 @@ tasks.withType<SpotBugsTask>().configureEach {
     reports.create("html") {
         enabled = true
     }
+    dependencies {
+        spotbugsSlf4j("org.slf4j:slf4j-simple")
+    }
 }
 
 spotbugs {
