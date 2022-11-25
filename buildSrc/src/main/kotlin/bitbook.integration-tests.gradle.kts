@@ -7,7 +7,7 @@ testing {
         this.register("integrationTest", JvmTestSuite::class) {
             testType.set(TestSuiteType.INTEGRATION_TEST)
             dependencies {
-                implementation(project)
+                implementation(project())
                 implementation("com.tngtech.archunit:archunit:1.0.1")
             }
 
