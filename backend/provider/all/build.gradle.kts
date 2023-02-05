@@ -1,3 +1,5 @@
+import de.cotto.javaconventions.plugins.JacocoPlugin
+
 plugins {
     id("bitbook.java-library-conventions")
 }
@@ -15,6 +17,6 @@ dependencies {
     implementation(project(":backend:provider:mempoolspace"))
 }
 
-tasks.withType<Bitbook_jacoco_gradle.CheckForExecutionDataTask> {
+tasks.withType<JacocoPlugin.CheckForExecutionDataTask> {
     enabled = false
 }

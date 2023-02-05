@@ -1,5 +1,7 @@
 package de.cotto.bitbook.backend.request;
 
+import com.github.valfirst.slf4jtest.TestLogger;
+import com.github.valfirst.slf4jtest.TestLoggerFactory;
 import de.cotto.bitbook.backend.model.ProviderException;
 import de.cotto.bitbook.backend.model.TestableProvider;
 import feign.FeignException;
@@ -11,12 +13,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import uk.org.lidalia.slf4jtest.TestLogger;
-import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
 
+import static com.github.valfirst.slf4jtest.LoggingEvent.debug;
+import static com.github.valfirst.slf4jtest.LoggingEvent.error;
+import static com.github.valfirst.slf4jtest.LoggingEvent.warn;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,9 +29,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.org.lidalia.slf4jtest.LoggingEvent.debug;
-import static uk.org.lidalia.slf4jtest.LoggingEvent.error;
-import static uk.org.lidalia.slf4jtest.LoggingEvent.warn;
 
 @ExtendWith(MockitoExtension.class)
 class RequestWorkerTest {

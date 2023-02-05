@@ -25,3 +25,10 @@ include 'backend:request'
 include 'backend:request:models'
 include 'lnd'
 include 'ownership'
+
+dependencyResolutionManagement {
+    includeBuild("gradle/meta-plugins")
+    repositories {
+        mavenCentral()
+    }
+}

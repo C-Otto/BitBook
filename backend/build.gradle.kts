@@ -3,10 +3,10 @@ plugins {
 }
 
 dependencies {
-    api(platform("org.springframework.cloud:spring-cloud-dependencies:2021.0.5"))
     api("org.springframework.cloud:spring-cloud-starter-openfeign")
-    api("io.github.resilience4j:resilience4j-spring-boot2:1.7.1")
+    api("io.github.resilience4j:resilience4j-spring-boot2")
     api("org.springframework.boot:spring-boot-starter-data-jpa")
+    runtimeOnly("io.vavr:vavr")
     implementation(project(":backend:models"))
     runtimeOnly("org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j")
     runtimeOnly("com.h2database:h2")

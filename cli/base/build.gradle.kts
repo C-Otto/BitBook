@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    api("org.springframework.shell:spring-shell-starter:2.0.0.RELEASE")
+    api("org.springframework.shell:spring-shell-starter")
     implementation(project(":backend"))
     implementation(project(":backend:models"))
     implementation(project(":backend:transaction"))

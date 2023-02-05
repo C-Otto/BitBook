@@ -1,38 +1,31 @@
 plugins {
-    id("java")
-    id("bitbook.cpd")
-    id("bitbook.errorprone")
-    id("bitbook.checkstyle")
-    id("bitbook.tests")
-    id("bitbook.mutationtests")
-    id("bitbook.integration-tests")
-    id("bitbook.pmd")
-    id("bitbook.jacoco")
+    id("de.c-otto.java-conventions")
     id("org.springframework.boot")
     id("io.spring.dependency-management")
     id("java-test-fixtures")
-    id("bitbook.spotbugs")
-    id("bitbook.versions")
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-    consistentResolution {
-        useCompileClasspathVersions()
-    }
-}
-
-repositories {
-    mavenCentral()
-}
-
-tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs.add("-Werror")
 }
 
 dependencies {
+    implementation(platform("de.c-otto.bitbook:platform"))
+    testFixturesImplementation(platform("de.c-otto.bitbook:platform"))
     implementation("org.springframework.boot:spring-boot-starter")
-    implementation("org.apache.commons:commons-lang3:3.12.0")
-    implementation("com.google.guava:guava:31.1-jre")
+    implementation("org.apache.commons:commons-lang3")
+    implementation("com.google.guava:guava")
+}
+
+testing {
+    suites {
+        named("integrationTest", JvmTestSuite::class).configure {
+            dependencies {
+                implementation("com.tngtech.archunit:archunit")
+            }
+        }
+        withType<JvmTestSuite>().configureEach {
+            dependencies {
+                implementation(project.dependencies.platform("de.c-otto.bitbook:platform"))
+                implementation("org.springframework.boot:spring-boot-starter-test")
+                implementation("org.awaitility:awaitility")
+            }
+        }
+    }
 }

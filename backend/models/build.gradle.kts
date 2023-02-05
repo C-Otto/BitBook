@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation("commons-codec:commons-codec:1.15")
+    implementation("commons-codec:commons-codec")
 }
 
 tasks.jar {

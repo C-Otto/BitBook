@@ -6,7 +6,7 @@ dependencies {
     implementation(project(":backend:models"))
     implementation(project(":backend:address-transactions"))
     implementation(project(":backend:provider:base"))
-    implementation("org.apache.mina:mina-core:2.1.6")
+    implementation("org.apache.mina:mina-core")
     testImplementation(testFixtures(project(":backend:models")))
     testFixturesImplementation(testFixtures(project(":backend:address-transactions")))
     testFixturesImplementation(testFixtures(project(":backend:models")))
