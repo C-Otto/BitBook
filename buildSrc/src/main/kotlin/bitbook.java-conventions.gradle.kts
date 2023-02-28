@@ -29,3 +29,7 @@ testing {
         }
     }
 }
+
+configurations.named("testRuntimeOnly") {
+    exclude(group = "ch.qos.logback", module = "logback-classic")
+}
