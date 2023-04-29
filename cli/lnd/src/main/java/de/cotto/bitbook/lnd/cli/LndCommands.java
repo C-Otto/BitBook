@@ -63,6 +63,6 @@ public class LndCommands {
     }
 
     private String readFile(File jsonFile) throws IOException {
-        return Files.readString(jsonFile.toPath(), StandardCharsets.US_ASCII);
+        return Files.readString(jsonFile.toPath(), StandardCharsets.UTF_8);
     }
 }
