@@ -68,7 +68,7 @@ class TransactionTest {
                 List.of(OUTPUT_1, OUTPUT_2, new Output(Coins.NONE, new Address("xxx"))),
                 BTC
         );
-        assertThat(coinbaseTransaction.getOutputs()).hasSize(2);
+        assertThat(coinbaseTransaction.getOutputs()).hasSize(3);
     }
 
     @Test
@@ -259,7 +259,9 @@ class TransactionTest {
     }
 
     @Test
-    void ignoresEmptyOutputs() {
+    void includes_empty_outputs() {
+        // Even though outputs not spending anything, they count when considering the output index.
+        // As the output index is used to identify lightning network channels, empty outputs must not be ignored.
         List<Output> outputs = List.of(
                 Output.EMPTY,
                 new Output(Coins.NONE, new Address("xx")),
@@ -268,7 +270,9 @@ class TransactionTest {
         );
         Transaction transaction =
                 new Transaction(TRANSACTION_HASH, BLOCK_HEIGHT, DATE_TIME, FEES, TRANSACTION.getInputs(), outputs, BTC);
-        assertThat(transaction.getOutputs()).isEqualTo(TRANSACTION.getOutputs());
+        assertThat(transaction.getOutputs())
+                .containsAll(TRANSACTION.getOutputs())
+                .hasSize(4);
     }
 
     @Test

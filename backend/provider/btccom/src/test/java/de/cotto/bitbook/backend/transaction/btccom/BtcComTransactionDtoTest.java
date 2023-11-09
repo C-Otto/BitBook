@@ -354,6 +354,6 @@ class BtcComTransactionDtoTest {
                 }""";
         BtcComTransactionDto btcComTransactionDto =
                 objectMapper.readValue(json, BtcComTransactionDto.class);
-        assertThat(btcComTransactionDto.toModel(BTC).getOutputs()).isEmpty();
+        assertThat(btcComTransactionDto.toModel(BTC).getOutputs()).hasSize(1);
     }
 }

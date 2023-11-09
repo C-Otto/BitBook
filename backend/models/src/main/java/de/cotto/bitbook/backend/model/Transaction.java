@@ -41,7 +41,7 @@ public class Transaction {
         this.time = time.withNano(0);
         this.fees = fees;
         this.inputs = inputs.stream().filter(input -> input.getValue().satoshis() > 0).collect(toList());
-        this.outputs = outputs.stream().filter(output -> output.getValue().satoshis() > 0).collect(toList());
+        this.outputs = new ArrayList<>(outputs);
         this.chain = chain;
         validateCoinsSum(hash, fees, inputs, outputs);
     }

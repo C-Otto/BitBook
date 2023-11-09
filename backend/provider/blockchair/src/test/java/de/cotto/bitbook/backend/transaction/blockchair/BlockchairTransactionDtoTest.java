@@ -192,6 +192,6 @@ class BlockchairTransactionDtoTest {
                 }""";
         BlockchairTransactionDto blockchairTransactionDto =
                 objectMapper.readValue(json, BlockchairTransactionDto.class);
-        assertThat(blockchairTransactionDto.toModel(BTC).getOutputs()).isEmpty();
+        assertThat(blockchairTransactionDto.toModel(BTC).getOutputs()).hasSize(1);
     }
 }
