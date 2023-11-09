@@ -84,7 +84,9 @@ class LndCommandsTest {
     @SuppressWarnings("UnnecessaryUnicodeEscape")
     void lndAddFromChannels_failure_with_utf8_character() throws IOException {
         when(lndService.addFromChannels(any())).thenReturn(123L);
-        File file = TempFileUtil.createTempFileWithContent("{\"foo\":\"⚡⚡\uFE0F\uD83C\uDF33\uD83D\uDC1D\"}");
+        File file = TempFileUtil.createTempFileWithContent(
+                "{\"foo\":\"⚡⚡\uFE0F\uD83C\uDF33\uD83D\uDC1D\"}" // checkstyle:OK
+        );
 
         assertThat(lndCommands.lndAddFromChannels(file)).isEqualTo("Added information for 123 channels");
     }
